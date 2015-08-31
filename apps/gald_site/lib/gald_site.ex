@@ -10,7 +10,7 @@ defmodule GaldSite do
       # Start the endpoint when the application starts
       supervisor(GaldSite.Endpoint, []),
       # Start the Ecto repository
-      worker(GaldSite.Repo, []),
+      # worker(GaldSite.Repo, []),
       # Here you could define other workers and supervisors as children
       # worker(GaldSite.Worker, [arg1, arg2, arg3]),
     ]

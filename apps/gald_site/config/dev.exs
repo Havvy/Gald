@@ -33,9 +33,9 @@ config :logger, :console, format: "[$level] $message\n"
 config :phoenix, :stacktrace_depth, 20
 
 # Configure your database
-config :gald_site, GaldSite.Repo,
-  adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
-  database: "gald_site_dev",
-  pool_size: 10
+# config :gald_site, GaldSite.Repo,
+#   adapter: Ecto.Adapters.Postgres,
+#   username: "postgres",
+#   password: "postgres",
+#   database: "gald_site_dev",
+#   pool_size: 10

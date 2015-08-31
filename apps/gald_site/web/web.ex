@@ -18,7 +18,7 @@ defmodule GaldSite.Web do
 
   def model do
     quote do
-      use Ecto.Model
+      # use Ecto.Model
     end
   end
 
@@ -26,9 +26,9 @@ defmodule GaldSite.Web do
     quote do
       use Phoenix.Controller
 
-      alias GaldSite.Repo
-      import Ecto.Model
-      import Ecto.Query, only: [from: 2]
+      # alias GaldSite.Repo
+      # import Ecto.Model
+      # import Ecto.Query, only: [from: 2]
 
       import GaldSite.Router.Helpers
     end
@@ -58,9 +58,9 @@ defmodule GaldSite.Web do
     quote do
       use Phoenix.Channel
 
-      alias GaldSite.Repo
-      import Ecto.Model
-      import Ecto.Query, only: [from: 2]
+      # alias GaldSite.Repo
+      # import Ecto.Model
+      # import Ecto.Query, only: [from: 2]
 
     end
   end

@@ -20,9 +20,9 @@ defmodule GaldSite.ConnCase do
       # Import conveniences for testing with connections
       use Phoenix.ConnTest
 
-      alias GaldSite.Repo
-      import Ecto.Model
-      import Ecto.Query, only: [from: 2]
+      # alias GaldSite.Repo
+      # import Ecto.Model
+      # import Ecto.Query, only: [from: 2]
 
       import GaldSite.Router.Helpers
 
@@ -33,7 +33,7 @@ defmodule GaldSite.ConnCase do
 
   setup tags do
     unless tags[:async] do
-      Ecto.Adapters.SQL.restart_test_transaction(GaldSite.Repo, [])
+      # Ecto.Adapters.SQL.restart_test_transaction(GaldSite.Repo, [])
     end
 
     :ok

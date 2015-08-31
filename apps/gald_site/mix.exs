@@ -20,7 +20,8 @@ defmodule GaldSite.Mixfile do
   def application do
     [mod: {GaldSite, []},
      applications: [:phoenix, :phoenix_html, :cowboy, :logger,
-                    :phoenix_ecto, :postgrex]]
+                    #:phoenix_ecto, :postgrex
+                    ]]
   end
 
   # Specifies which paths to compile per environment
@@ -32,8 +33,8 @@ defmodule GaldSite.Mixfile do
   # Type `mix help deps` for examples and options
   defp deps do
     [{:phoenix, "~> 0.17"},
-     {:phoenix_ecto, "~> 1.1"},
-     {:postgrex, ">= 0.0.0"},
+     #{:phoenix_ecto, "~> 1.1"},
+     #{:postgrex, ">= 0.0.0"},
      {:phoenix_html, "~> 2.1"},
      {:phoenix_live_reload, "~> 1.0", only: :dev},
      {:cowboy, "~> 1.0"}]

@@ -1,52 +1,52 @@
-defmodule GaldSite.ModelCase do
-  @moduledoc """
-  This module defines the test case to be used by
-  model tests.
+# defmodule GaldSite.ModelCase do
+#   @moduledoc """
+#   This module defines the test case to be used by
+#   model tests.
 
-  You may define functions here to be used as helpers in
-  your model tests. See `errors_on/2`'s definition as reference.
+#   You may define functions here to be used as helpers in
+#   your model tests. See `errors_on/2`'s definition as reference.
 
-  Finally, if the test case interacts with the database,
-  it cannot be async. For this reason, every test runs
-  inside a transaction which is reset at the beginning
-  of the test unless the test case is marked as async.
-  """
+#   Finally, if the test case interacts with the database,
+#   it cannot be async. For this reason, every test runs
+#   inside a transaction which is reset at the beginning
+#   of the test unless the test case is marked as async.
+#   """
 
-  use ExUnit.CaseTemplate
+#   use ExUnit.CaseTemplate
 
-  using do
-    quote do
-      alias GaldSite.Repo
-      import Ecto.Model
-      import Ecto.Query, only: [from: 2]
-      import GaldSite.ModelCase
-    end
-  end
+#   using do
+#     quote do
+#       alias GaldSite.Repo
+#       import Ecto.Model
+#       import Ecto.Query, only: [from: 2]
+#       import GaldSite.ModelCase
+#     end
+#   end
 
-  setup tags do
-    unless tags[:async] do
-      Ecto.Adapters.SQL.restart_test_transaction(GaldSite.Repo, [])
-    end
+#   setup tags do
+#     unless tags[:async] do
+#       Ecto.Adapters.SQL.restart_test_transaction(GaldSite.Repo, [])
+#     end
 
-    :ok
-  end
+#     :ok
+#   end
 
-  @doc """
-  Helper for returning list of errors in model when passed certain data.
+#   @doc """
+#   Helper for returning list of errors in model when passed certain data.
 
-  ## Examples
+#   ## Examples
 
-  Given a User model that has validation for the presence of a value for the
-  `:name` field and validation that `:password` is "safe":
+#   Given a User model that has validation for the presence of a value for the
+#   `:name` field and validation that `:password` is "safe":
 
-      iex> errors_on(%User{}, password: "password")
-      [{:password, "is unsafe"}, {:name, "is blank"}]
+#       iex> errors_on(%User{}, password: "password")
+#       [{:password, "is unsafe"}, {:name, "is blank"}]
 
-  You would then write your assertion like:
+#   You would then write your assertion like:
 
-      assert {:password, "is unsafe"} in errors_on(%User{}, password: "password")
-  """
-  def errors_on(model, data) do
-    model.__struct__.changeset(model, data).errors
-  end
-end
+#       assert {:password, "is unsafe"} in errors_on(%User{}, password: "password")
+#   """
+#   def errors_on(model, data) do
+#     model.__struct__.changeset(model, data).errors
+#   end
+# end

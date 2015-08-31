@@ -12,7 +12,8 @@ config :gald_site, GaldSite.Endpoint,
   secret_key_base: "lvrGGgOE1ErFxNOLWlYUqhLxA7are54DqDaJmHDt7jbhmP3UiCslma0mTCvEGZWM",
   render_errors: [accepts: ~w(html json)],
   pubsub: [name: GaldSite.PubSub,
-           adapter: Phoenix.PubSub.PG2]
+           adapter: Phoenix.PubSub.PG2],
+  server: true
 
 # Configures Elixir's Logger
 config :logger, :console,

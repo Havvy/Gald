@@ -13,9 +13,9 @@ config :logger, level: :warn
 config :phoenix, :stacktrace_depth, 20
 
 # Configure your database
-config :gald_site, GaldSite.Repo,
-  adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
-  database: "gald_site_test",
-  pool: Ecto.Adapters.SQL.Sandbox
+# config :gald_site, GaldSite.Repo,
+#   adapter: Ecto.Adapters.Postgres,
+#   username: "postgres",
+#   password: "postgres",
+#   database: "gald_site_test",
+#   pool: Ecto.Adapters.SQL.Sandbox
