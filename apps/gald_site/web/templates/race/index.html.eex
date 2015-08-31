@@ -1,0 +1,5 @@
+<h2>The Gald Race</h2>
+<div id="gr-game-log">
+    <p>Loading.</p>
+</div>
+<button type="button" id="gr-roll-dice" value="Roll Dice">Roll Dice</button>

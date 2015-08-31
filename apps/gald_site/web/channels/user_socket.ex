@@ -2,7 +2,7 @@ defmodule GaldSite.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  # channel "rooms:*", GaldSite.RoomChannel
+  channel "race:*", GaldSite.RaceChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
@@ -30,7 +30,7 @@ defmodule GaldSite.UserSocket do
   # Would allow you to broadcast a "disconnect" event and terminate
   # all active sockets and channels for a given user:
   #
-  #     GaldSite.Endpoint.broadcast("users_socket:" <> user.id, "disconnect", %{})
+  #     GaldRaceSite.Endpoint.broadcast("users_socket:" <> user.id, "disconnect", %{})
   #
   # Returning `nil` makes this socket anonymous.
   def id(_socket), do: nil

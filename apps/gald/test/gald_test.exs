@@ -8,6 +8,6 @@ defmodule Gald.RaceTest do
     Gald.Race.move_player(race, player, 10)
     Gald.Race.move_player(race, player, 10)
     Gald.Race.move_player(race, player, 10)
-    assert Gald.Race.is_over(race) == false
+    assert Gald.Race.is_over(race) == true
   end
 end
