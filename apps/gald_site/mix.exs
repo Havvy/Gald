@@ -20,8 +20,8 @@ defmodule GaldSite.Mixfile do
   def application do
     [mod: {GaldSite, []},
      applications: [:phoenix, :phoenix_html, :cowboy, :logger,
-                    #:phoenix_ecto, :postgrex
-                    ]]
+                    #:phoenix_ecto, :postgrex,
+                    :gald]]
   end
 
   # Specifies which paths to compile per environment

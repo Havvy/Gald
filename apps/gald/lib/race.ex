@@ -26,6 +26,10 @@ defmodule Gald.Race do
     race |> map() |> Gald.Map.move_player(player, space_change)
   end
 
+  def get_player_location(race, player) do
+    race |> map() |> Gald.Map.get_player_location(player)
+  end
+
   def is_over(race) do
     race |> map() |> Gald.Map.is_over()
   end

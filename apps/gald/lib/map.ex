@@ -10,28 +10,28 @@ defmodule Gald.Map do
     GenServer.start_link(__MODULE__, end_space)
   end
 
-  def add_player(server, player) do
-    GenServer.cast(server, {:new_player, player})
+  def add_player(map, player) do
+    GenServer.cast(map, {:new_player, player})
   end
 
-  def delete_player(server, player) do
-    GenServer.cast(server, {:delete_player, player})
+  def delete_player(map, player) do
+    GenServer.cast(map, {:delete_player, player})
   end
 
-  def move_player(server, player, space_change) do
-    GenServer.cast(server, {:move_player, player, space_change})
+  def move_player(map, player, space_change) do
+    GenServer.cast(map, {:move_player, player, space_change})
   end
 
-  def start_game(server) do
-    GenServer.cast(server, {:start_game})
+  def start_game(map) do
+    GenServer.cast(map, {:start_game})
   end
 
-  def get_player_location(server, player) do
-    GenServer.call(server, {:get_player_location, player})
+  def get_player_location(map, player) do
+    GenServer.call(map, {:get_player_location, player})
   end
 
-  def is_over(server) do
-    GenServer.call(server, {:is_over})
+  def is_over(map) do
+    GenServer.call(map, {:is_over})
   end
 
   ## Server
