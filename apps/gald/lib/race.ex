@@ -54,4 +54,6 @@ defmodule Gald.Race do
     Enum.find(&(match?({Gald.Map, _, _, _}, &1)))
     pid
   end
+
+  # TODO(Havvy): Have a way to terminate a race.
 end

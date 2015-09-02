@@ -36,6 +36,12 @@ defmodule GaldSite.RaceChannel do
     {:noreply, socket}
   end
 
+  def handle_in("new_game", %{}, socket) do
+    GaldSite.Room.new_game()
+    broadcast! socket, "temp_new_game", %{}
+    {:noreply, socket}
+  end
+
   defp get_game, do: GaldSite.Room.get_game
   defp get_player, do: GaldSite.Room.get_player
 end

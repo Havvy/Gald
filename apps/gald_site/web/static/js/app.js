@@ -3,6 +3,7 @@ import {Socket} from "../../../deps/phoenix/web/static/js/phoenix";
 // TODO(Havvy): Make the GameLog its own JS object.
 let gameLog = document.querySelector("#gr-game-log");
 let rollDiceButton = document.querySelector("#gr-roll-dice");
+let newGameButton = document.querySelector("#gr-new-game");
 
 let socket = new Socket("/socket");
 socket.connect();
@@ -46,6 +47,15 @@ chan.on("game_over", function (res) {
 rollDiceButton.addEventListener("click", function (event) {
     chan.push("request_move", { player: 1 });
 }, false);
+
+// TODO(Havvy): CODE(MULTIROOM): Remove me. Games will be created from a new-game page.
+newGameButton.addEventListener("click", function (event) {
+    chan.push("new_game");
+}, false);
+
+chan.on("temp_new_game", function (res) {
+    gameLog.innerHTML += `<p>A new game has been started. The old game has been misplaced.</p>`;
+});
 
 // TODO(Havvy): Make the GameLog its own JS object.
 gameLog.innerHTML = "<p>App initialized.</p>";

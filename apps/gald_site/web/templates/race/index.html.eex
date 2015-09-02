@@ -3,3 +3,4 @@
     <p>Loading.</p>
 </div>
 <button type="button" id="gr-roll-dice" value="Roll Dice">Roll Dice</button>
+<button type="button" id="gr-new-game" value="New Game">New Game</button>
