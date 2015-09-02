@@ -11,14 +11,18 @@ defmodule Gald do
   def start(_type, _args) do
     import Supervisor.Spec
 
-    children = [supervisor(Gald.Race, [])]
+    children = [supervisor(Gald.Race.Supervisor, [])]
 
     opts = [strategy: :simple_one_for_one, name: Gald.Supervisor]
     Supervisor.start_link(children, opts)
   end
 
   # Client
-  def new_game(game_opts) do
-    Supervisor.start_child(Gald.Supervisor, [game_opts])
+  @spec new_race(pos_integer) :: {:ok, pid}
+  def new_race(game_opts) do
+    {:ok, race_supervisor} = Supervisor.start_child(Gald.Supervisor, [game_opts])
+    children = Supervisor.which_children(race_supervisor)
+    {_, race, _, _} = Enum.find(children, &(match?({Gald.Race, _, _, _}, &1)))
+    {:ok, race}
   end
 end

@@ -4,6 +4,6 @@ defmodule Gald.PlayerTest do
 
   test "Creation of a player" do
     {:ok, psup} = PSupervisor.start_link()
-    {:ok, _player} = PSupervisor.add_player(psup)
+    {:ok, _player} = PSupervisor.add_player(psup, "alice")
   end
 end

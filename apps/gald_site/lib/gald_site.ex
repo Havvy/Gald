@@ -1,15 +1,16 @@
 defmodule GaldSite do
   use Application
 
-  # See http://elixir-lang.org/docs/stable/elixir/Application.html
-  # for more information on OTP Applications
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 
     children = [
       # Start the endpoint when the application starts
       supervisor(GaldSite.Endpoint, []),
-      worker(GaldSite.Room, [])
+
+      # Assuming a worker can be anything that has start_link/n
+      # and return an on_start.
+      worker(GaldSite.RaceManager, [])
       # Start the Ecto repository
       # worker(GaldSite.Repo, []),
     ]
