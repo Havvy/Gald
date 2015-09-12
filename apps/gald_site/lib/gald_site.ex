@@ -7,9 +7,6 @@ defmodule GaldSite do
     children = [
       # Start the endpoint when the application starts
       supervisor(GaldSite.Endpoint, []),
-
-      # Assuming a worker can be anything that has start_link/n
-      # and return an on_start.
       worker(GaldSite.RaceManager, [])
       # Start the Ecto repository
       # worker(GaldSite.Repo, []),
