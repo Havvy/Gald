@@ -14,7 +14,6 @@ export default function Channel (name) {
     chan.join()
     .receive("ok", resolve)
     .receive("error", reject)
-
     // TODO(Havvy): CODE(TIMEOUT) Reject with some data.
     .after(10e3, reject);
 

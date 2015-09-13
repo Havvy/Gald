@@ -1,16 +1,14 @@
 defmodule GaldSite.RaceChannel do
   use Phoenix.Channel
+  defp get_race(socket), do: socket.assigns.race
 
-  # TODO(Havvy): CODE(MULTIPLAYER): Remove me.
-  def join("race:lobby", _auth_msg, socket) do
-    race = get_race
-    snapshot = Gald.Race.snapshot(race)
-    {:ok, snapshot, socket}
-  end
-
-  # TODO(Havvy): CODE(MULTIPLAYER): Write me.
-  def join("race:" <> _private_room_id, _auth_msg, _socket) do
-    {:error, %{reason: "unauthorized"}}
+  def join("race:" <> name, _auth_msg, socket) do
+    case GaldSite.RaceManager.get(name) do
+      {:ok, race} ->
+        socket = Phoenix.Socket.assign(socket, :race, race)
+        {:ok, Gald.Race.snapshot(race), socket}
+      {:error, reason} -> {:error, %{reason: reason}}
+    end
   end
 
   # TODO(Havvy): Remove me at some point. This should *never* be possible.
@@ -21,7 +19,7 @@ defmodule GaldSite.RaceChannel do
   # TODO(Havvy): Figure out how to store the player as something the player can authenticate as.
   # TODO(Havvy): Get a player name from the player.
   def handle_in("join", %{"name" => name}, socket) do
-    race = get_race
+    race = get_race(socket)
     case Gald.Race.add_player(race, name) do
       :ok ->
         broadcast! socket, "g-join", %{name: name}
@@ -34,7 +32,7 @@ defmodule GaldSite.RaceChannel do
   end
 
   def handle_in("start", %{}, socket) do
-    race = get_race()
+    race = get_race(socket)
     # TODO(Havvy): Check if game is already started.
     # TODO(Havvy): Check if player has ability to start game.
     Gald.Race.start_game(race)
@@ -45,7 +43,7 @@ defmodule GaldSite.RaceChannel do
   def handle_in("move", %{"player" => player}, socket) do
     # TODO(Havvy): Check if it is the player's turn (in Gald itself though).
     # TODO(Havvy): All of this logic in the Gald app itself.
-    race = get_race
+    race = get_race(socket)
 
     if Gald.Race.is_over(race) do
       {:reply, {:error, %{reason: "Cannot move. Game is over."}}, socket}
@@ -60,13 +58,4 @@ defmodule GaldSite.RaceChannel do
       {:reply, {:ok, %{}}, socket}
     end
   end
-
-  # TODO(Havvy): CODE(MULTIROOM): Remove me.
-  def handle_in("temp-start-new-game", %{}, socket) do
-    GaldSite.RaceManager.new_race("lobby", 60)
-    broadcast! socket, "g-temp-new-game", %{}
-    {:noreply, socket}
-  end
-
-  defp get_race, do: GaldSite.RaceManager.get("lobby")
 end

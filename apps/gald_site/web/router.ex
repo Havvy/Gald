@@ -18,6 +18,8 @@ defmodule GaldSite.Router do
 
     get "/", PageController, :index
     get "/race", RaceController, :index
+    post "/race/create", RaceController, :create
+    get "/race/:id", RaceController, :show
   end
 
   # Other scopes may use custom stacks.

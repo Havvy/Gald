@@ -37,12 +37,6 @@ export default function Gald (snapshot) {
     let impl = status[snapshot.status](snapshot.data, selfControl);
 
     let gald = {
-        // TODO(Havvy): CODE(MULTIROOM): Remove Me
-        newGame () {
-            self = undefined;
-            impl = status["lobby"]({players: [], config: snapshot.config}, selfControl);
-        },
-
         setSelf (newSelf) {
             self = newSelf;
         },

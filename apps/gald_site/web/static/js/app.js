@@ -9,8 +9,11 @@ import Channel from "./util/channel";
 // gald: Gald
 let gald;
 
-// TODO(Havvy): CODE(MULTIROOM): Get channel name based off of URL.
-let chan = Channel("lobby");
+let chan = function () {
+    let pathname = window.location.pathname;
+    let name = pathname.split("/")[2];
+    return Channel(name);
+}();
 
 const gameLog = function () {
     // TODO(Havvy): Make the game log have a scrollbar when it gets big enough.
@@ -57,10 +60,6 @@ const map = function () {
 
 // TODO(Havvy): Look into React for the frontend?
 chan.onJoinPromise
-.catch(function (err) {
-    gameLog.append("Sorry, unable to join the race.");
-    gameLog.append(`Reason: ${err.reason}`);
-})
 .then(function onJoinOk (galdSnapshot) {
     gameLog.append("Welcome to the Race!");
     gald = Gald(galdSnapshot);
@@ -82,9 +81,12 @@ chan.onJoinPromise
         default:
             gameLog.append(`Game in unknown state, ${gald.status()}!`);
     }
+}, function onJoinError ({reason}) {
+    gameLog.append("Sorry, unable to join the race.");
+    gameLog.append(`Reason: ${reason}`);
 })
 .catch(function (err) {
-    gameLog.append("Error!");
+    gameLog.append("Error in onJoinOk!");
     console.log(err);
     gameLog.append(String(err));
 });
@@ -106,21 +108,11 @@ void function moveHandler () {
         }
 
         chan.request("move", { player: self })
-        .catch(function ({reason}) {
-            gameLog.append(reason);
-        })
         .then(function ({}) {
             // no-op.
+        }, function ({reason}) {
+            gameLog.append(reason);
         });
-    }, false);
-}();
-
-// TODO(Havvy): CODE(MULTIROOM): Remove me. Games will be created from a new-game page.
-void function newGameHandler () {
-    const newGameButton = document.querySelector("#gr-new-game");
-
-    newGameButton.addEventListener("click", function (event) {
-        chan.emit("temp-start-new-game");
     }, false);
 }();
 
@@ -142,13 +134,12 @@ void function joinGameHandler () {
         }
 
         chan.request("join", {name: joinGameNameInput.value})
-        .catch(function ({reason}) {
-            gameLog.append(reason);
-        })
         .then(function ({name}) {
             gald.setSelf(name);
             map.update();
             gameLog.append(`You are ${name}.`);
+        }, function ({reason}) {
+            gameLog.append(reason);
         });
     }, false);
 }();
@@ -185,11 +176,6 @@ chan.on("move_player", function ({player, spaces, end_space}) {
 chan.on("game_over", function ({snapshot}) {
     gameLog.append("Game over!");
     gald.end(snapshot);
-});
-
-chan.on("temp-new-game", function () {
-    gameLog.append(`A new game has been started. The old game has been misplaced.`);
-    gald.newGame();
 });
 
 void function initialize () { 

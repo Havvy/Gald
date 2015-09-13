@@ -10,21 +10,27 @@ defmodule GaldSite.RaceManager do
   @spec start_link() :: {:ok, t}
   def start_link() do
     {:ok, manager} = Agent.start_link(&HashDict.new/0, name: __MODULE__)
-
-    # TODO(Havvy): CODE(MULTIROOM): Remove me.
-    GaldSite.RaceManager.new_race("lobby", 25)
-    {:ok, manager}
   end
 
-  def new_race(subtopic, config) do
+  def new_race(name, config) do
     # TODO(Havvy): put_new instead of put
     Agent.update(__MODULE__, fn (dict) -> 
       {:ok, race} = Gald.new_race(config)
-      Dict.put(dict, subtopic, race)
+      Dict.put(dict, name, race)
     end)
   end
 
-  def get(subtopic) do
-    Agent.get(__MODULE__, &(&1[subtopic]))
+  def get(name) do
+    Agent.get(__MODULE__, fn (dict) ->
+      if HashDict.has_key?(dict, name) do
+        {:ok, HashDict.get(dict, name)}
+      else
+        {:error, "Game '#{name}' does not exist."}
+      end
+    end)
+  end
+
+  def all() do
+    Agent.get(__MODULE__, &Dict.keys/1)
   end
 end

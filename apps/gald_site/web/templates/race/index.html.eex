@@ -1,16 +1,17 @@
-<h2>The Gald Race</h2>
-<button type="button" id="gr-roll-dice" value="Roll Dice">Roll Dice (No Dice Yet)</button>
-<br>
-<label for="gr-join-game-name">Name:</label> <input id="gr-join-name" type="text" placeholder="Jacob"> <button type="button" id="gr-join-game" value="Join Game">Join Game</button>
-<br>
-<button type="button" id="gr-start-game" value="Start Game">Start Game</button>
-<button type="button" id="gr-new-game" value="New Game">New Game</button>
+<h2>Lobby</h2>
 
-<h3>Map</h3>
-<div id="gr-map">
-</div>
+<!-- TODO(Havvy): New game page. -->
+<h3>New Game</h3>
+<form action="/race/create" method="post">
+    <input type="hidden" name="_csrf_token" value="<%= @csrf %>">
+    <label for="gl-new-game-name">Name:</label>
+    <input type="text" placeholder="name" name="name">
+    <button type="submit">Submit</button>
+</form>
 
-<h3>Game Log</h3>
-<div id="gr-game-log">
-    <p>Loading.</p>
-</div>
+<h3>Current Games</h3>
+<ul id="current-games">
+    <%= for game <- @games do %>
+        <li><a href="/race/<%=game%>"><%=game%></a></li>
+    <% end %>
+</ul>
