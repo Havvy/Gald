@@ -1,11 +1,13 @@
 defmodule GaldSite.RaceChannel do
   use Phoenix.Channel
   defp get_race(socket), do: socket.assigns.race
+  defp get_race_name(socket), do: socket.assigns.race_name
 
   def join("race:" <> name, _auth_msg, socket) do
-    case GaldSite.RaceManager.get(name) do
+    case GaldSite.RaceManager.put_viewer(name, socket.transport_pid) do
       {:ok, race} ->
         socket = Phoenix.Socket.assign(socket, :race, race)
+        socket = Phoenix.Socket.assign(socket, :race_name, name)
         {:ok, Gald.Race.snapshot(race), socket}
       {:error, reason} -> {:error, %{reason: reason}}
     end
@@ -57,5 +59,16 @@ defmodule GaldSite.RaceChannel do
 
       {:reply, {:ok, %{}}, socket}
     end
+  end
+
+  def terminate({:shutdown, left_or_closed}, socket) do
+    IO.puts("RaceChannel.terminate called - Somebody left!")
+    GaldSite.RaceManager.delete_viewer(get_race_name(socket), socket.transport_pid)
+    {:shutdown, left_or_closed}
+  end
+  def terminate(reason, _socket) do
+    IO.puts("RaceChannel.terminate called - Unknown reason")
+    IO.inspect(reason)
+    reason
   end
 end
