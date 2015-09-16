@@ -1,6 +1,6 @@
 defmodule GaldSite.RaceManager do
   @moduledoc """
-  This module is basically a HashDict<subtopic, Gald.Race.t> where
+  This module is basically a Map<subtopic, Gald.Race.t> where
   "race:" <> subtopic = topic. E.g., for a race accessible at
   /race/lobby, it'd "lobby".
   """
@@ -10,7 +10,7 @@ defmodule GaldSite.RaceManager do
 
   @spec start_link() :: {:ok, t}
   def start_link() do
-    Agent.start_link(&HashDict.new/0, name: __MODULE__)
+    Agent.start_link(&Map.new/0, name: __MODULE__)
   end
 
   def new_race(name, config) do
@@ -24,8 +24,8 @@ defmodule GaldSite.RaceManager do
   @spec get(String.t) :: {:ok, pid} | {:error, String.t}
   def get(name) do
     Agent.get(__MODULE__, fn (dict) ->
-      if HashDict.has_key?(dict, name) do
-        {race, _viewers} = HashDict.get(dict, name)
+      if Map.has_key?(dict, name) do
+        {race, _viewers} = Map.get(dict, name)
         {:ok, race}
       else
         {:error, "Race '#{name}' does not exist."}
@@ -51,7 +51,7 @@ defmodule GaldSite.RaceManager do
 
     if (match?({:ok, _race}, get_result)) do
       Agent.update(__MODULE__, fn (dict) ->
-        HashDict.update!(dict, name, fn ({race, viewers}) ->
+        Map.update!(dict, name, fn ({race, viewers}) ->
           {race, HashSet.put(viewers, viewer)}
         end)
       end)
@@ -65,16 +65,16 @@ defmodule GaldSite.RaceManager do
   @spec delete_viewer(name, Phoenix.Socket.t) :: :delete | :ok
   def delete_viewer(name, viewer) do
     Agent.get_and_update(__MODULE__, fn (dict) ->
-      dict = HashDict.update!(dict, name, fn ({race, viewers}) ->
+      dict = Map.update!(dict, name, fn ({race, viewers}) ->
         viewers = HashSet.delete(viewers, viewer)
         {race, viewers}
       end)
 
-      {_race, viewers} = HashDict.get(dict, name)
+      {_race, viewers} = Map.get(dict, name)
 
       if HashSet.size(viewers) == 0 do
         # TODO(Havvy): Actually terminate the race's PID
-        {:delete, HashDict.delete(dict, name)}
+        {:delete, Map.delete(dict, name)}
       else
         {:ok, dict}
       end
