@@ -6,41 +6,46 @@ defmodule GaldSite.RaceManager do
   """
 
   @opaque t :: pid
-  @type name :: String.t
+  @type url :: String.t
 
   @spec start_link() :: {:ok, t}
   def start_link() do
     Agent.start_link(&Map.new/0, name: __MODULE__)
   end
 
-  def new_race(name, config) do
-    # TODO(Havvy): put_new instead of put
-    return = Agent.update(__MODULE__, fn (dict) -> 
+  def new_race(config) do
+    # TODO(Havvy): Generate the race url randomly.
+    url = Regex.replace(~r/[^A-Za-z0-9]/, config.name, "-", global: true)
+
+    Agent.update(__MODULE__, fn (map) -> 
       {:ok, race} = Gald.new_race(config)
-      Dict.put(dict, name, {race, HashSet.new()})
+      Map.put_new(map, url, {race, HashSet.new()})
     end)
 
-    GaldSite.Endpoint.broadcast!("lobby", "g-race:put", %{race: name})
+    GaldSite.Endpoint.broadcast!("lobby", "g-race:put", %{name: config.name, url: url})
 
-    return
+    url
   end
 
   @spec get(String.t) :: {:ok, pid} | {:error, String.t}
-  def get(name) do
-    Agent.get(__MODULE__, fn (dict) ->
-      if Map.has_key?(dict, name) do
-        {race, _viewers} = Map.get(dict, name)
+  def get(url) do
+    Agent.get(__MODULE__, fn (map) ->
+      if Map.has_key?(map, url) do
+        {race, _viewers} = Map.get(map, url)
         {:ok, race}
       else
-        {:error, "Race '#{name}' does not exist."}
+        {:error, "Race at /race/'#{url}' does not exist."}
       end
     end)
   end
 
-  @spec all() :: [String]
+  @spec all() :: [{String.t, String.t}]
   def all() do
-    Agent.get(__MODULE__, &Dict.keys/1)
+    Agent.get(__MODULE__, fn (map) ->
+      IO.inspect(Enum.map(map, &to_url_name/1))
+    end)
   end
+  defp to_url_name({url, {race, _viewers}}), do: %{url: url, name: Gald.Race.get_name(race)}
 
   @doc """
   Add a viewer of the game to the viewers of the game.
@@ -50,12 +55,12 @@ defmodule GaldSite.RaceManager do
   Returns what get/1 passed the first argument to this
   function returns.
   """
-  def put_viewer(name, viewer) do
-    get_result = GaldSite.RaceManager.get(name)
+  def put_viewer(url, viewer) do
+    get_result = GaldSite.RaceManager.get(url)
 
     if (match?({:ok, _race}, get_result)) do
-      Agent.update(__MODULE__, fn (dict) ->
-        Map.update!(dict, name, fn ({race, viewers}) ->
+      Agent.update(__MODULE__, fn (map) ->
+        Map.update!(map, url, fn ({race, viewers}) ->
           {race, HashSet.put(viewers, viewer)}
         end)
       end)
@@ -66,21 +71,21 @@ defmodule GaldSite.RaceManager do
 
   # CLEAN(Havvy): This function is a mess of state. Ask others how to
   #               refactor this into something cleaner.
-  @spec delete_viewer(name, Phoenix.Socket.t) :: :delete | :ok
-  def delete_viewer(name, viewer) do
+  @spec delete_viewer(url, Phoenix.Socket.t) :: :delete | :ok
+  def delete_viewer(url, viewer) do
     Agent.get_and_update(__MODULE__, fn (dict) ->
-      dict = Map.update!(dict, name, fn ({race, viewers}) ->
+      dict = Map.update!(dict, url, fn ({race, viewers}) ->
         viewers = HashSet.delete(viewers, viewer)
         {race, viewers}
       end)
 
-      {_race, viewers} = Map.get(dict, name)
+      {_race, viewers} = Map.get(dict, url)
 
       if HashSet.size(viewers) == 0 do
         # TODO(Havvy): Actually terminate the race's PID
-        {:delete, Map.delete(dict, name)}
+        {:delete, Map.delete(dict, url)}
 
-        GaldSite.Endpoint.broadcast!("lobby", "g-race:delete", %{race: name})
+        GaldSite.Endpoint.broadcast!("lobby", "g-race:delete", %{url: url})
       else
         {:ok, dict}
       end

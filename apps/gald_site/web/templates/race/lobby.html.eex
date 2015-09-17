@@ -11,9 +11,8 @@
 
 <h3>Current Games</h3>
 <ul id="gr-current-games">
-    <!-- TODO(Havvy): CODE(RACE_NAME_URL_SPLIT): `{name, url} <- @races` -->
-    <%= for game <- @games do %>
-        <li><a href="/race/<%=game%>"><%=game%></a></li>
+    <%= for {url, name} <- @races do %>
+        <li><a href="/race/<%=url%>"><%=name%></a></li>
     <% end %>
 </ul>
 

@@ -11,19 +11,13 @@ defmodule Gald.Race do
   end
 
   @spec snapshot(t) :: snapshot
-  def snapshot(race) do
-    GenServer.call(race, {:snapshot})
-  end
+  def snapshot(race), do: GenServer.call(race, {:snapshot})
 
-  def add_player(race, name) do
-    GenServer.call(race, {:add_player, name})
-  end
+  def add_player(race, name), do: GenServer.call(race, {:add_player, name})
 
-  def start_game(race) do
-    GenServer.cast(race, {:start_game})
-  end
+  def start_game(race), do: GenServer.cast(race, {:start_game})
 
-  @spec move_player(pid, any, integer) :: non_neg_integer
+  @spec move_player(t, any, integer) :: non_neg_integer
   def move_player(race, player, space_change) do
     GenServer.call(race, {:move_player, player, space_change})
   end
@@ -32,10 +26,14 @@ defmodule Gald.Race do
     GenServer.call(race, {:get_player_location, player})
   end
 
-  @spec is_over(pid) :: boolean
-  def is_over(race) do
-    GenServer.call(race, {:is_over})
-  end
+  @spec is_over(t) :: boolean
+  def is_over(race), do: GenServer.call(race, {:is_over})
+
+  @spec config(t) :: %Gald.Config{}
+  def config(race), do: GenServer.call(race, {:config})
+
+  @spec get_name(t) :: String.t
+  def get_name(race), do: config(race).name
 
   # Server
   def init(config) do
@@ -88,6 +86,8 @@ defmodule Gald.Race do
   def handle_call({:get_player_location, player}, _from, state) do
     {:reply, Gald.Map.get_player_location(state.map, player), state}
   end
+
+  def handle_call({:config}, _from, state), do: {:reply, state.config, state}
 
   def handle_cast({:start_game}, state) do
     import Supervisor.Spec

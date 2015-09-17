@@ -3,7 +3,7 @@ defmodule GaldSite.RaceController do
 
   def index(conn, _params) do
     token = Plug.CSRFProtection.get_csrf_token()
-    render conn, "index.html", games: GaldSite.RaceManager.all(), csrf: token
+    render conn, "lobby.html", races: GaldSite.RaceManager.all(), csrf: token
   end
 
   def show(conn, _params) do
@@ -14,8 +14,8 @@ defmodule GaldSite.RaceController do
   # def new(conn, _params), do: nil
 
   def create(conn, %{"name" => name}) do
-    GaldSite.RaceManager.new_race(name, %Gald.Config{end_space: 25, name: name})
-    redirect conn, to: "/race/#{name}"
+    url = GaldSite.RaceManager.new_race(%Gald.Config{end_space: 25, name: name})
+    redirect conn, to: "/race/#{url}"
   end
   def create(conn, _params) do
     conn
