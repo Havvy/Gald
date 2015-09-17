@@ -9,7 +9,7 @@ export default function Channel (name) {
 
     let socket = new Socket("/socket");
     socket.connect();
-    let chan = socket.channel(`race:${name}`, {});
+    let chan = socket.channel(name, {});
 
     chan.join()
     .receive("ok", resolve)

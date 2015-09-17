@@ -2,14 +2,11 @@ exports.config = {
   // See http://brunch.io/#documentation for docs.
   files: {
     javascripts: {
-      joinTo: 'js/app.js'
-
-      // To use a separate vendor.js bundle, specify two files path
-      // https://github.com/brunch/brunch/blob/stable/docs/config.md#files
-      // joinTo: {
-      //  'js/app.js': /^(web\/static\/js)/,
-      //  'js/vendor.js': /^(web\/static\/vendor)|(deps)/
-      // }
+      joinTo: {
+        'js/util.js': /^(web\/static\/js\/util)|(\.\.\/\.\.\/deps\/phoenix(_html)?\/web\/static\/js)/,
+        'js/gald.js': /^(web\/static\/js\/gald)/,
+        'js/lobby.js': /^(web\/static\/js\/lobby)/
+      }
       //
       // To change the order of concatenation of files, explicitly mention here
       // https://github.com/brunch/brunch/tree/master/docs#concatenation
@@ -23,9 +20,9 @@ exports.config = {
     stylesheets: {
       joinTo: 'css/app.css'
     },
-    templates: {
-      joinTo: 'js/app.js'
-    }
+    // templates: {
+    //   joinTo: 'js/app.js'
+    // }
   },
 
   conventions: {
@@ -56,7 +53,8 @@ exports.config = {
 
   modules: {
     autoRequire: {
-      'js/app.js': ['web/static/js/app']
+      "js/gald.js": ["web/static/js/gald/main"],
+      "js/lobby.js": ["web/static/js/lobby/main"]
     }
   },
 

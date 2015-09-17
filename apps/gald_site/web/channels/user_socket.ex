@@ -3,6 +3,7 @@ defmodule GaldSite.UserSocket do
 
   ## Channels
   channel "race:*", GaldSite.RaceChannel
+  channel "lobby", GaldSite.LobbyChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket

@@ -1,7 +1,7 @@
 "use strict";
 
-import Gald from "./gald/gald";
-import Channel from "./util/channel";
+import Gald from "./gald";
+import Channel from "../util/channel";
 // import UserController from "./user/main";
 // import View from "./view/main";
 // import Dom from "./???/main";
@@ -12,7 +12,7 @@ let gald;
 let chan = function () {
     let pathname = window.location.pathname;
     let name = pathname.split("/")[2];
-    return Channel(name);
+    return Channel(`race:${name}`);
 }();
 
 const gameLog = function () {

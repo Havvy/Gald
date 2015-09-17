@@ -10,8 +10,12 @@
 </form>
 
 <h3>Current Games</h3>
-<ul id="current-games">
+<ul id="gr-current-games">
+    <!-- TODO(Havvy): CODE(RACE_NAME_URL_SPLIT): `{name, url} <- @races` -->
     <%= for game <- @games do %>
         <li><a href="/race/<%=game%>"><%=game%></a></li>
     <% end %>
 </ul>
+
+<script src="<%= static_path(@conn, "/js/util.js") %>"></script>
+<script src="<%= static_path(@conn, "/js/lobby.js") %>"></script>

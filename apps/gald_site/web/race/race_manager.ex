@@ -15,10 +15,14 @@ defmodule GaldSite.RaceManager do
 
   def new_race(name, config) do
     # TODO(Havvy): put_new instead of put
-    Agent.update(__MODULE__, fn (dict) -> 
+    return = Agent.update(__MODULE__, fn (dict) -> 
       {:ok, race} = Gald.new_race(config)
       Dict.put(dict, name, {race, HashSet.new()})
     end)
+
+    GaldSite.Endpoint.broadcast!("lobby", "g-race:put", %{race: name})
+
+    return
   end
 
   @spec get(String.t) :: {:ok, pid} | {:error, String.t}
@@ -75,6 +79,8 @@ defmodule GaldSite.RaceManager do
       if HashSet.size(viewers) == 0 do
         # TODO(Havvy): Actually terminate the race's PID
         {:delete, Map.delete(dict, name)}
+
+        GaldSite.Endpoint.broadcast!("lobby", "g-race:delete", %{race: name})
       else
         {:ok, dict}
       end
