@@ -5,7 +5,7 @@ defmodule Gald.Race do
   @opaque t :: pid
 
   # Client
-  @spec start_link(pos_integer) :: {:ok, t}
+  @spec start_link(%Gald.Config{}) :: {:ok, t}
   def start_link(config) do
     GenServer.start_link(__MODULE__, config)
   end
@@ -93,7 +93,7 @@ defmodule Gald.Race do
     import Supervisor.Spec
 
     map_dict = %{players: player_list(state.players),
-                 end_space: state.config}
+                 end_space: state.config.end_space}
     map_spec = worker(Gald.Map, [map_dict])
     {:ok, map} = Supervisor.start_child(state.slave, map_spec)
 

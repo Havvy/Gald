@@ -14,7 +14,7 @@ defmodule GaldSite.RaceController do
   # def new(conn, _params), do: nil
 
   def create(conn, %{"name" => name}) do
-    GaldSite.RaceManager.new_race(name, 25)
+    GaldSite.RaceManager.new_race(name, %Gald.Config{end_space: 25, name: name})
     redirect conn, to: "/race/#{name}"
   end
   def create(conn, _params) do

@@ -3,9 +3,10 @@ defmodule Gald.RaceTest do
 
   @p1 "alice"
   @p2 "bob"
+  @config %Gald.Config{end_space: 25}
 
   test "race of one player going to space 25" do
-    {:ok, race} = Gald.new_race(25)
+    {:ok, race} = Gald.new_race(@config)
     :ok = Gald.Race.add_player(race, @p1)
     Gald.Race.start_game(race)
     10 = Gald.Race.move_player(race, @p1, 10)
@@ -16,7 +17,7 @@ defmodule Gald.RaceTest do
   end
 
   test "race of two players going to space 25" do
-    {:ok, race} = Gald.new_race(25)
+    {:ok, race} = Gald.new_race(@config)
     :ok = Gald.Race.add_player(race, @p1)
     :ok = Gald.Race.add_player(race, @p2)
     Gald.Race.start_game(race)
@@ -30,7 +31,7 @@ defmodule Gald.RaceTest do
   end
 
   test "disallowing of players joining after race started" do
-    {:ok, race} = Gald.new_race(25)
+    {:ok, race} = Gald.new_race(@config)
 
     # A game needs at least one player.
     :ok = Gald.Race.add_player(race, @p1)
@@ -41,7 +42,7 @@ defmodule Gald.RaceTest do
   end
 
   test "disallowing of players joining with the same name" do
-    {:ok, race} = Gald.new_race(25)
+    {:ok, race} = Gald.new_race(@config)
 
     :ok = Gald.Race.add_player(race, @p1)
 
