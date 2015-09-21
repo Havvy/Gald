@@ -80,7 +80,7 @@ defmodule Gald.Race do
   end
 
   def handle_call({:snapshot}, _from, state) do
-    {:reply, snapshot(Gald.Status.get_status(state.status), state), state}
+    {:reply, Gald.Snapshot.new(Gald.Status.get_status(state.status), state), state}
   end
 
   def handle_call({:get_player_location, player}, _from, state) do
@@ -102,17 +102,8 @@ defmodule Gald.Race do
     {:noreply, %{state | map: map}}
   end
 
-  defp snapshot(:lobby, state) do
-    %{status: :lobby, data: %{config: state.config, players: player_list(state.players)}}
-  end
-  defp snapshot(:play, state) do
-    %{status: :play, data: %{config: state.config, players: player_list(state.players), map: Gald.Map.snapshot(state.map)}}
-  end
-  defp snapshot(:over, state) do
-    %{status: :over, data: %{config: state.config, players: player_list(state.players), map: Gald.Map.snapshot(state.map)}}
-  end
-
-  defp player_list(players), do: Enum.into(Dict.keys(players), HashSet.new())
+  # TODO(Havvy): Have a Player manager thing that can give this for us.
+  def player_list(players), do: Enum.into(Dict.keys(players), HashSet.new())
 
   # TODO(Havvy): Have a way to terminate a race.
 end
