@@ -75,5 +75,6 @@ defmodule Gald.SnapshotTest do
   end
 
   defp into_set(list), do: Enum.into(list, HashSet.new())
-  defp into_dict(list), do: Enum.into(list, HashDict.new())
+  defp into_dict(list), do: Enum.into(list, Map.new())
 end
+

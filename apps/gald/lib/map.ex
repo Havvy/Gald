@@ -12,7 +12,7 @@ defmodule Gald.Map do
   @type player:: any
   @type opts :: %{end_space: pos_integer, players: [player]}
   @type state :: %{end_space: pos_integer,
-                   players: HashDict.t(player, non_neg_integer)}
+                   players: Map.t(player, non_neg_integer)}
   @opaque t :: pid
 
   ## Client
@@ -38,13 +38,13 @@ defmodule Gald.Map do
   @spec is_over(t) :: boolean
   def is_over(map), do: GenServer.call(map, {:is_over})
 
-  @spec snapshot(t) :: HashDict.t(player, non_neg_integer)
+  @spec snapshot(t) :: Map.t(player, non_neg_integer)
   def snapshot(map), do: GenServer.call(map, {:snapshot})
 
   ## Server
   @spec init(opts) :: {:ok, state}
   def init(state = %{end_space: _end_space, players: players}) do
-    players = Enum.into(players, HashDict.new(), &{&1, 0})
+    players = Enum.into(players, Map.new(), &{&1, 0})
     {:ok, %{state | players: players}}
   end
 
@@ -72,7 +72,7 @@ defmodule Gald.Map do
     {:reply, is_over, state}
   end
 
-  @spec handle_call({:snapshot}, any, state) :: {:reply, HashDict.t(player, non_neg_integer), state}
+  @spec handle_call({:snapshot}, any, state) :: {:reply, Map.t(player, non_neg_integer), state}
   def handle_call({:snapshot}, _from, state) do
     {:reply, state.players, state}
   end
