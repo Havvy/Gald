@@ -2,7 +2,7 @@
 
 // fn GaldLobby(snapshot: GaldOverSnapshot) -> GaldOver
 export default function GaldOver (snapshot, selfControl) {
-    let {players, map, config} = snapshot;
+    let {players, config} = snapshot;
     // let {players, config} = snapshot;
     // players: Set<String>
     // config: GaldConfig
@@ -13,7 +13,7 @@ export default function GaldOver (snapshot, selfControl) {
         },
 
         players: function () {
-            return players.slice();
+            return Object.keys(players);;
         },
 
         self: function () {
@@ -22,6 +22,10 @@ export default function GaldOver (snapshot, selfControl) {
 
         status: function () {
             return "over";
+        },
+
+        movePlayer (player, space) {
+            throw new Error("Unreachable code path has been reached.");
         }
     };
 };

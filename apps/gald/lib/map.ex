@@ -38,8 +38,8 @@ defmodule Gald.Map do
   @spec is_over(t) :: boolean
   def is_over(map), do: GenServer.call(map, {:is_over})
 
-  @spec snapshot(t) :: Map.t(player, non_neg_integer)
-  def snapshot(map), do: GenServer.call(map, {:snapshot})
+  @spec player_spaces(t) :: Map.t(player, non_neg_integer)
+  def player_spaces(map), do: GenServer.call(map, {:player_spaces})
 
   ## Server
   @spec init(opts) :: {:ok, state}
@@ -72,8 +72,8 @@ defmodule Gald.Map do
     {:reply, is_over, state}
   end
 
-  @spec handle_call({:snapshot}, any, state) :: {:reply, Map.t(player, non_neg_integer), state}
-  def handle_call({:snapshot}, _from, state) do
+  @spec handle_call({:player_spaces}, any, state) :: {:reply, Map.t(player, non_neg_integer), state}
+  def handle_call({:player_spaces}, _from, state) do
     {:reply, state.players, state}
   end
 

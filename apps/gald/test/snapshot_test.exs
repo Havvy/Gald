@@ -47,8 +47,7 @@ defmodule Gald.SnapshotTest do
 
     assert %{status: :play, data: %Gald.Snapshot.Play{
       config: @config,
-      players: into_set([@p1]),
-      map: %{@p1 => 0}
+      players: %{@p1 => %{space: 0}}
     }} == snapshot
   end
 
@@ -61,8 +60,7 @@ defmodule Gald.SnapshotTest do
 
     assert %{status: :play, data: %Gald.Snapshot.Play{
       config: @config,
-      players: into_set([@p1]),
-      map: %{@p1 => 10}
+      players: %{@p1 => %{space: 10}}
     }} == snapshot
   end
 
@@ -75,8 +73,7 @@ defmodule Gald.SnapshotTest do
 
     assert %{status: :over, data: %Gald.Snapshot.Over{
       config: @config_short_race,
-      players: into_set([@p1]),
-      map: %{@p1 => 30}
+      players: %{@p1 => %{space: 30}}
     }} == snapshot
   end
 

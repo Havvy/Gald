@@ -1,11 +1,22 @@
 "use strict";
 
+const objectMap = function (object, fn) {
+    const ret = {};
+
+    Object.keys(object).forEach(function (key) {
+        ret[key] = fn(object[key]);
+    });
+
+    return ret;
+};
+
 // fn GaldLobby(snapshot: GaldPlaySnapshot) -> GaldPlay
 export default function GaldPlay (snapshot, selfControl) {
-    let {players, map, config} = snapshot;
-    // players: Set<String>
-    // map: Map<String, Number>
+    const {players, config} = snapshot;
+    // players: Map<String, {space: Number}>
     // config: GaldConfig
+
+    const map = objectMap(players, (player) => player.space);
 
     return {
         join (playerName) {
@@ -13,7 +24,7 @@ export default function GaldPlay (snapshot, selfControl) {
         },
 
         players: function () {
-            return players.slice();
+            return Object.keys(players);
         },
 
         self: function () {
@@ -24,8 +35,8 @@ export default function GaldPlay (snapshot, selfControl) {
             return "play";
         },
 
-        movePlayer: function (player, position) {
-            map[player] = position;
+        movePlayer: function (player, space) {
+            map[player] = space;
         }
     };
 };
