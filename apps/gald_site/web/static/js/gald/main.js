@@ -76,6 +76,7 @@ chan.onJoinPromise
             break;
         case "over":
             gameLog.append("The game is over.");
+            map.update();
             // TODO(Havvy): Who won, what spaces are players at?
             break;
         default:
