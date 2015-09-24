@@ -37,7 +37,7 @@ export default function Channel (name) {
             .receive("error", reject)
 
             // TODO(Havvy): CODE(TIMEOUT) Reject with some data.
-            .after(10e3, reject);
+            .after(10e3, reject.bind(null, {reason: "Connection timed out after 10 seconds."}));
 
             return promise;
         }

@@ -15,6 +15,14 @@ export default function GaldLobby (snapshot, selfControl) {
             return players.slice();
         },
 
+        playerSpaces: function () {
+            return players.reduce((res, name) => { res[name] = 0; return res; }, {})
+        },
+
+        wonPlayers: function () {
+            return [];
+        },
+
         self: function () {
             return selfControl.read();
         },

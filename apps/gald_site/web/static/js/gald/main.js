@@ -38,13 +38,21 @@ const map = function () {
 
     return {
         update () {
-            // TODO(Havvy): Where are the players at?
             let html = "<ul>";
-            const players = gald.players();
+            const playerSpaces = gald.playerSpaces();
+            const wonPlayers = gald.wonPlayers();
+            console.log(wonPlayers);
 
-            html += players.map(function (player) {
+            html += Object.keys(playerSpaces).map(function (playerName) {
+                const playerSpace = playerSpaces[playerName];
+
                 // XXX(Havvy): This is an XSS vulnerability.
-                return `<li>${player}</li>`;
+                //             Specifically, we don't clean the name at all yet.
+                if (wonPlayers.indexOf(playerName) !== -1) {
+                    return `<li><b>${playerName}</b>: ${playerSpace}</li>`;
+                } else {
+                    return `<li>${playerName}: ${playerSpace}</li>`;
+                }
             }).join("");
 
             html += "</ul>";
@@ -82,12 +90,12 @@ chan.onJoinPromise
         default:
             gameLog.append(`Game in unknown state, ${gald.status()}!`);
     }
-}, function onJoinError ({reason}) {
+}, function onJoinError (error) {
     gameLog.append("Sorry, unable to join the race.");
-    gameLog.append(`Reason: ${reason}`);
+    gameLog.append(`Reason: ${error.reason}`);
 })
 .catch(function (err) {
-    gameLog.append("Error in onJoinOk!");
+    gameLog.append("Error while trying to connect to the channel!");
     console.log(err);
     gameLog.append(String(err));
 });
@@ -167,19 +175,22 @@ chan.on("join", function ({name}) {
 chan.on("start", function ({snapshot}) {
     gameLog.append("Starting game!");
     gald.start(snapshot);
+    map.update();
 });
 
 chan.on("move_player", function ({player, spaces, end_space}) {
     gald.movePlayer(player, end_space);
     gameLog.append(`Player ${player} moved forward ${spaces} spaces to space ${end_space}.`);
+    map.update();
 });
 
 chan.on("game_over", function ({snapshot}) {
     gameLog.append("Game over!");
     gald.end(snapshot);
+    map.update();
 });
 
-void function initialize () { 
+void function initialize () {
     gameLog.initialize();
     map.initialize();
 }();

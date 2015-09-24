@@ -10,7 +10,8 @@ let status = {
     "over": Over
 };
 
-let methods = ["join", "status", "players", "self", "movePlayer"];
+// TODO(Havvy): Have the `players` method return an object with methods on it.
+let methods = ["join", "status", "players", "playerSpaces", "wonPlayers", "self", "movePlayer"];
 
 export default function Gald (snapshot) {
     // We dispatch out most calls to our inner impl which is one of

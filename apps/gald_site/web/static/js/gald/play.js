@@ -10,6 +10,10 @@ const objectMap = function (object, fn) {
     return ret;
 };
 
+const objectSlice = function (object) {
+    return objectMap(object, (value) => value);
+};
+
 // fn GaldLobby(snapshot: GaldPlaySnapshot) -> GaldPlay
 export default function GaldPlay (snapshot, selfControl) {
     const {players, config} = snapshot;
@@ -25,6 +29,14 @@ export default function GaldPlay (snapshot, selfControl) {
 
         players: function () {
             return Object.keys(players);
+        },
+
+        playerSpaces: function () {
+            return objectSlice(map);
+        },
+
+        wonPlayers: function () {
+            return [];
         },
 
         self: function () {
