@@ -21,15 +21,19 @@ defmodule GaldSite.RaceChannel do
   # TODO(Havvy): Figure out how to store the player as something the player can authenticate as.
   # TODO(Havvy): Get a player name from the player.
   def handle_in("join", %{"name" => name}, socket) do
-    race = get_race(socket)
-    case Gald.Race.add_player(race, name) do
-      :ok ->
-        broadcast! socket, "g-join", %{name: name}
-        {:reply, {:ok, %{name: name}}, socket}
-      {:error, :duplicate_name} ->
-        {:reply, {:error, %{reason: "Cannot join game with that name. Name is already taken."}}, socket}
-      {:error, :already_started} ->
-        {:reply, {:error, %{reason: "Cannot join game. Game is already started."}}, socket}
+    if Regex.match?(~R/[^\p{L}0-9-]/, name) do
+      {:reply, {:error, %{reason: "Invalid nickname. Only letters, numbers, and dashes are allowed."}}, socket}
+    else
+      race = get_race(socket)
+      case Gald.Race.add_player(race, name) do
+        :ok ->
+          broadcast! socket, "g-join", %{name: name}
+          {:reply, {:ok, %{name: name}}, socket}
+        {:error, :duplicate_name} ->
+          {:reply, {:error, %{reason: "Cannot join game with that name. Name is already taken."}}, socket}
+        {:error, :already_started} ->
+          {:reply, {:error, %{reason: "Cannot join game. Game is already started."}}, socket}
+      end
     end
   end
 

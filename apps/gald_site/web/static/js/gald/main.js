@@ -46,8 +46,6 @@ const map = function () {
             html += Object.keys(playerSpaces).map(function (playerName) {
                 const playerSpace = playerSpaces[playerName];
 
-                // XXX(Havvy): This is an XSS vulnerability.
-                //             Specifically, we don't clean the name at all yet.
                 if (wonPlayers.indexOf(playerName) !== -1) {
                     return `<li><b>${playerName}</b>: ${playerSpace}</li>`;
                 } else {
@@ -85,7 +83,6 @@ chan.onJoinPromise
         case "over":
             gameLog.append("The game is over.");
             map.update();
-            // TODO(Havvy): Who won, what spaces are players at?
             break;
         default:
             gameLog.append(`Game in unknown state, ${gald.status()}!`);
@@ -139,6 +136,11 @@ void function joinGameHandler () {
         // TODO(Havvy): Test what happens if somebody sends a 'join' when the game is already started.
         if (gald.status() !== "lobby") {
             gameLog.append("The game has already started. You cannot join.");
+            return;
+        }
+
+        if (/[^a-zA-Z0-9-]/.test(joinGameNameInput.value)) {
+            gameLog.append("Your name can only contain letters, numbers, and dashes.");
             return;
         }
 
