@@ -1,50 +1,39 @@
-# defmodule Gald.Player do
-#   use Supervisor
-
-#   # Client
-#   @spec start_link(String.t) :: Supervisor.on_start
-#   def start_link(name) do
-#     Supervisor.start_link(__MODULE__, name)
-#   end
-
-#   # Server
-#   def init(_name) do
-#     children = []
-#     supervise(children, strategy: :one_for_all)
-#   end
-# end
-
 defmodule Gald.Player do
+  @moduledoc """
+  A player in the Gald Race. Use `Gald.Race.player(race_pid, player_name)` as
+  the name of the player.
+  """
   use GenServer
+  import ShortMaps
+
+  @type t :: String.t
 
   # Client
-  def start_link(name) do
-    GenServer.start_link(__MODULE__, name)
+  def start_link(init_arg, opts \\ []) do
+    GenServer.start_link(__MODULE__, init_arg, opts)
   end
+
+  def input(player), do: who(player, :in)
+  def out(player), do: who(player, :out)
+
+  @doc "Gives a tuple of the player input and output."
+  def io(player), do: {input(player), out(player)}
+
+  @doc "Gets the player name of the player. Deprecated. Probably useless."
+  def name(player), do: GenServer.call(player, {:get, :name})
 
   # Server
-  def init(name) do
-    {:ok, name}
-  end
-end
-
-defmodule Gald.Player.Supervisor do
-  use Supervisor
-
-  # Client
-  @spec start_link() :: Supervisor.on_start
-  def start_link() do
-    Supervisor.start_link(__MODULE__, [])
+  def init(~m{name race}a) do
+    # TODO(Havvy): Make this a supervision tree.
+    {:ok, _out} = GenEvent.start_link([name: out(self)])
+    {:ok, _input} = Gald.Player.In.start_link(%{player: name, race: race}, name: input(self))
+    {:ok, ~m{name race}a}
   end
 
-  @spec add_player(pid, String.t) :: Supervisor.on_start
-  def add_player(players, name) do
-    Supervisor.start_child(players, [name])
+  def handle_call({:get, key}, _from, state) do
+    {:reply, state[key], state}
   end
 
-  # Server
-  def init([]) do
-    child = [supervisor(Gald.Player, [])]
-    supervise(child, strategy: :simple_one_for_one)
-  end
+  # FIXME(Havvy): Should take the `race`.
+  defp who(player, component), do: {:global, {player, component}}
 end

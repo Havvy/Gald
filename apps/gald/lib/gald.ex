@@ -1,28 +1,28 @@
 defmodule Gald do
   @moduledoc """
-  Contains multiple instances of Gald races which are uncreatively
-  called a Gald.Race. You can start a Race from the application, but
-  otherwise, the main API of a Race is on Gald.Race.
-  """
+  "The Gald Race" game
 
+  Contains multiple instances of Gald.Race, anonymously.
+  """
   use Application
 
   # Application Callback
-  def start(_type, _args) do
+  @doc """
+  Starts the :gald application.
+
+  Creates a non-module backed SimpleSupervisor for Gald Races.
+
+  You can start a new race with start_race/1 and stop it with Gald.Race.stop/1.
+  """
+  def start(_type, _arg) do
     import Supervisor.Spec
-
-    children = [supervisor(Gald.Race.Supervisor, [])]
-
-    opts = [strategy: :simple_one_for_one, name: Gald.Supervisor]
-    Supervisor.start_link(children, opts)
+    child = [supervisor(Gald.Race, [])]
+    Supervisor.start_link(child, [strategy: :simple_one_for_one, name: Gald.Supervisor])
   end
 
-  # Client
-  @spec new_race(pos_integer) :: {:ok, pid}
-  def new_race(game_opts) do
-    {:ok, race_supervisor} = Supervisor.start_child(Gald.Supervisor, [game_opts])
-    children = Supervisor.which_children(race_supervisor)
-    {_, race, _, _} = Enum.find(children, &(match?({Gald.Race, _, _, _}, &1)))
-    {:ok, race}
+  @spec start_race(%Gald.Config{}) :: {:ok, pid}
+  @doc "Start a race."
+  def start_race(race_opts) do
+    Supervisor.start_child(Gald.Supervisor, [race_opts])
   end
 end

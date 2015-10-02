@@ -1,9 +1,13 @@
 defmodule Gald.PlayerTest do
   use ExUnit.Case, async: true
-  alias Gald.Player.Supervisor, as: PSupervisor
+  alias Gald.Players, as: Players
 
+  @p1 "alice"
+
+  @tag :skip
   test "Creation of a player" do
-    {:ok, psup} = PSupervisor.start_link()
-    {:ok, _player} = PSupervisor.add_player(psup, "alice")
+    {:ok, race_out} = GenEvent.start_link()
+    {:ok, psup} = Players.start_link(race_out)
+    {:ok, _p1} = Players.new_player(psup, @p1)
   end
 end

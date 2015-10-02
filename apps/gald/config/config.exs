@@ -1,5 +1,3 @@
-# This file is responsible for configuring your application
-# and its dependencies with the aid of the Mix.Config module.
 use Mix.Config
 
 # This configuration is loaded before any dependency and is restricted
@@ -8,12 +6,12 @@ use Mix.Config
 # if you want to provide default values for your application for third-
 # party users, it should be done in your mix.exs file.
 
-# Sample configuration:
-#
-#     config :logger, :console,
-#       level: :info,
-#       format: "$date $time [$level] $metadata$message\n",
-#       metadata: [:user_id]
+config :logger,
+  handle_sasl_reports: false,
+  level: :debug
+
+config :logger, :console,
+  format: "$metadata[$level] $message\n"
 
 # It is also possible to import configuration files, relative to this
 # directory. For example, you can emulate configuration per environment

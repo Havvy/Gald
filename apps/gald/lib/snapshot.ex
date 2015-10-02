@@ -20,37 +20,51 @@ defmodule Gald.Snapshot.Over do
 end
 
 defmodule Gald.Snapshot do
+  use Gald.Race
+  import ShortMaps
+
   @moduledoc """
   This module is tightly coupled with Gald.Race.
   """
 
-  def new(:lobby, state) do
+  @type t :: {Gald.Controller.status, any}
+
+  def new(~m{race status config}a) do
+    new(race, status, config)
+  end
+
+  def new(race, :lobby, config) do
     %{status: :lobby, data: %Gald.Snapshot.Lobby{
-      config: state.config,
-      players: Gald.Race.player_list(state.players)
+      config: config,
+      players: Gald.Players.names(players(race))
     }}
   end
 
-  def new(:play, state) do
-    player_spaces = Gald.Map.player_spaces(state.map)
-    players = player_spaces
+  def new(race, :preplay, config) do
+    new(race, :play, config)
+  end
+
+  def new(race, :play, config) do
+    players = Gald.Map.player_spaces(map(race))
       |> Enum.map(fn({name, space}) -> {name, %{space: space}} end)
       |> Enum.into(%{})
 
     %{status: :play, data: %Gald.Snapshot.Play{
-      config: state.config,
+      config: config,
       players: players
     }}
+
+    %{status: :play, data: ~m{%Play config players}a}
   end
 
-  def new(:over, state) do
-    player_spaces = Gald.Map.player_spaces(state.map)
+  def new(race, :over, config) do
+    player_spaces = Gald.Map.player_spaces(map(race))
     players = player_spaces
       |> Enum.map(fn({name, space}) -> {name, %{space: space}} end)
       |> Enum.into(%{})
 
     %{status: :over, data: %Gald.Snapshot.Over{
-      config: state.config,
+      config: config,
       players: players
     }}
   end

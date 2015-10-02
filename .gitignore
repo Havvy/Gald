@@ -1,5 +1,8 @@
+/.idea
 /_build
 /deps
 erl_crash.dump
 *.ez
 *.beam
+gald_umbrella.iml
+/apps/simple_supervisor/
