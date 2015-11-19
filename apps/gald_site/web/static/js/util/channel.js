@@ -14,15 +14,25 @@ export default function Channel (name) {
     chan.join()
     .receive("ok", resolve)
     .receive("error", reject)
-    // TODO(Havvy): CODE(TIMEOUT) Reject with some data.
-    .after(10e3, reject);
+    .after(10e3, reject.bind(null, {reason: "Connection timed out after 5 seconds."}));
 
     return {
         onJoinPromise,
 
-        // All global messages are preceded with a "g-".
-        on: function (topic, handler) {
-            chan.on(`g-${topic}`, handler);
+        // All global messages are preceded with a "global:".
+        onGlobal: function (topic, handler) {
+            chan.on(`global:${topic}`, function (payload) {
+                console.debug(`[Global] ${topic}`, payload);
+                handler(payload);
+            });
+        },
+
+        // All user messages are preceded with a "user:".
+        onUser: function (topic, handler) {
+            chan.on(`user:${topic}`, function (payload) {
+                console.debug(`[User] ${topic}`, payload);
+                handler(payload);
+            });
         },
 
         emit: function (topic, payload) {
@@ -35,8 +45,6 @@ export default function Channel (name) {
             chan.push(topic, payload)
             .receive("ok", resolve)
             .receive("error", reject)
-
-            // TODO(Havvy): CODE(TIMEOUT) Reject with some data.
             .after(10e3, reject.bind(null, {reason: "Connection timed out after 10 seconds."}));
 
             return promise;

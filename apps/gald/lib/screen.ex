@@ -7,15 +7,36 @@ defmodule Gald.Screen do
   <No Screen>
   """
 
-  @type init_arg :: %{race: Race.t, player: Player.t}
+  @type init_arg :: %{}
   @typep data :: term
   @typep screen_name :: module
   @typep screen :: nil | {screen_name, data}
   @typep state :: %{race: Race.t, player: Playter.t, screen: screen}
-  # @typep state 
   @typep player_option :: atom | String.t
 
+  @doc """
+  Invoked when the screen sequence is started.
+
+  `init_arg` is a map with data dependent upon the individual screen sequence.
+
+  So as to not have everybody provide the Race and the current player's turn,
+  both are provided in a tuple in the second argument.
+
+  The return value is data that is sent to the other callbacks. Kind of like
+  `state` in a GenServer.
+
+  If you need the player's name for display, save it in your data.
+  """
   @callback init(init_arg, {Race.t, Player.t}) :: data
+
+  @doc """
+  Called when generating shapshots screen events.
+  """
+  @callback get_display(data) :: %Gald.ScreenDisplay{}
+
+  @doc """
+  Called when the current player selects an option.
+  """
   @callback handle_player_option(player_option, data, {Race.t, Player.t}) ::
     {:next, {module, data}} | :end_sequence
 
@@ -26,8 +47,8 @@ defmodule Gald.Screen do
   @doc """
   Starts a new Screen Sequence server.
   """
-  def start_link(init_arg, opts \\ []) do
-    GenServer.start_link(__MODULE__, init_arg, opts)
+  def start_link(init_arg, otp_opts \\ []) do
+    GenServer.start_link(__MODULE__, init_arg, otp_opts)
   end
 
   @doc """
@@ -70,8 +91,8 @@ defmodule Gald.Screen do
   end
 
   defp initialize_screen(screen_name, screen_init_arg, {race, player}) do
-    screen = {screen_name, apply(screen_name, :init, [screen_init_arg, {race, player}])}
-    Race.notify(race, {:screen, screen})
-    screen
+    screen_data = apply(screen_name, :init, [screen_init_arg, {race, player}])
+    Gald.ScreenDisplay.set(Race.display(race), {screen_name, screen_data})
+    {screen_name, screen_data}
   end
 end

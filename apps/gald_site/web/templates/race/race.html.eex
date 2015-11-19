@@ -1,13 +1,17 @@
 <h2>The Gald Race</h2>
-<button type="button" id="gr-roll-dice" value="Roll Dice">Roll Dice (No Dice Yet)</button>
 <br>
 <label for="gr-join-game-name">Name:</label> <input id="gr-join-name" type="text" placeholder="Jacob"> <button type="button" id="gr-join-game" value="Join Game">Join Game</button>
 <br>
-<button type="button" id="gr-start-game" value="Start Game">Start Game</button>
 
 <h3>Map</h3>
 <div id="gr-map">
 </div>
+
+<h3>Screen</h3>
+<div>
+  <h4 id="gr-screen-title">Lobby</h4>
+  <p id="gr-screen-body">People are joining.</p>
+  <p id="gr-screen-options"><button type="button" id="gr-start-game" value="Start Game">Start Game</button></p>
 
 <h3>Game Log</h3>
 <div id="gr-game-log">

@@ -47,6 +47,7 @@ defmodule Gald.Controller do
   def handle_call(:config, _from, state), do: {:reply, state.config, state}
 
   def handle_cast(:begin, state = ~m{race config}a) do
+    state = %{state | status: :play}
     # Determine turn order
     turn_order = Gald.TurnOrder.calculate(players(race))
 
@@ -59,28 +60,29 @@ defmodule Gald.Controller do
     # Start the Map
     map_config = %{
       players: Gald.Players.names(players(race)),
-      end_space: state.config.end_space,
-      race: race
+      end_space: state.config.end_space
     }
     {:ok, _map} = Gald.Race.start_map(race, map_config)
 
-    snapshot = Gald.Snapshot.new(race, :preplay, state)
-    GenEvent.notify(out(race), {:begin, snapshot})
+    # Start the screen monitoring processing.
+    {:ok, _display} = Gald.Race.start_display(race, %{})
+
+    snapshot = Gald.Snapshot.new(%{state | status: :beginning})
+    GenEvent.notify(out(race), {:begin, snapshot.data})
 
     round_config = %{
-      race: race,
       turn_order: turn_order
     }
     {:ok, _round} = Gald.Race.start_round(race, round_config)
 
-    {:noreply, %{state | status: :play}}
+    {:noreply, state}
   end
 
-  def handle_cast(:finish, state = ~m{race config}a) do
-    snapshot = Gald.Snapshot.new(%{race: race, status: :over, config: config})
-    GenEvent.notify(out(race), {:finish, snapshot})
-
-    {:noreply, %{state | status: :over}}
+  def handle_cast(:finish, state = ~m{race}a) do
+    state = %{state | status: :over}
+    snapshot = Gald.Snapshot.new(state)
+    GenEvent.notify(out(race), {:finish, snapshot.data})
+    {:noreply, state}
   end
 
   # TODO(Havvy): Have a way to terminate a race.

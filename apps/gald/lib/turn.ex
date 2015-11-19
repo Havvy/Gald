@@ -17,11 +17,15 @@ defmodule Gald.Turn do
     GenServer.start_link(__MODULE__, init_arg, opts)
   end
 
+  @doc """
+  Handles a player selecting an option.
+  """
   def player_option(turn, player, option) do
     GenServer.call(turn, {:player_option, player, option})
   end
 
   # Client
+  @doc false
   def init(~m{race player}a) do
     Logger.info "Turn Start for #{player}"
     Race.notify(race, {:turn_start, player})
@@ -30,8 +34,10 @@ defmodule Gald.Turn do
     {:ok, ~m{race player screen_ref}a}
   end
 
+  @doc false
   def handle_cast({:start_screen_sequence, screen}, %{race: race, player: player, screen_ref: nil}) do
-    {:ok, screen} = Race.start_screen(race, ~m{race player screen}a)
+    IO.puts("Screen " <> inspect screen)
+    {:ok, screen} = Race.start_screen(race, ~m{player screen}a)
     screen_ref = Process.monitor(screen)
     {:noreply, ~m{race player screen_ref}a}
   end
@@ -41,6 +47,7 @@ defmodule Gald.Turn do
     {:stop, :normal, state}
   end
 
+  @doc false
   def handle_call({:player_option, player, option}, _from, state = ~m{race player}a) do
     Screen.player_option(Race.screen(race), option)
     {:reply, :ok, state}
@@ -49,6 +56,7 @@ defmodule Gald.Turn do
     {:reply, {:error, :not_your_turn}, state}
   end
 
+  @doc false
   def handle_info({:DOWN, screen_ref, :process, _pid, _reason}, state = ~m{race screen_ref}a) do
     Gald.Race.delete_screen(race)
     # TODO(Havvy): When there's in-game events, do more than just terminate.

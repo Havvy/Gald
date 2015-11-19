@@ -1,5 +1,5 @@
 # TODO(Havvy): This should only be loaded for tests.
-defmodule EventQueue.Handler do
+defmodule Gald.TestHelpers.EventQueue.Handler do
   require Logger
   use GenEvent
 
@@ -14,7 +14,7 @@ defmodule EventQueue.Handler do
   end
 end
 
-defmodule EventQueue do
+defmodule Gald.TestHelpers.EventQueue do
   @empty_queue :queue.new()
 
   use GenServer
@@ -22,18 +22,18 @@ defmodule EventQueue do
   # Client
   def start_link(event_manager) do
     {:ok, self} = GenServer.start_link(__MODULE__, :no_args)
-    GenEvent.add_handler(event_manager, EventQueue.Handler, self)
+    GenEvent.add_handler(event_manager, Gald.TestHelpers.EventQueue.Handler, self)
     {:ok, self}
   end
 
   def start(event_manager) do
     {:ok, self} = GenServer.start(__MODULE__, :no_args)
-    GenEvent.add_handler(event_manager, EventQueue.Handler, self)
+    GenEvent.add_handler(event_manager, Gald.TestHelpers.EventQueue.Handler, self)
     {:ok, self}
   end
 
   def next(event_queue, timeout \\ 5000) do
-    GenServer.call(event_queue, :next_eq, timeout)
+    GenServer.call(event_queue, :next, timeout)
   end
 
   def stop(event_queue) do
@@ -57,10 +57,10 @@ defmodule EventQueue do
     {:stop, :normal, nil}
   end
 
-  def handle_call(:next_eq, from, {@empty_queue, nil}) do
+  def handle_call(:next, from, {@empty_queue, nil}) do
     {:noreply, {@empty_queue, from}}
   end
-  def handle_call(:next_eq, _from, {queue, nil}) do
+  def handle_call(:next, _from, {queue, nil}) do
     {{:value, event}, queue} = :queue.out(queue)
     {:reply, event, queue}
   end

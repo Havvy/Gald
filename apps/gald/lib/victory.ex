@@ -18,22 +18,37 @@ defmodule Gald.Victory do
     GenServer.call(victory, :check)
   end
 
+  def winners(victory) do
+    GenServer.call(victory, :winners)
+  end
+
   # Client
-  def init(state = ~m{race end_space}a) do
-    {:ok, state}
+  def init(~m{race end_space}a) do
+    {:ok, ~m{race end_space}a}
   end
 
   def handle_call(:check, _from, state = ~m{race end_space}a) do
-    victory = race |>
-    map() |>
-    Gald.Map.player_spaces() |>
-    Map.values() |>
-    Enum.any?(&(&1 >= end_space))
+    victory = player_spaces(race)
+    |> Map.values()
+    |> Enum.any?(&(&1 >= end_space))
+
 
     if victory do
       Gald.Race.finish(race)
     end
 
     {:reply, victory, state}
+  end
+
+  def handle_call(:winners, _from, state = ~m{race end_space}a) do
+    reply = player_spaces(race)
+    |> Enum.filter(fn ({_name, space}) -> space >= end_space end)
+    |> Enum.map(fn ({name, _space}) -> name end)
+
+    {:reply, reply, state}
+  end
+
+  defp player_spaces(race) do
+    race |> map() |> Gald.Map.player_spaces()
   end
 end

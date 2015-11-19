@@ -4,13 +4,12 @@ defmodule Gald.Race do
 
   When you `use` this module, you import the functions
   `controller`, `out`, `players`, `player`, `supervisor`,
-  `map`, `round`, `turn`, and `screen`
+  `map`, `round`, `turn`, `screen`, `victory`, and `display`.
   """
 
   @opaque t :: pid
 
   use Supervisor
-  alias Gald.Race
   import Kernel, except: [round: 1]
 
   @doc false
@@ -21,7 +20,8 @@ defmodule Gald.Race do
       import Gald.Race, only: [
         controller: 1, out: 1, players: 1,
         player: 2, supervisor: 1, victory: 1,
-        map: 1, round: 1, turn: 1, screen: 1
+        map: 1, round: 1, turn: 1, screen: 1,
+        display: 1
       ]
     end
   end
@@ -54,6 +54,7 @@ defmodule Gald.Race do
   def player(race, name), do: who(race, {:player, name})
   def victory(race), do: who(race, :victory)
   def map(race), do: who(race, :map)
+  def display(race), do: who(race, :display)
   def round(race), do: who(race, :rounds)
   def turn(race), do: who(race, :turn)
   def screen(race), do: who(race, :screen)
@@ -83,6 +84,11 @@ defmodule Gald.Race do
     Supervisor.delete_child(race, Gald.Turn)
   end
 
+  # @spec start_display(Race.t, %Race.ScreenDisplay.Config{}) :: {:ok, pid}
+  def start_display(race, arg) do
+    start_worker(race, Gald.ScreenDisplay, [arg, [name: display(race)]])
+  end
+
   # @spec start_screen(Race.t, %Race.Screen.Config{}) :: {:ok, pid}
   def start_screen(race, arg) do
     start_worker(race, Gald.Screen, [arg, [name: screen(race)]], :transient)
@@ -92,11 +98,9 @@ defmodule Gald.Race do
     Supervisor.delete_child(race, Gald.Screen)
   end
 
-  defp start_worker(race, component, args, restart \\ :permanent) do
-    # TODO(Havvy): Make each component have start_link(map, genserver_opts)
-    #              and then inject `race` into map.
-    #              and then inject `name` into genserver_opts.
-    spec = worker(component, args, [restart: restart])
+  defp start_worker(race, component, [args, otp_opts], restart \\ :permanent) do
+    args = Map.put(args, :race, race)
+    spec = worker(component, [args, otp_opts], [restart: restart])
     Supervisor.start_child(race, spec)
   end
 

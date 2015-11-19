@@ -1,6 +1,7 @@
 defmodule Gald.TwoPlayerRaceTo25Test do
   require Logger
   use ExUnit.Case, async: true
+  alias Gald.TestHelpers.EventQueue
 
   @p1 "alice"
   @p2 "bob"
@@ -17,7 +18,7 @@ defmodule Gald.TwoPlayerRaceTo25Test do
     assert {:new_player, @p2} = next_event(race_out)
 
     Gald.Race.begin(race)
-    assert {:begin, %{status: :play, data: %Gald.Snapshot.Play{}}} = next_event(race_out)
+    assert {:begin, %Gald.Snapshot.Play{}} = next_event(race_out)
 
     round(1, race_out, @p1, p1_in, @p2, p2_in)
     round(2, race_out, @p1, p1_in, @p2, p2_in)
@@ -25,7 +26,7 @@ defmodule Gald.TwoPlayerRaceTo25Test do
     assert {:round_start, 3} = next_event(race_out)
     turn(race_out, @p1, p1_in, 3)
     
-    assert {:finish, %{status: :over, data: %Gald.Snapshot.Over{}}} = next_event(race_out)
+    assert {:finish, %Gald.Snapshot.Over{}} = next_event(race_out)
 
     EventQueue.stop(race_out)
     Gald.Race.stop(race)

@@ -1,5 +1,6 @@
 defmodule GaldSite.RaceController do
   use GaldSite.Web, :controller
+  import ShortMaps
 
   def index(conn, _params) do
     token = Plug.CSRFProtection.get_csrf_token()
@@ -13,9 +14,10 @@ defmodule GaldSite.RaceController do
   # TODO(Havvy): New game page.
   # def new(conn, _params), do: nil
 
-  def create(conn, %{"name" => name}) do
-    url = GaldSite.RaceManager.new_race(%Gald.Config{end_space: 25, name: name})
-    redirect conn, to: "/race/#{url}"
+  def create(conn, ~m{visible_name}) do
+    config = %Gald.Config{end_space: 25, name: visible_name}
+    internal_race_name = GaldSite.RaceManager.start_race(config)
+    redirect conn, to: "/race/#{internal_race_name}"
   end
   def create(conn, _params) do
     conn

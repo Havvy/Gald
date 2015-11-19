@@ -1,21 +1,25 @@
 defmodule Gald.Snapshot.Lobby do
   defstruct [
-    config: nil,   # Glad.Config{}
-    players: nil,  # HashSet.t(Gald.Player.name)
+    config: %Gald.Config{},   # %Gald.Config{}
+    players: HashSet.new(),  # HashSet.t(Gald.Player.name)
   ]
 end
 
 defmodule Gald.Snapshot.Play do
   defstruct [
-    config: nil,  # %Gald.Config{}
-    players: nil, # %{String.t => %{space: non_negative_integer}}
+    config: %Gald.Config{},  # %Gald.Config{}
+    players: HashSet.new(), # HashSet.t(Gald.Player.name),
+    turn: nil, # Gald.Player.name | nil
+    map: %{}, # HashDict.t(Gald.Player.name, Gald.Map.space)
+    screen: %{}
   ]
 end
 
 defmodule Gald.Snapshot.Over do
   defstruct [
-    config: nil,
-    players: nil,
+    config: %Gald.Config{},
+    players: HashSet.new(),
+    winners: HashSet.new()
   ]
 end
 
@@ -36,36 +40,36 @@ defmodule Gald.Snapshot do
   def new(race, :lobby, config) do
     %{status: :lobby, data: %Gald.Snapshot.Lobby{
       config: config,
-      players: Gald.Players.names(players(race))
+      players: get_players(race)
     }}
   end
 
-  def new(race, :preplay, config) do
-    new(race, :play, config)
+  def new(race, :beginning, config) do
+    players = get_players(race)
+    map = Gald.Map.player_spaces(map(race))
+      |> Enum.map(fn({name, space}) -> {name, %{space: space}} end)
+      |> Enum.into(%{})
+
+    %{status: :play, data: ~m{%Play config players map}a}
   end
 
   def new(race, :play, config) do
-    players = Gald.Map.player_spaces(map(race))
-      |> Enum.map(fn({name, space}) -> {name, %{space: space}} end)
+    players = get_players(race)
+    map = Gald.Map.player_spaces(map(race))
       |> Enum.into(%{})
 
-    %{status: :play, data: %Gald.Snapshot.Play{
-      config: config,
-      players: players
-    }}
+    turn = Gald.Round.current(round(race))
+    screen = Gald.ScreenDisplay.get(display(race))
 
-    %{status: :play, data: ~m{%Play config players}a}
+    %{status: :play, data: ~m{%Play config players map turn screen}a}
   end
 
   def new(race, :over, config) do
-    player_spaces = Gald.Map.player_spaces(map(race))
-    players = player_spaces
-      |> Enum.map(fn({name, space}) -> {name, %{space: space}} end)
-      |> Enum.into(%{})
+    players = get_players(race)
+    winners = Gald.Victory.winners(victory(race))
 
-    %{status: :over, data: %Gald.Snapshot.Over{
-      config: config,
-      players: players
-    }}
+    %{status: :over, data: ~m{%Over config players winners}a}
   end
+
+  defp get_players(race), do: Gald.Players.names(players(race))
 end

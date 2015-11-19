@@ -5,7 +5,7 @@
 <form action="/race/create" method="post">
     <input type="hidden" name="_csrf_token" value="<%= @csrf %>">
     <label for="gl-new-game-name">Name:</label>
-    <input type="text" placeholder="name" name="name">
+    <input type="text" placeholder="name" name="visible_name">
     <button type="submit">Submit</button>
 </form>
 

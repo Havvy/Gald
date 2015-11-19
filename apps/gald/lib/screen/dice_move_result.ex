@@ -28,7 +28,16 @@ defmodule Gald.Screen.DiceMoveResult do
     }
   end
 
-  def handle_player_option(:confirm, _screen, {_race, _player}) do
+  def handle_player_option(_option, _screen, {_race, _player}) do
     :end_sequence
+  end
+
+  def get_display(%Gald.Screen.DiceMoveResult{who: {:player, who}, to: {rel, abs}}) do
+    %Gald.ScreenDisplay {
+      title: "Movement!",
+      body: "#{who} moved forward #{rel} spaces to position #{abs}.",
+      pictures: %Gald.ScreenPictures{},
+      options: ["Continue"]
+    }
   end
 end

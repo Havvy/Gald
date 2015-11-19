@@ -1,3 +1,5 @@
+// TODO(Havvy): Look into React for the frontend?
+
 "use strict";
 
 import Gald from "./gald";
@@ -7,6 +9,7 @@ import Channel from "../util/channel";
 // import Dom from "./???/main";
 
 // gald: Gald
+// Binding changed by start & finish events.
 let gald;
 
 let chan = function () {
@@ -33,25 +36,60 @@ const gameLog = function () {
     };
 }();
 
+const screen = function () {
+    const title = document.querySelector("#gr-screen-title");
+    const body = document.querySelector("#gr-screen-body");
+    const pictures = null;
+    const options = document.querySelector("#gr-screen-options");
+    const time = null;
+
+    return {
+        update () {
+            const screen = gald.getScreen();
+
+            if (!screen) {
+                // Game hasn't started yet,
+                // or between start and first screen.
+                return;
+            }
+
+            title.innerHTML = screen.title;
+            body.innerHTML = screen.body;
+            // TODO(Havvy): Create a <ul> or something.
+
+            console.log(typeof screen.options);
+            options.innerHTML = screen.options.join(";");
+        }
+    };
+
+}();
+
 const map = function () {
     const element = document.querySelector("#gr-map");
 
     return {
         update () {
             let html = "<ul>";
-            const playerSpaces = gald.playerSpaces();
-            const wonPlayers = gald.wonPlayers();
-            console.log(wonPlayers);
 
-            html += Object.keys(playerSpaces).map(function (playerName) {
-                const playerSpace = playerSpaces[playerName];
+            if (gald.getLifecycleStatus() === "play") {
+                const playerSpaces = gald.getPlayerSpaces();
 
-                if (wonPlayers.indexOf(playerName) !== -1) {
-                    return `<li><b>${playerName}</b>: ${playerSpace}</li>`;
-                } else {
+                html += Object.keys(playerSpaces).map(function (playerName) {
+                    const playerSpace = playerSpaces[playerName];
                     return `<li>${playerName}: ${playerSpace}</li>`;
-                }
-            }).join("");
+                }).join("");
+            } else {
+                const players = gald.getPlayers();
+                const winners = gald.getWinners();
+
+                html += players.map(function (playerName) {
+                    if (winners.indexOf(playerName) !== -1) {
+                        return `<li><b>${playerName}</b></li>`;
+                    } else {
+                        return `<li>${playerName}</li>`;
+                    }
+                });
+            }
 
             html += "</ul>";
 
@@ -64,14 +102,14 @@ const map = function () {
     }; 
 }();
 
-// TODO(Havvy): Look into React for the frontend?
 chan.onJoinPromise
-.then(function onJoinOk (galdSnapshot) {
+.then(function onJoinOk (snapshot) {
+    console.log(snapshot);
     gameLog.append("Welcome to the Race!");
-    gald = Gald(galdSnapshot);
+    gald = Gald(snapshot);
     gameLog.append("The race is known to us.");
 
-    switch (gald.status()) {
+    switch (gald.getLifecycleStatus()) {
         case "lobby":
             gameLog.append("The game has not yet been started.");
             map.update();
@@ -85,11 +123,14 @@ chan.onJoinPromise
             map.update();
             break;
         default:
-            gameLog.append(`Game in unknown state, ${gald.status()}!`);
+            gameLog.append(`Game in unknown state, ${gald.getLifecycleStatus()}!`);
     }
 }, function onJoinError (error) {
     gameLog.append("Sorry, unable to join the race.");
     gameLog.append(`Reason: ${error.reason}`);
+    if (error.stack) {
+      gamelog.append(error.stack);
+    }
 })
 .catch(function (err) {
     gameLog.append("Error while trying to connect to the channel!");
@@ -97,44 +138,17 @@ chan.onJoinPromise
     gameLog.append(String(err));
 });
 
-void function moveHandler () {
-    const rollDiceButton = document.querySelector("#gr-roll-dice");
-
-    rollDiceButton.addEventListener("click", function (event) {
-        const self = gald.self();
-
-        if (!self) {
-            gameLog.append("Cannot move. You are not playing.");
-            return;
-        }
-
-        if (gald.status() !== "play") {
-            gameLog.append("Cannot move. Game is not being played.");
-            return;
-        }
-
-        chan.request("move", { player: self })
-        .then(function ({}) {
-            // no-op.
-        }, function ({reason}) {
-            gameLog.append(reason);
-        });
-    }, false);
-}();
-
 void function joinGameHandler () {
     const joinGameButton = document.querySelector("#gr-join-game");
     const joinGameNameInput = document.querySelector("#gr-join-name");
 
     joinGameButton.addEventListener("click", function (event) {
-        // TODO(Havvy): gald.canJoin() -> Result<(), "already-playing" | "already-started">
-        if (gald.self()) {
+        if (gald.getControlledPlayer()) {
             gameLog.append("You are already playing.");
             return;
         }
 
-        // TODO(Havvy): Test what happens if somebody sends a 'join' when the game is already started.
-        if (gald.status() !== "lobby") {
+        if (gald.getLifecycleStatus() !== "lobby") {
             gameLog.append("The game has already started. You cannot join.");
             return;
         }
@@ -146,7 +160,7 @@ void function joinGameHandler () {
 
         chan.request("join", {name: joinGameNameInput.value})
         .then(function ({name}) {
-            gald.setSelf(name);
+            gald.setControlledPlayer(name);
             map.update();
             gameLog.append(`You are ${name}.`);
         }, function ({reason}) {
@@ -157,39 +171,58 @@ void function joinGameHandler () {
 
 let startGameButton = document.querySelector("#gr-start-game");
 startGameButton.addEventListener("click", function (event) {
-    if (gald.status() !== "lobby") {
-        gameLog.append("The game is already started. You cannot start it again.");
-        return;
-    }
-
     // TODO(Havvy): Check if person is one who created game.
     // TODO(Havvy): Check to see if there's a player.
 
     chan.emit("start");
 });
 
-chan.on("join", function ({name}) {
-    gald.join(name);
-    map.update();
-    gameLog.append(`${name} has joined the game.`);
-});
+const globalHandlers = {
+    "new_player": function ({player_name}) {
+        gald.putPlayer(player_name);
+        map.update();
+        gameLog.append(`${player_name} has joined the game.`);
+    },
 
-chan.on("start", function ({snapshot}) {
-    gameLog.append("Starting game!");
-    gald.start(snapshot);
-    map.update();
-});
+    "begin": function ({snapshot}) {
+        gameLog.append("Starting game!");
+        gald = Gald({state: "play", data: snapshot})
+        map.update();
+        screen.update();
+    },
 
-chan.on("move_player", function ({player, spaces, end_space}) {
-    gald.movePlayer(player, end_space);
-    gameLog.append(`Player ${player} moved forward ${spaces} spaces to space ${end_space}.`);
-    map.update();
-});
+    "finish": function ({snapshot}) {
+        gameLog.append("Game over!");
+        gald = Gald({state: "over", data: snapshot})
+        map.update();
+    },
 
-chan.on("game_over", function ({snapshot}) {
-    gameLog.append("Game over!");
-    gald.end(snapshot);
-    map.update();
+    "round_start": function ({round_number}) {
+        gameLog.append(`Round ${round_number} started.`);
+    },
+
+    "turn_start": function ({player_name}) {
+        gald.setTurn(player_name);
+    },
+
+    "screen": function ({screen: screenData}) {
+        gald.setScreen(screenData);
+        screen.update();
+    },
+
+    "move": function ({to, entity_type, entity_name}) {
+        if (entity_type !== player) {
+            console.error(`Entity type '#{entity_type}' not player.`);
+            return;
+        }
+
+        gald.setPlayerSpace(entity_name, to);
+        map.update();
+    }
+};
+
+Object.keys(globalHandlers).forEach(function (event) {
+    chan.onGlobal(event, globalHandlers[event]);
 });
 
 void function initialize () {

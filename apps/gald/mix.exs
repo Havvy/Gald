@@ -21,7 +21,8 @@ defmodule Gald.Mixfile do
   defp deps do
     [
       {:dialyze, "~> 0.2.0"},
-      {:short_maps, "~> 0.1.0"}
+      {:short_maps, "~> 0.1.0"},
+      {:credo, "~> 0.1.0"}
     ]
   end
 end
