@@ -11,7 +11,7 @@ defmodule Gald.Snapshot.Play do
     players: HashSet.new(), # HashSet.t(Gald.Player.name),
     turn: nil, # Gald.Player.name | nil
     map: %{}, # HashDict.t(Gald.Player.name, Gald.Map.space)
-    screen: %{}
+    screen: nil # nil | %Gald.ScreenDisplay{}
   ]
 end
 
@@ -46,18 +46,13 @@ defmodule Gald.Snapshot do
 
   def new(race, :beginning, config) do
     players = get_players(race)
-    map = Gald.Map.player_spaces(map(race))
-      |> Enum.map(fn({name, space}) -> {name, %{space: space}} end)
-      |> Enum.into(%{})
-
+    map = Gald.Map.player_spaces(map(race)) |> Enum.into(%{})
     %{status: :play, data: ~m{%Play config players map}a}
   end
 
   def new(race, :play, config) do
     players = get_players(race)
-    map = Gald.Map.player_spaces(map(race))
-      |> Enum.into(%{})
-
+    map = Gald.Map.player_spaces(map(race)) |> Enum.into(%{})
     turn = Gald.Round.current(round(race))
     screen = Gald.ScreenDisplay.get(display(race))
 

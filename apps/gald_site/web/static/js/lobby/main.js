@@ -12,7 +12,7 @@ const racesList = function () {
     }
 
     function li ({visible_name, internal_name}) {
-        return `<li id="${ref(internal_name)}"><a href="./${internal_name}">${visible_name}</a></li>`;
+        return `<li id="${ref(internal_name)}"><a href="/race/${internal_name}">${visible_name}</a></li>`;
     }
 
     return {

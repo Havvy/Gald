@@ -37,31 +37,58 @@ const gameLog = function () {
 }();
 
 const screen = function () {
-    const title = document.querySelector("#gr-screen-title");
-    const body = document.querySelector("#gr-screen-body");
-    const pictures = null;
-    const options = document.querySelector("#gr-screen-options");
-    const time = null;
+    const titleElement = document.querySelector("#gr-screen-title");
+    const bodyElement = document.querySelector("#gr-screen-body");
+    const picturesElement = null;
+    const optionsElement = document.querySelector("#gr-screen-options");
+    const timeElement = null;
+
+    const updateOptionsElement = function (options) {
+        const isCurrentTurn = gald.getTurn() === gald.getControlledPlayer();
+
+        optionsElement.innerHTML = options.map(function (option) {
+            return `<button ${isCurrentTurn ? "" : "disabled=\"disabled\""} value="${option}" type="button">${option}</button>`;
+        }).join("")
+    };
+
+    optionsElement.addEventListener("click", function (clickEvent) {
+        if (clickEvent.target.tagName !== "BUTTON") {
+            return;
+        }
+
+        chan.emit("option", {option: clickEvent.target.value});
+    });
 
     return {
         update () {
-            const screen = gald.getScreen();
+            const lifecycleStatus = gald.getLifecycleStatus();
+            if (lifecycleStatus === "play") {
+                const screen = gald.getScreen();
 
-            if (!screen) {
-                // Game hasn't started yet,
-                // or between start and first screen.
-                return;
+                if (!screen) {
+                    // Game hasn't started yet,
+                    // or between start and first screen.
+                    return;
+                }
+
+                titleElement.innerHTML = screen.title;
+                bodyElement.innerHTML = screen.body;
+                updateOptionsElement(screen.options);
+            } else if (lifecycleStatus === "over") {
+                const winners = gald.getWinners();
+
+                titleElement.innerHTML = "Game over.";
+
+                if (winners.length === 1) {
+                    bodyElement.innerHTML = `The winner is ${winners[0]}!`;
+                } else {
+                    bodyElement.innerHTML = `The winners are ${winners.join(", ")}.`
+                }
+
+                optionsElement.innerHTML = "";
             }
-
-            title.innerHTML = screen.title;
-            body.innerHTML = screen.body;
-            // TODO(Havvy): Create a <ul> or something.
-
-            console.log(typeof screen.options);
-            options.innerHTML = screen.options.join(";");
         }
     };
-
 }();
 
 const map = function () {
@@ -73,10 +100,15 @@ const map = function () {
 
             if (gald.getLifecycleStatus() === "play") {
                 const playerSpaces = gald.getPlayerSpaces();
+                const turn = gald.getTurn();
 
                 html += Object.keys(playerSpaces).map(function (playerName) {
                     const playerSpace = playerSpaces[playerName];
-                    return `<li>${playerName}: ${playerSpace}</li>`;
+                    if (playerName === turn) {
+                        return `<li><b>${playerName}</b>: ${playerSpace}</li>`
+                    } else {
+                        return `<li>${playerName}: ${playerSpace}</li>`;
+                    }
                 }).join("");
             } else {
                 const players = gald.getPlayers();
@@ -84,11 +116,11 @@ const map = function () {
 
                 html += players.map(function (playerName) {
                     if (winners.indexOf(playerName) !== -1) {
-                        return `<li><b>${playerName}</b></li>`;
+                        return `<li>${playerName} [Winner]</li>`;
                     } else {
                         return `<li>${playerName}</li>`;
                     }
-                });
+                }).join("");
             }
 
             html += "</ul>";
@@ -104,7 +136,6 @@ const map = function () {
 
 chan.onJoinPromise
 .then(function onJoinOk (snapshot) {
-    console.log(snapshot);
     gameLog.append("Welcome to the Race!");
     gald = Gald(snapshot);
     gameLog.append("The race is known to us.");
@@ -134,7 +165,7 @@ chan.onJoinPromise
 })
 .catch(function (err) {
     gameLog.append("Error while trying to connect to the channel!");
-    console.log(err);
+    console.error(err);
     gameLog.append(String(err));
 });
 
@@ -186,15 +217,24 @@ const globalHandlers = {
 
     "begin": function ({snapshot}) {
         gameLog.append("Starting game!");
-        gald = Gald({state: "play", data: snapshot})
+        gald = Gald({
+            status: "play",
+            data: snapshot,
+            controlledPlayer: gald.getControlledPlayer()
+        });
         map.update();
         screen.update();
     },
 
     "finish": function ({snapshot}) {
         gameLog.append("Game over!");
-        gald = Gald({state: "over", data: snapshot})
+        gald = Gald({
+            status: "over",
+            data: snapshot,
+            controlledPlayer: gald.getControlledPlayer()
+        });
         map.update();
+        screen.update();
     },
 
     "round_start": function ({round_number}) {
@@ -203,6 +243,8 @@ const globalHandlers = {
 
     "turn_start": function ({player_name}) {
         gald.setTurn(player_name);
+        map.update();
+        gameLog.append(`Turn start for ${player_name}.`);
     },
 
     "screen": function ({screen: screenData}) {
@@ -211,12 +253,13 @@ const globalHandlers = {
     },
 
     "move": function ({to, entity_type, entity_name}) {
-        if (entity_type !== player) {
+        if (entity_type !== "player") {
             console.error(`Entity type '#{entity_type}' not player.`);
             return;
         }
 
         gald.setPlayerSpace(entity_name, to);
+        gameLog.append(`${entity_name} moved to space ${to}.`);
         map.update();
     }
 };

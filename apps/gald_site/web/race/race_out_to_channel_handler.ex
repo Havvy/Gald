@@ -29,6 +29,7 @@ defmodule GaldSite.RaceOutToChannelHandler do
   @doc false
   def handle_event({topic, payload}, ~m{channel}a) do
     payload = serialize_payload(topic, payload)
+    # TODO(Havvy): Rename 'global' to 'public'.
     topic = "global:#{Atom.to_string(topic)}"
     GaldSite.Endpoint.broadcast!(channel, topic, payload)
     {:ok, ~m{channel}a}
@@ -48,8 +49,8 @@ defmodule GaldSite.RaceOutToChannelHandler do
   defp serialize_payload(:round_start, round_number), do: ~m{round_number}a
   defp serialize_payload(:turn_start, player_name), do: ~m{player_name}a
   defp serialize_payload(:screen, screen) do ~m{screen}a end
-  defp serialize_payload(:move, {to, {entity_type, entity_name}}) do
+  defp serialize_payload(:move, %{to: to, who: {entity_type, entity_name}}) do
     ~m{entity_type entity_name to}a
   end
-  defp serialize_payload(topic, _payload), do: raise "Unknown event '#{topic}'."
+  defp serialize_payload(topic, _payload), do: raise "Unknown event '#{inspect topic}'."
 end

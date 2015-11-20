@@ -6,6 +6,7 @@ defmodule GaldSite.RaceChannel do
 
   defp get_race(socket), do: socket.assigns.race
   defp get_internal_name(socket), do: socket.assigns.internal_name
+  defp get_player_input(socket), do: socket.assigns.player_input
 
   def join("race:" <> internal_name, _auth_msg, socket) do
     # TODO(Havvy): Send the channel PID instead of the transport_pid?
@@ -58,13 +59,10 @@ defmodule GaldSite.RaceChannel do
   end
 
   def handle_in("option", ~m{option}, socket) do
-    if option != "Confirm" do
-      {:reply, {:error, %{reason: "Cannot do anything other than confirm."}}, socket}
-    else
-      # race = get_race(socket)
-      # TODO(Havvy): Pass option to Player.In.
-      {:reply, {:ok, %{}}, socket}
-    end
+    # race = get_race(socket)
+    player_input = get_player_input(socket)
+    Gald.Player.In.select_option(player_input, option)
+    {:reply, {:ok, %{}}, socket}
   end
 
   def handle_in(message, payload, socket) do

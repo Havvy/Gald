@@ -1,10 +1,9 @@
 "use-strict";
 
-export default function Gald ({status: state, data: snapshot}) {
+export default function Gald ({status: state, data: snapshot, controlledPlayer}) {
   // Shared data.
   let players = snapshot.players;
   let config = snapshot.config;
-  let controlledPlayer;
 
   // Lobby only data
 
@@ -19,10 +18,7 @@ export default function Gald ({status: state, data: snapshot}) {
   if (state === "lobby") {
 
   } else if (state === "play") {
-    map = Object.keys(players).reduce(function (map, player) {
-      map[player] = players[player].space;
-    }, {});
-
+    map = snapshot.map;
     turn = snapshot.turn;
     screen = snapshot.screen;
   } else if (state === "over") {

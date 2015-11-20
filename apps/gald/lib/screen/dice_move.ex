@@ -16,10 +16,13 @@ defmodule Gald.Screen.DiceMove do
 
   The `roll` is used to decide which dice images to show to the player.
   """
-  defstruct [roll: {:d, 2, 6}]
+  defstruct [
+    roll: {:d, 2, 6},
+    player: "$player"
+  ]
 
-  def init(_init_arg, {_race, _player}) do
-    %Gald.Screen.DiceMove{}
+  def init(_init_arg, {_race, player}) do
+    %Gald.Screen.DiceMove{player: player}
   end
 
   def handle_player_option(_option, _data, {race, player}) do
@@ -30,10 +33,10 @@ defmodule Gald.Screen.DiceMove do
     {:next, Gald.Screen.DiceMoveResult, ~m{player_space roll}a}
   end
 
-  def get_display(%Gald.Screen.DiceMove{roll: {:d, _dice_count, _dice_size}}) do
+  def get_display(%Gald.Screen.DiceMove{roll: {:d, _dice_count, _dice_size}, player: player}) do
     %ScreenDisplay{
       title: "Roll Dice",
-      body: "It's your turn.",
+      body: "It's #{player}'s turn.",
       pictures: [],
       options: ["Roll"]
     }
