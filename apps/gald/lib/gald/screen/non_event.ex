@@ -9,18 +9,18 @@ defmodule Gald.Screen.NonEvent do
   It literally does nothing for the event phase.
   """
 
-  def init(_init_arg, {_race, player}) do
+  def init(_init_arg, {_race, _player}) do
     nil
   end
 
-  def handle_player_option(_option, _data, {race, player}) do
+  def handle_player_option(_option, _data, {_race, _player}) do
     :end_sequence
   end
 
   def get_display(_data) do
     %ScreenDisplay{
       title: "Nothing Happened",
-      body: "How disappointing..",
+      body: "How disappointing.",
       pictures: [],
       options: ["Continue"]
     }
