@@ -45,12 +45,12 @@ defmodule Gald.TwoPlayerRaceTo25Test do
   defp turn(race_out, name, player_in, round) do
     assert {:turn_start, name} = next_event(race_out)
 
-    assert {:screen, {Gald.Screen.DiceMove, %Gald.Screen.DiceMove{
-      roll: {:d, 2, 6}
-    }}} = next_event(race_out)
+    assert {:screen, %Gald.ScreenDisplay{
+      # TODO(Havvy): More details here.
+    }} = next_event(race_out)
 
-    Logger.info("Player #{name} confirming dice move.")
-    Gald.Player.In.confirm(player_in)
+    Logger.info("Player #{name} rolling.")
+    Gald.Player.In.select_option(player_in, "Roll")
 
     end_space = round * 10
     assert {:move, %Gald.Move{
@@ -58,15 +58,19 @@ defmodule Gald.TwoPlayerRaceTo25Test do
       to: ^end_space
     }} = next_event(race_out)
 
-    assert {:screen, {Gald.Screen.DiceMoveResult, %Gald.Screen.DiceMoveResult{
-      to: {10, ^end_space},
-      roll: {{:d, 6}, [5, 5]}
-    }}} = next_event(race_out)
+    assert {:screen, %Gald.ScreenDisplay{
+      # TODO(Havvy): More details here.
+    }} = next_event(race_out)
 
     Logger.info("Player #{name} confirming dice move result.")
-    Gald.Player.In.confirm(player_in)
+    Gald.Player.In.select_option(player_in, "Continue")
 
-    # TODO(Havvy): Post-dice roll events things here.
+    assert {:screen, %Gald.ScreenDisplay{
+      title: "Nothing Happened"
+    }} = next_event(race_out)
+
+    Logger.info("Player #{name} confirming event.")
+    Gald.Player.In.select_option(player_in, "Continue")
 
     Logger.info("End of #{name}'s turn.")
   end

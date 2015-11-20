@@ -1,5 +1,6 @@
 defmodule Gald.ScreenDisplay do
   @moduledoc false
+  import Logger
 
   defstruct [
     title: "",
@@ -24,10 +25,10 @@ defmodule Gald.ScreenDisplay do
     Agent.get(display, &get_screen_display/1)
   end
 
-  defp get_screen_display({screen_name, screen_data}) do
-    apply(screen_name, :get_display, [screen_data])
-  end
   defp get_screen_display({_race, {screen_name, screen_data}}) do
     get_screen_display({screen_name, screen_data})
+  end
+  defp get_screen_display({screen_name, screen_data}) do
+    apply(screen_name, :get_display, [screen_data])
   end
 end

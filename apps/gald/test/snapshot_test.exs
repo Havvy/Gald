@@ -62,9 +62,7 @@ defmodule Gald.SnapshotTest do
       turn: @p1,
       screen: %ScreenDisplay{
         title: "Roll Dice",
-        body: "It's your turn.",
-        pictures: [],
-        options: "Roll"
+        options: ["Roll"]
       }
     }} == snapshot
   end
@@ -74,7 +72,7 @@ defmodule Gald.SnapshotTest do
     {:ok, race_out} = EventWaiter.start(Gald.Race.out(race))
     Race.new_player(race, @p1)
     Race.begin(race)
-    EventWaiter.await(race_out, :turn_start)
+    EventWaiter.await(race_out, :screen)
     Gald.Map.move(Race.map(race), {:player, @p1}, {:relative, 10})
     EventWaiter.await(race_out, :move)
     snapshot = Race.snapshot(race)
@@ -86,11 +84,9 @@ defmodule Gald.SnapshotTest do
       turn: @p1,
       screen: %ScreenDisplay{
         title: "Roll Dice",
-        body: "It's your turn.",
-        pictures: [],
-        options: "Roll"
+        options: ["Roll"]
       }
-    }} == snapshot
+    }} = snapshot
   end
 
   @tag :skip
