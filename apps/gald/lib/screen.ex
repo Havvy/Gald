@@ -1,6 +1,9 @@
+# TODO(Havvy): Rename to Gald.Phase
 defmodule Gald.Screen do
   @moduledoc """
   A server for the handling of a sequence of screens.
+
+  This will be Gald.Phase in the future.
 
   <Curernt Player>
   <Sequence>

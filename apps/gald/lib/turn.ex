@@ -31,15 +31,24 @@ defmodule Gald.Turn do
     Race.notify(race, {:turn_start, player})
     GenServer.cast(self, {:start_screen_sequence, dice_move_screen()})
     screen_ref = nil
-    {:ok, ~m{race player screen_ref}a}
+    phase = :dice
+    {:ok, ~m{race player screen_ref phase}a}
   end
 
   @doc false
-  def handle_cast({:start_screen_sequence, screen}, %{race: race, player: player, screen_ref: nil}) do
-    IO.puts("Screen " <> inspect screen)
+  def handle_cast({:start_screen_sequence, screen}, state = %{race: race, player: player, screen_ref: nil}) do
     {:ok, screen} = Race.start_screen(race, ~m{player screen}a)
     screen_ref = Process.monitor(screen)
-    {:noreply, ~m{race player screen_ref}a}
+    {:noreply, %{state | screen_ref: screen_ref}}
+  end
+
+  def handle_cast(:next_phase, state = %{phase: :dice}) do
+    GenServer.cast(self, {:start_screen_sequence, non_event_screen})
+    {:noreply, %{state | phase: :event}}
+  end
+  def handle_cast(:next_phase, state = %{phase: :event}) do
+    GenServer.cast(self, :stop)
+    {:noreply, state}
   end
 
   def handle_cast(:stop, state) do
@@ -59,13 +68,16 @@ defmodule Gald.Turn do
   @doc false
   def handle_info({:DOWN, screen_ref, :process, _pid, _reason}, state = ~m{race screen_ref}a) do
     Gald.Race.delete_screen(race)
-    # TODO(Havvy): When there's in-game events, do more than just terminate.
-    GenServer.cast(self, :stop)
-    {:noreply, state}
+    GenServer.cast(self, :next_phase)
+    {:noreply, %{state | screen_ref: nil}}
   end
 
   # Initial Screens
-  defp dice_move_screen() do
+  defp dice_move_screen do
     {Gald.Screen.DiceMove, nil}
+  end
+
+  defp non_event_screen do
+    {Gald.Screen.NonEvent, nil}
   end
 end
