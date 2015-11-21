@@ -73,7 +73,7 @@ defmodule Gald.TestHelpers.EventWaiter do
     end
   end
 
-  defp take_until(@empty_queue, until) do
+  defp take_until(@empty_queue, _until) do
     {@empty_queue, nil}
   end
   defp take_until(queue, until) do

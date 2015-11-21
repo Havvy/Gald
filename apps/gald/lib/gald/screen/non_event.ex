@@ -1,6 +1,5 @@
 defmodule Gald.Screen.NonEvent do
   @behaviour Gald.Screen
-  import ShortMaps
   alias Gald.ScreenDisplay
 
   @moduledoc """

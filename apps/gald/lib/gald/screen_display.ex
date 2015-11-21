@@ -1,6 +1,5 @@
 defmodule Gald.ScreenDisplay do
   @moduledoc false
-  import Logger
 
   defstruct [
     title: "",

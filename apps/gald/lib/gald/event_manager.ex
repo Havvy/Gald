@@ -1,5 +1,5 @@
 defmodule Gald.EventManager do
-  """
+  @doc """
   Manages events.
   """
 
