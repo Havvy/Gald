@@ -19,9 +19,6 @@ defmodule Gald.Player do
   @doc "Gives a tuple of the player input and output."
   def io(player), do: {input(player), out(player)}
 
-  @doc "Gets the player name of the player. Deprecated. Probably useless."
-  def name(player), do: GenServer.call(player, {:get, :name})
-
   # Server
   def init(~m{name race}a) do
     # TODO(Havvy): Make this a supervision tree.
