@@ -17,7 +17,7 @@ defmodule Gald.Screen.DiceMoveResult do
 
   defstruct who: {:player, "$no_player$"}, to: {2, 2}, roll: {{:d, 6}, [1, 1]}
 
-  def init(~m{player_space roll}a, {_race, player}) do
+  def init(~m{player_space roll player}a) do
     {_dice, relative} = roll
     relative = Enum.sum(relative)
 
@@ -28,7 +28,7 @@ defmodule Gald.Screen.DiceMoveResult do
     }
   end
 
-  def handle_player_option(_option, _screen, {_race, _player}) do
+  def handle_player_option(_option, _screen) do
     :end_sequence
   end
 

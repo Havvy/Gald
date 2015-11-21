@@ -21,16 +21,14 @@ defmodule Gald.Screen do
   Invoked when the screen sequence is started.
 
   `init_arg` is a map with data dependent upon the individual screen sequence.
-
-  So as to not have everybody provide the Race and the current player's turn,
-  both are provided in a tuple in the second argument.
+  For the beginning of a sequence, the map will contain only `race` and `player`.
 
   The return value is data that is sent to the other callbacks. Kind of like
   `state` in a GenServer.
 
   If you need the player's name for display, save it in your data.
   """
-  @callback init(init_arg, {Race.t, Player.t}) :: data
+  @callback init(init_arg) :: data
 
   @doc """
   Called when generating shapshots screen events.
@@ -40,10 +38,11 @@ defmodule Gald.Screen do
   @doc """
   Called when the current player selects an option.
   """
-  @callback handle_player_option(player_option, data, {Race.t, Player.t}) ::
+  @callback handle_player_option(player_option, data) ::
     {:next, {module, data}} | :end_sequence
 
   use GenServer
+  import ShortMaps
   alias Gald.Race
 
   # Server
@@ -75,26 +74,28 @@ defmodule Gald.Screen do
 
   # Client
   @spec init(term) :: state
-  def init(%{race: race, player: player, screen: {screen_name, screen_init_arg}}) do
+  def init(~m{race player screen}a) do
     {:ok, %{
       race: race,
       player: player,
-      screen: initialize_screen(screen_name, screen_init_arg, {race, player})
+      screen: initialize_screen(race, screen, ~m{race player}a)
     }}
   end
 
   def handle_cast({:player_option, option}, %{race: race, player: player, screen: {screen_name, screen_data}}) do
-    case apply(screen_name, :handle_player_option, [option, screen_data, {race, player}]) do
+    case apply(screen_name, :handle_player_option, [option, screen_data]) do
       {:next, screen_name, screen_init_args} ->
-        screen = initialize_screen(screen_name, screen_init_args, {race, player})
+        screen_init_args = Map.put(screen_init_args, :race, race)
+        screen_init_args = Map.put(screen_init_args, :player, player)
+        screen = initialize_screen(race, screen_name, screen_init_args)
         {:noreply, %{race: race, player: player, screen: screen}}
       :end_sequence ->
         {:stop, :normal, %{race: race, player: player, screen: nil}}
     end
   end
 
-  defp initialize_screen(screen_name, screen_init_arg, {race, player}) do
-    screen_data = apply(screen_name, :init, [screen_init_arg, {race, player}])
+  defp initialize_screen(race, screen_name, screen_init_arg) do
+    screen_data = apply(screen_name, :init, [screen_init_arg])
     Gald.ScreenDisplay.set(Race.display(race), {screen_name, screen_data})
     {screen_name, screen_data}
   end

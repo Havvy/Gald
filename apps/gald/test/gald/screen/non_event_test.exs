@@ -4,12 +4,12 @@ defmodule Gald.Screen.NonEventTest do
   alias Gald.ScreenDisplay
 
   test "NonEvent Screen" do
-    assert nil == NonEvent.init(nil, {self, self})
+    assert nil == NonEvent.init(%{race: nil, player: nil})
     assert %ScreenDisplay{
       title: "Nothing Happened",
       body: "How disappointing.",
       options: ["Continue"]
     } = NonEvent.get_display(nil)
-    assert :end_sequence == NonEvent.handle_player_option("Continue", nil, {self, self})
+    assert :end_sequence == NonEvent.handle_player_option("Continue", nil)
   end
 end

@@ -12,7 +12,7 @@ defmodule Gald.EventManager.Production do
   }
 
   def events(), do: [
-    {Gald.Screen.NonEvent, nil}
+    Gald.Screen.NonEvent
   ]
   
 end

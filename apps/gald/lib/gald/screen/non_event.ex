@@ -9,11 +9,11 @@ defmodule Gald.Screen.NonEvent do
   It literally does nothing for the event phase.
   """
 
-  def init(_init_arg, {_race, _player}) do
+  def init(_init_arg) do
     nil
   end
 
-  def handle_player_option(_option, _data, {_race, _player}) do
+  def handle_player_option(_option, _data) do
     :end_sequence
   end
 

@@ -18,14 +18,15 @@ defmodule Gald.Screen.DiceMove do
   """
   defstruct [
     roll: {:d, 2, 6},
-    player: "$player"
+    player: "$player",
+    race: nil
   ]
 
-  def init(_init_arg, {_race, player}) do
-    %Gald.Screen.DiceMove{player: player}
+  def init(~m{race player}a) do
+    %Gald.Screen.DiceMove{race: race, player: player}
   end
 
-  def handle_player_option(_option, _data, {race, player}) do
+  def handle_player_option(_option, %Gald.Screen.DiceMove{race: race, player: player}) do
     Map.move(Race.map(race), {:player, player}, {:relative, 10})
     roll = {{:d, 6}, [5, 5]}
     player_space = Map.space_of(Race.map(race), {:player, player})

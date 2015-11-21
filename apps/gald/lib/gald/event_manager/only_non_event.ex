@@ -9,7 +9,7 @@ defmodule Gald.EventManager.OnlyNonEvent do
 
   def init(_config, _race), do: nil
   def next(_state, _player), do: %{
-    screen: {Gald.Screen.NonEvent, nil},
+    screen: Gald.Screen.NonEvent,
     state: nil
   }
 end

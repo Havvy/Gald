@@ -28,7 +28,7 @@ defmodule Gald.Turn do
   def init(~m{race player}a) do
     Logger.info "Turn Start for #{player}"
     Race.notify(race, {:turn_start, player})
-    GenServer.cast(self, {:start_screen_sequence, dice_move_screen()})
+    GenServer.cast(self, {:start_screen_sequence, Gald.Screen.DiceMove})
     screen_ref = nil
     phase = :dice
     {:ok, ~m{race player screen_ref phase}a}
@@ -70,10 +70,5 @@ defmodule Gald.Turn do
     Gald.Race.delete_screen(race)
     GenServer.cast(self, :next_phase)
     {:noreply, %{state | screen_ref: nil}}
-  end
-
-  # Initial Screens
-  defp dice_move_screen do
-    {Gald.Screen.DiceMove, nil}
   end
 end
