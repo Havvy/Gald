@@ -3,6 +3,7 @@ defmodule Gald.Players do
   use GenServer
   import ShortMaps
   alias Gald.Race
+  alias Gald.Player
 
   # Client
   def start_link(init_arg, opts \\ []) do
@@ -14,13 +15,14 @@ defmodule Gald.Players do
   end
 
   def names(players), do: GenServer.call(players, :names)
+  def emit_stats(players), do: GenServer.call(players, :emit_stats)
   def turn_order_deciding_data(players), do: GenServer.call(players, :turndata)
 
   def by_name(players, name), do: GenServer.call(players, {:by_name, name})
 
   # Server
   def init(race) do
-    player_spec = Supervisor.Spec.worker(Gald.Player, [])
+    player_spec = Supervisor.Spec.worker(Player, [])
     {:ok, sup} = Supervisor.start_link([player_spec], strategy: :simple_one_for_one)
     names_to_pids = %{}
     join_ix = 0
@@ -59,5 +61,13 @@ defmodule Gald.Players do
   # TODO(Havvy): Remove me.
   def handle_call({:by_name, name}, _from, state = ~m{names_to_pids}a) do
     {:reply, Map.get(names_to_pids, name).pid, state}
+  end
+
+  def handle_cast(:emit_stats, _from, state = ~m{names_to_pids}a) do
+    for {_, %{pid: pid}} <- names_to_pids do
+      Player.emit_stats(pid)
+    end
+
+    {:noreply, state}
   end
 end

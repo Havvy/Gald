@@ -1,24 +1,25 @@
 defmodule Gald.Snapshot.Lobby do
   defstruct [
-    config: %Gald.Config{},   # %Gald.Config{}
-    players: HashSet.new(),  # HashSet.t(Gald.Player.name)
+    config: %Gald.Config{}, # %Gald.Config{}
+    players: []
   ]
 end
 
+# TODO(Havvy): Player stats
 defmodule Gald.Snapshot.Play do
   defstruct [
-    config: %Gald.Config{},  # %Gald.Config{}
-    players: HashSet.new(), # HashSet.t(Gald.Player.name),
-    turn: nil, # Gald.Player.name | nil
-    map: %{}, # HashDict.t(Gald.Player.name, Gald.Map.space)
-    screen: nil # nil | %Gald.ScreenDisplay{}
+    config: %Gald.Config{},
+    players: [],
+    turn: nil,
+    map: %{},
+    screen: nil
   ]
 end
 
 defmodule Gald.Snapshot.Over do
   defstruct [
     config: %Gald.Config{},
-    players: HashSet.new(),
+    players: [],
     winners: HashSet.new()
   ]
 end
