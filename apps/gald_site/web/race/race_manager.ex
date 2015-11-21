@@ -1,6 +1,7 @@
 defmodule GaldSite.RaceManager do
   import ShortMaps
   import Logger
+  alias Gald.Config
 
   defmodule State do
     defstruct visible_name: "Gald Race", race: nil, viewers: MapSet.new()
@@ -37,10 +38,12 @@ defmodule GaldSite.RaceManager do
     Agent.start_link(&Map.new/0, name: @manager)
   end
 
-  @spec start_race(%Gald.Config{}) :: internal_name
-  def start_race(config = %Gald.Config{name: visible_name}) do
+  @spec start_race(%Config{}) :: internal_name
+  def start_race(config = %Config{name: visible_name}) do
     internal_name = gen_internal_name(visible_name)
     Logger.debug("Starting race '#{visible_name}' [#{internal_name}]")
+
+    config = %Config{config | manager: Gald.EventManager.Production}
 
     Agent.update(@manager, fn (map) ->
       {:ok, race} = Gald.start_race(config)
