@@ -60,6 +60,13 @@ defmodule Gald.Race do
   def screen(race), do: who(race, :screen)
   def event_manager(race), do: who(race, :event_manager)
 
+  def component_functions, do: [
+    controller: 1, out: 1, players: 1,
+    player: 2, supervisor: 1, victory: 1,
+    map: 1, round: 1, turn: 1, screen: 1,
+    display: 1, event_manager: 1
+  ]
+
   ## Dynamic Components
   # @spec start_map(Race.t, %Race.Map.Config{}) :: {:ok, pid}
   def start_map(race, arg) do

@@ -68,7 +68,8 @@ defmodule Gald.Controller do
     {:ok, _display} = Gald.Race.start_display(race, %{})
 
     # Start the event choosing process.
-    {:ok, _event_manager} = Gald.Race.start_event_manager(race, %{})
+    event_manager_config = ~m{config}a
+    {:ok, _event_manager} = Gald.Race.start_event_manager(race, event_manager_config)
 
     snapshot = Gald.Snapshot.new(%{state | status: :beginning})
     GenEvent.notify(out(race), {:begin, snapshot.data})

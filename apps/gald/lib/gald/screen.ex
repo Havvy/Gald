@@ -11,9 +11,9 @@ defmodule Gald.Screen do
   """
 
   @type init_arg :: %{}
-  @typep data :: term
-  @typep screen_name :: module
-  @typep screen :: nil | {screen_name, data}
+  @type data :: term
+  @type screen_name :: module
+  @type screen :: nil | {screen_name, data}
   @typep state :: %{race: Race.t, player: Playter.t, screen: screen}
   @typep player_option :: atom | String.t
 

@@ -1,5 +1,10 @@
 defmodule Gald.Config do
-  defstruct end_space: 120, name: "Gald Race"
+  defstruct [
+    name: "Gald Race",
+    end_space: 120,
+    manager: Gald.EventManager.OnlyNonEvent,
+    manager_config: nil
+  ]
 
   def get_and_update(state, key, updater) do
     Map.get_and_update(state, key, updater)

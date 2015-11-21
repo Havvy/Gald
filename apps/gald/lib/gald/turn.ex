@@ -41,8 +41,8 @@ defmodule Gald.Turn do
     {:noreply, %{state | screen_ref: screen_ref}}
   end
 
-  def handle_cast(:next_phase, state = %{phase: :dice, race: race}) do
-    initial_event_screen = Gald.EventManager.next(event_manager(race))
+  def handle_cast(:next_phase, state = %{phase: :dice, race: race, player: player}) do
+    initial_event_screen = Gald.EventManager.next(event_manager(race), player)
     GenServer.cast(self, {:start_screen_sequence, initial_event_screen})
     {:noreply, %{state | phase: :event}}
   end
