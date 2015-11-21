@@ -21,7 +21,7 @@ defmodule Gald.Race do
         controller: 1, out: 1, players: 1,
         player: 2, supervisor: 1, victory: 1,
         map: 1, round: 1, turn: 1, screen: 1,
-        display: 1
+        display: 1, event_manager: 1
       ]
     end
   end
@@ -58,6 +58,7 @@ defmodule Gald.Race do
   def round(race), do: who(race, :rounds)
   def turn(race), do: who(race, :turn)
   def screen(race), do: who(race, :screen)
+  def event_manager(race), do: who(race, :event_manager)
 
   ## Dynamic Components
   # @spec start_map(Race.t, %Race.Map.Config{}) :: {:ok, pid}
@@ -96,6 +97,11 @@ defmodule Gald.Race do
 
   def delete_screen(race) do
     Supervisor.delete_child(race, Gald.Screen)
+  end
+
+  # @spec start_event_manager(Race.t, %Race.EventManager.Config{}) :: {:ok, pid}
+  def start_event_manager(race, arg) do
+    start_worker(race, Gald.EventManager, [arg, [name: event_manager(race)]])
   end
 
   defp start_worker(race, component, [args, otp_opts], restart \\ :permanent) do

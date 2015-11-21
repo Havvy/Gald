@@ -1,12 +1,11 @@
 defmodule Gald.Turn do
-  # TODO(Havvy): This should probably be a gen_fsm again,
+  # TODO(Havvy): This should probably be a gen_fsm,
   #              not because of having to handle which
   #              screen is live, but instead because it
   #              has to handle which screen sequence is
   #              be shown next, if any.
-  #              For now, with only a single sequence,
-  #              there isn't anything to worry about.
   use GenServer
+  use Gald.Race
   import ShortMaps
   require Logger
   alias Gald.Race
@@ -42,8 +41,9 @@ defmodule Gald.Turn do
     {:noreply, %{state | screen_ref: screen_ref}}
   end
 
-  def handle_cast(:next_phase, state = %{phase: :dice}) do
-    GenServer.cast(self, {:start_screen_sequence, non_event_screen})
+  def handle_cast(:next_phase, state = %{phase: :dice, race: race}) do
+    initial_event_screen = Gald.EventManager.next(event_manager(race))
+    GenServer.cast(self, {:start_screen_sequence, initial_event_screen})
     {:noreply, %{state | phase: :event}}
   end
   def handle_cast(:next_phase, state = %{phase: :event}) do
@@ -75,9 +75,5 @@ defmodule Gald.Turn do
   # Initial Screens
   defp dice_move_screen do
     {Gald.Screen.DiceMove, nil}
-  end
-
-  defp non_event_screen do
-    {Gald.Screen.NonEvent, nil}
   end
 end

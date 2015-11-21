@@ -67,6 +67,9 @@ defmodule Gald.Controller do
     # Start the screen monitoring processing.
     {:ok, _display} = Gald.Race.start_display(race, %{})
 
+    # Start the event choosing process.
+    {:ok, _event_manager} = Gald.Race.start_event_manager(race, %{})
+
     snapshot = Gald.Snapshot.new(%{state | status: :beginning})
     GenEvent.notify(out(race), {:begin, snapshot.data})
 
