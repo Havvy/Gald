@@ -110,6 +110,9 @@ const map = function () {
                         return `<li>${playerName}: ${playerSpace}</li>`;
                     }
                 }).join("");
+
+                const finishLine = gald.getEndSpace();
+                html += `<li>Finish Line: ${finishLine}</li>`;
             } else {
                 const players = gald.getPlayers();
                 const winners = gald.getWinners();

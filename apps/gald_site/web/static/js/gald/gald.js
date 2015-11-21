@@ -80,6 +80,10 @@ export default function Gald ({status: state, data: snapshot, controlledPlayer})
       }
     },
 
+    getEndSpace () {
+        return config.end_space;
+    },
+
     _: "dummy field"
   }
 }
