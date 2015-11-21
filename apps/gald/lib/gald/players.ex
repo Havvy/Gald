@@ -58,12 +58,7 @@ defmodule Gald.Players do
     {:reply, res, state}
   end
 
-  # TODO(Havvy): Remove me.
-  def handle_call({:by_name, name}, _from, state = ~m{names_to_pids}a) do
-    {:reply, Map.get(names_to_pids, name).pid, state}
-  end
-
-  def handle_cast(:emit_stats, _from, state = ~m{names_to_pids}a) do
+  def handle_cast(:emit_stats, state = ~m{names_to_pids}a) do
     for {_, %{pid: pid}} <- names_to_pids do
       Player.emit_stats(pid)
     end
