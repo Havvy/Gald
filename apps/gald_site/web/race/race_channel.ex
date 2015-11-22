@@ -39,8 +39,7 @@ defmodule GaldSite.RaceChannel do
       case Gald.Race.new_player(race, player_name) do
         {:ok, {input, output}} ->
           socket = Phoenix.Socket.assign(socket, :player_input, input)
-          # TODO(Havvy): Don't assign to socket; attach listener instead.
-          socket = Phoenix.Socket.assign(socket, :player_output, output)
+          GenEvent.add_handler(output, GaldSite.PlayerOutToSocketHandler, ~m{socket}a)
           {:reply, {:ok, %{name: player_name}}, socket}
         {:error, :duplicate_name} ->
           {:reply, {:error, %{reason: "Cannot join game with that name. Name is already taken."}}, socket}

@@ -2,15 +2,16 @@
 defmodule Gald.TestHelpers.EventQueue.Handler do
   require Logger
   use GenEvent
+  import ShortMaps
 
-  def init(event_queue) do
-    {:ok, event_queue}
+  def init(~m{event_queue name}a) do
+    {:ok, ~m{event_queue name}a}
   end
 
-  def handle_event(event, event_queue) do
-    Logger.info("EVENT: #{inspect event}")
+  def handle_event(event, ~m{event_queue name}a) do
+    Logger.info("EVENT[#{name}]: #{inspect event}")
     GenServer.cast(event_queue, {:event, event})
-    {:ok, event_queue}
+    {:ok, ~m{event_queue name}a}
   end
 end
 
@@ -18,17 +19,24 @@ defmodule Gald.TestHelpers.EventQueue do
   @empty_queue :queue.new()
 
   use GenServer
+  require Logger
 
   # Client
-  def start_link(event_manager) do
+  def start_link(event_manager, name) do
     {:ok, self} = GenServer.start_link(__MODULE__, :no_args)
-    GenEvent.add_handler(event_manager, Gald.TestHelpers.EventQueue.Handler, self)
+    GenEvent.add_handler(event_manager, Gald.TestHelpers.EventQueue.Handler, %{
+      event_queue: self,
+      name: name
+    })
     {:ok, self}
   end
 
-  def start(event_manager) do
-    {:ok, self} = GenServer.start(__MODULE__, :no_args)
-    GenEvent.add_handler(event_manager, Gald.TestHelpers.EventQueue.Handler, self)
+  def start(event_manager, name) do
+    {:ok, self} = GenServer.start(__MODULE__, name)
+    GenEvent.add_handler(event_manager, Gald.TestHelpers.EventQueue.Handler, %{
+      event_queue: self,
+      name: name
+    })
     {:ok, self}
   end
 
@@ -41,26 +49,27 @@ defmodule Gald.TestHelpers.EventQueue do
   end
 
   # Server
-  def init(:no_args) do
-    {:ok, {@empty_queue, nil}}
+  def init(name) do
+    {:ok, %{queue: @empty_queue, from: nil, name: name}}
   end
 
-  def handle_cast({:event, event}, {queue, nil}) do
-    {:noreply, {:queue.in(event, queue)}}
+  def handle_cast({:event, event}, state = %{queue: queue, from: nil}) do
+    queue = :queue.in(event, queue)
+    {:noreply, %{ state | queue: queue }}
   end
-  def handle_cast({:event, event}, {@empty_queue, from}) do
+  def handle_cast({:event, event}, state = %{queue: @empty_queue, from: from}) do
     GenServer.reply(from, event)
-    {:noreply, {@empty_queue, nil}}
+    {:noreply, %{ state | queue: @empty_queue, from: nil }}
   end
 
   def handle_cast(:stop, _state) do
     {:stop, :normal, nil}
   end
 
-  def handle_call(:next, from, {@empty_queue, nil}) do
-    {:noreply, {@empty_queue, from}}
+  def handle_call(:next, from, state = %{queue: @empty_queue, from: nil}) do
+    {:noreply, %{ state | from: from }}
   end
-  def handle_call(:next, _from, {queue, nil}) do
+  def handle_call(:next, _from, %{queue: queue, from: nil }) do
     {{:value, event}, queue} = :queue.out(queue)
     {:reply, event, queue}
   end

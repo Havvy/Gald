@@ -78,6 +78,7 @@ defmodule Gald.Controller do
 
     snapshot = Snapshot.new(%{state | status: :beginning})
     GenEvent.notify(out(race), {:begin, snapshot.data})
+    Players.emit_stats(players(race))
 
     round_config = %{
       turn_order: turn_order
