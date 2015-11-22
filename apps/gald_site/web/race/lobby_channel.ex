@@ -7,10 +7,10 @@ defmodule GaldSite.LobbyChannel do
   end
 
   def broadcast_put(~m{internal_name visible_name}a) do
-    GaldSite.Endpoint.broadcast!("lobby", "global:put", ~m{internal_name visible_name}a)
+    GaldSite.Endpoint.broadcast!("lobby", "public:put", ~m{internal_name visible_name}a)
   end
 
   def broadcast_delete(~m{internal_name}a) do
-    GaldSite.Endpoint.broadcast!("lobby", "global:delete", ~m{internal_name}a)
+    GaldSite.Endpoint.broadcast!("lobby", "public:delete", ~m{internal_name}a)
   end
 end

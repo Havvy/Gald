@@ -19,18 +19,18 @@ export default function Channel (name) {
     return {
         onJoinPromise,
 
-        // All global messages are preceded with a "global:".
-        onGlobal: function (topic, handler) {
-            chan.on(`global:${topic}`, function (payload) {
-                console.debug(`[Global] ${topic}`, payload);
+        // All global messages are preceded with a "public:".
+        onPublic: function (topic, handler) {
+            chan.on(`public:${topic}`, function (payload) {
+                console.debug(`[Public] ${topic}`, payload);
                 handler(payload);
             });
         },
 
-        // All user messages are preceded with a "user:".
-        onUser: function (topic, handler) {
-            chan.on(`user:${topic}`, function (payload) {
-                console.debug(`[User] ${topic}`, payload);
+        // All user messages are preceded with a "private:".
+        onPrivate: function (topic, handler) {
+            chan.on(`private:${topic}`, function (payload) {
+                console.debug(`[Private] ${topic}`, payload);
                 handler(payload);
             });
         },

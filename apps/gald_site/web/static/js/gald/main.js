@@ -211,7 +211,7 @@ startGameButton.addEventListener("click", function (event) {
     chan.emit("start");
 });
 
-const globalHandlers = {
+const publicHandlers = {
     "new_player": function ({player_name}) {
         gald.putPlayer(player_name);
         map.update();
@@ -267,8 +267,8 @@ const globalHandlers = {
     }
 };
 
-Object.keys(globalHandlers).forEach(function (event) {
-    chan.onGlobal(event, globalHandlers[event]);
+Object.keys(publicHandlers).forEach(function (event) {
+    chan.onPublic(event, publicHandlers[event]);
 });
 
 void function initialize () {

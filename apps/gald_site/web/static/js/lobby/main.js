@@ -37,5 +37,5 @@ chan.onJoinPromise
     alert(reason);
 });
 
-chan.onGlobal("put", racesList.put);
-chan.onGlobal("delete", racesList.delete);
+chan.onPublic("put", racesList.put);
+chan.onPublic("delete", racesList.delete);

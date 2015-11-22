@@ -3,17 +3,17 @@ defmodule GaldSite.RaceOutToChannelHandler do
   The race event emitter emits events in the form of
   {topic, payload}. This event handler orwards events
   to every listener of a channel with a topic of
-  "global:topic".
+  "public:topic".
 
   ## Topics
 
-  * global:new_player, %{player_name: String}
-  * global:begin, %{snapshot: %Gald.Snapshot{}}
-  * global:finish, %{snapshot: %Gald.Snapshot{}}
-  * global:round_start, %{round_number: number}
-  * global:turn_start, %{player_name: String}
-  * global:screen, %{name: String, data: Object}
-  * global:move, %{to: number, entity_type: String, entity_name: string}
+  * public:new_player, %{player_name: String}
+  * public:begin, %{snapshot: %Gald.Snapshot{}}
+  * public:finish, %{snapshot: %Gald.Snapshot{}}
+  * public:round_start, %{round_number: number}
+  * public:turn_start, %{player_name: String}
+  * public:screen, %{name: String, data: Object}
+  * public:move, %{to: number, entity_type: String, entity_name: string}
   """
   
   use GenEvent
@@ -29,8 +29,7 @@ defmodule GaldSite.RaceOutToChannelHandler do
   @doc false
   def handle_event({topic, payload}, ~m{channel}a) do
     payload = serialize_payload(topic, payload)
-    # TODO(Havvy): Rename 'global' to 'public'.
-    topic = "global:#{Atom.to_string(topic)}"
+    topic = "public:#{Atom.to_string(topic)}"
     GaldSite.Endpoint.broadcast!(channel, topic, payload)
     {:ok, ~m{channel}a}
   end
