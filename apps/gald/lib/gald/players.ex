@@ -15,7 +15,7 @@ defmodule Gald.Players do
   end
 
   def names(players), do: GenServer.call(players, :names)
-  def emit_stats(players), do: GenServer.call(players, :emit_stats)
+  def emit_stats(players), do: GenServer.cast(players, :emit_stats)
   def turn_order_deciding_data(players), do: GenServer.call(players, :turndata)
 
   def by_name(players, name), do: GenServer.call(players, {:by_name, name})

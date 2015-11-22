@@ -9,16 +9,21 @@ defmodule Gald.TwoPlayerRaceTo25Test do
 
   test "two players racing to space 25" do
     {:ok, race} = Gald.start_race(@config)
-    {:ok, race_out} = EventQueue.start(Gald.Race.out(race))
+    {:ok, race_out} = EventQueue.start(Gald.Race.out(race), "race")
 
-    {:ok, {p1_in, _p1_out}} = Gald.Race.new_player(race, @p1)
+    {:ok, {p1_in, p1_out}} = Gald.Race.new_player(race, @p1)
+    {:ok, p1_out} = EventQueue.start(p1_out, @p1)
     assert {:new_player, @p1} = next_event(race_out)
 
-    {:ok, {p2_in, _p2_out}} = Gald.Race.new_player(race, @p2)
+    {:ok, {p2_in, p2_out}} = Gald.Race.new_player(race, @p2)
+    {:ok, p2_out} = EventQueue.start(p2_out, @p2)
     assert {:new_player, @p2} = next_event(race_out)
 
     Gald.Race.begin(race)
     assert {:begin, %Gald.Snapshot.Play{}} = next_event(race_out)
+    assert {:stats, %Gald.Player.Stats{}} = next_event(p1_out)
+    Logger.debug("Passed that assert.")
+    assert {:stats, %Gald.Player.Stats{}} = next_event(p2_out)
 
     round(1, race_out, @p1, p1_in, @p2, p2_in)
     round(2, race_out, @p1, p1_in, @p2, p2_in)
@@ -32,8 +37,8 @@ defmodule Gald.TwoPlayerRaceTo25Test do
     Gald.Race.stop(race)
   end
 
-  defp next_event(race_out) do
-    EventQueue.next(race_out, 1000)
+  defp next_event(eq) do
+    EventQueue.next(eq, 1000)
   end
 
   defp round(n, race_out, p1_name, p1_in, p2_name, p2_in) do

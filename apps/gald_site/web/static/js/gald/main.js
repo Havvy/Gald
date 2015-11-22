@@ -3,6 +3,7 @@
 "use strict";
 
 import Gald from "./gald";
+import ControlledPlayer from "./player";
 import Channel from "../util/channel";
 // import UserController from "./user/main";
 // import View from "./view/main";
@@ -11,6 +12,7 @@ import Channel from "../util/channel";
 // gald: Gald
 // Binding changed by start & finish events.
 let gald;
+let controlledPlayer;
 
 let chan = function () {
     let pathname = window.location.pathname;
@@ -44,7 +46,7 @@ const screen = function () {
     const timeElement = null;
 
     const updateOptionsElement = function (options) {
-        const isCurrentTurn = gald.getTurn() === gald.getControlledPlayer();
+        const isCurrentTurn = gald.getTurn() === controlledPlayer.getName();
 
         optionsElement.innerHTML = options.map(function (option) {
             return `<button ${isCurrentTurn ? "" : "disabled=\"disabled\""} value="${option}" type="button">${option}</button>`;
@@ -177,7 +179,7 @@ void function joinGameHandler () {
     const joinGameNameInput = document.querySelector("#gr-join-name");
 
     joinGameButton.addEventListener("click", function (event) {
-        if (gald.getControlledPlayer()) {
+        if (typeof controlledPlayer !== "undefined") {
             gameLog.append("You are already playing.");
             return;
         }
@@ -194,7 +196,7 @@ void function joinGameHandler () {
 
         chan.request("join", {name: joinGameNameInput.value})
         .then(function ({name}) {
-            gald.setControlledPlayer(name);
+            controlledPlayer = ControlledPlayer(name);
             map.update();
             gameLog.append(`You are ${name}.`);
         }, function ({reason}) {
@@ -267,8 +269,18 @@ const publicHandlers = {
     }
 };
 
+const privateHandlers = {
+    "stats": function (stats) {
+        controlledPlayer.setStats(stats);
+    }
+};
+
 Object.keys(publicHandlers).forEach(function (event) {
     chan.onPublic(event, publicHandlers[event]);
+});
+
+Object.keys(privateHandlers).forEach(function (event) {
+    chan.onPrivate(event, privateHandlers[event]);
 });
 
 void function initialize () {
