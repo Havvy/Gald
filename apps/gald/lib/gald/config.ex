@@ -2,8 +2,9 @@ defmodule Gald.Config do
   defstruct [
     name: "Gald Race",
     end_space: 120,
-    manager: Gald.EventManager.OnlyNonEvent,
-    manager_config: nil
+    manager: Gald.EventManager.Production,
+    manager_config: nil,
+    rng: Gald.Rng.Production
   ]
 
   def get_and_update(state, key, updater) do

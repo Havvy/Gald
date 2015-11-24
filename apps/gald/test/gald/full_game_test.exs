@@ -1,11 +1,15 @@
-defmodule Gald.TwoPlayerRaceTo25Test do
+defmodule Gald.FullGameTest do
   require Logger
   use ExUnit.Case, async: true
   alias Gald.TestHelpers.EventQueue
 
   @p1 "alice"
   @p2 "bob"
-  @config %Gald.Config{end_space: 25}
+  @config %Gald.Config{
+    end_space: 25,
+    manager: Gald.EventManager.OnlyNonEvent,
+    rng: Gald.Rng.FullGameTest
+  }
 
   test "two players racing to space 25" do
     {:ok, race} = Gald.start_race(@config)

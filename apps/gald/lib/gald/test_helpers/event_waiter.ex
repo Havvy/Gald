@@ -1,7 +1,7 @@
 # TODO(Havvy): This should only be loaded for tests.
 defmodule Gald.TestHelpers.EventWaiter.Handler do
-  require Logger
   use GenEvent
+  require Logger
 
   def init(event_queue) do
     {:ok, event_queue}
@@ -18,17 +18,19 @@ defmodule Gald.TestHelpers.EventWaiter do
   @empty_queue :queue.new()
 
   use GenServer
+  require Logger
 
   # Client
   def start_link(event_manager) do
     {:ok, self} = GenServer.start_link(__MODULE__, :no_args)
-    GenEvent.add_handler(event_manager, Gald.TestHelpers.EventQueue.Handler, self)
+    GenEvent.add_handler(event_manager, Gald.TestHelpers.EventWaiter.Handler, self)
     {:ok, self}
   end
 
   def start(event_manager) do
+    Logger.debug("Starting event waiter")
     {:ok, self} = GenServer.start(__MODULE__, :no_args)
-    GenEvent.add_handler(event_manager, Gald.TestHelpers.EventQueue.Handler, self)
+    GenEvent.add_handler(event_manager, Gald.TestHelpers.EventWaiter.Handler, self)
     {:ok, self}
   end
 
@@ -42,34 +44,40 @@ defmodule Gald.TestHelpers.EventWaiter do
 
   # Server
   def init(:no_args) do
-    {:ok, {@empty_queue, nil}}
+    {:ok, %{
+      queue: @empty_queue,
+      from: nil,
+      awaiting: nil
+    }}
   end
 
-  def handle_cast({:event, event}, {queue, nil}) do
-    {:noreply, {:queue.in(event, queue)}}
+  def handle_cast({:event, event}, state = %{queue: queue, from: nil}) do
+    {:noreply, %{ state | queue: :queue.in(event, queue) }}
   end
-  def handle_cast({:event, {awaiting, _data}}, {@empty_queue, {from, awaiting}}) do
+  def handle_cast({:event, {awaiting, _data}}, state = %{queue: @empty_queue, from: from, awaiting: awaiting}) do
     GenServer.reply(from, :ok)
-    {:noreply, {@empty_queue, nil}}
+    {:noreply, %{ state | queue: @empty_queue, from: nil, awaiting: nil }}
   end
-  def handle_cast({:event, _event}, {@empty_queue, from}) do
-    {:noreply, {@empty_queue, from}}
+  def handle_cast({:event, _event}, state) do
+    {:noreply, state}
   end
 
   def handle_cast(:stop, _state) do
     {:stop, :normal, nil}
   end
 
-  def handle_call({:await, awaiting}, from, {@empty_queue, nil}) do
-    {:noreply, {@empty_queue, {from, awaiting}}}
+  def handle_call({:await, awaiting}, from, state = %{queue: @empty_queue, from: nil}) do
+    Logger.debug("Awaiting event '#{awaiting}'.")
+    {:noreply, %{ state | from: from, awaiting: awaiting }}
   end
-  def handle_call({:await, awaiting}, from, {queue, nil}) do
+  def handle_call({:await, awaiting}, from, state = %{queue: queue}) do
+    Logger.debug("Awaiting event '#{awaiting}'.")
     {queue, awaited} = take_until(queue, awaiting)
 
     if (awaited != nil) do
-      {:reply, awaited, {queue, nil}}
+      {:reply, awaited, %{ state | queue: queue, from: nil, awaited: nil }}
     else
-      {:noreply, {queue, {from, awaiting}}}
+      {:noreply, %{ state | queue: queue, from: from, awaiting: awaiting }}
     end
   end
 

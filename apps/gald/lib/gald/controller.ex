@@ -52,6 +52,8 @@ defmodule Gald.Controller do
   def handle_call(:config, _from, state), do: {:reply, state.config, state}
 
   def handle_cast(:begin, state = ~m{race config}a) do
+    require Logger
+    Logger.debug("Beginning race.")
     state = %{state | status: :play}
     # Determine turn order
     turn_order = TurnOrder.calculate(players(race))
@@ -77,6 +79,8 @@ defmodule Gald.Controller do
     {:ok, _event_manager} = Race.start_event_manager(race, event_manager_config)
 
     snapshot = Snapshot.new(%{state | status: :beginning})
+
+    Logger.debug("Notifying :begin")
     GenEvent.notify(out(race), {:begin, snapshot.data})
     Players.emit_stats(players(race))
 
