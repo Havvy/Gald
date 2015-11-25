@@ -4,13 +4,15 @@ defmodule Gald.Race do
 
   When you `use` this module, you import the functions
   `controller`, `out`, `players`, `player`, `supervisor`,
-  `map`, `round`, `turn`, `screen`, `victory`, and `display`.
+  `map`, `round`, `turn`, `screen`, `victory`, `display`,
+  and `rng.
   """
 
   @opaque t :: pid
 
   use Supervisor
   import Kernel, except: [round: 1]
+  alias Gald.Config
 
   @doc false
   defmacro __using__(_opts) do
@@ -21,24 +23,25 @@ defmodule Gald.Race do
         controller: 1, out: 1, players: 1,
         player: 2, supervisor: 1, victory: 1,
         map: 1, round: 1, turn: 1, screen: 1,
-        display: 1, event_manager: 1
+        display: 1, event_manager: 1, rng: 1
       ]
     end
   end
 
   ## Starting and Stopping
-  @spec start_link(%Gald.Config{}, [term]) :: Supervisor.on_start
-  @spec start(%Gald.Config{}, [term]) :: Supervisor.on_start
+  @spec start_link(%Config{}, [term]) :: Supervisor.on_start
+  @spec start(%Config{}, [term]) :: Supervisor.on_start
   def start_link(config, opts \\ []), do: Supervisor.start_link(__MODULE__, config, opts)
   def start(config, opts \\[]), do: Supervisor.start(__MODULE__, config, opts)
   def stop(race), do: Process.exit(race, :shutdown)
 
   # Server
-  def init(config) do
+  def init(config = %Config{rng: rng_module}) do
     children = [
       worker(Gald.Controller, [self, config, [name: controller(self)]]),
       worker(GenEvent, [[name: out(self)]]),
-      worker(Gald.Players, [self, [name: players(self)]])
+      worker(Gald.Players, [self, [name: players(self)]]),
+      worker(Gald.Rng, [%{module: config.rng}, [name: rng(self)]]),
       # Other children started dynamically.
     ]
 
@@ -59,13 +62,7 @@ defmodule Gald.Race do
   def turn(race), do: who(race, :turn)
   def screen(race), do: who(race, :screen)
   def event_manager(race), do: who(race, :event_manager)
-
-  def component_functions, do: [
-    controller: 1, out: 1, players: 1,
-    player: 2, supervisor: 1, victory: 1,
-    map: 1, round: 1, turn: 1, screen: 1,
-    display: 1, event_manager: 1
-  ]
+  def rng(race), do: who(race, :rng)
 
   ## Dynamic Components
   # @spec start_map(Race.t, %Race.Map.Config{}) :: {:ok, pid}

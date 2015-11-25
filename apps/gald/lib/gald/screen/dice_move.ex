@@ -4,32 +4,43 @@ defmodule Gald.Screen.DiceMove do
   alias Gald.Race
   alias Gald.Map
   alias Gald.ScreenDisplay
+  alias Gald.Rng
 
-  # TODO(Havvy): Rewrite this module doc.
   @moduledoc """
-  The screen for requesting a player roll the dice.
+  The screen for requesting a player roll the dice for movement.
 
-  This screen is usually seen at the beginning of a turn.
-
-  * who: `{:player, player_name}`
-  * roll: `{:d, dice_count, dice_size}`
-
-  The `roll` is used to decide which dice images to show to the player.
+  This screen is seen at the beginning of a player's turn.
   """
   defstruct [
     roll: {:d, 2, 6},
     player: "$player",
-    race: nil
+    map: nil,
+    rng: nil
   ]
 
   def init(~m{race player}a) do
-    %Gald.Screen.DiceMove{race: race, player: player}
+    %Gald.Screen.DiceMove{
+      map: Race.map(race),
+      rng: Race.rng(race),
+      player: player
+    }
   end
 
-  def handle_player_option(_option, %Gald.Screen.DiceMove{race: race, player: player}) do
-    Map.move(Race.map(race), {:player, player}, {:relative, 10})
-    roll = {{:d, 6}, [5, 5]}
-    player_space = Map.space_of(Race.map(race), {:player, player})
+  def handle_player_option(_option, state) do
+    %Gald.Screen.DiceMove{
+      map: map,
+      rng: rng,
+      player: player,
+      roll: roll
+    } = state
+
+    roll_result = roll_dice(rng, roll)
+    total = sum_roll(roll_result)
+    {:d, _roll_count, roll_size} = roll
+
+    roll = {{:d, roll_size}, roll_result}
+    Map.move(map, {:player, player}, {:relative, total})
+    player_space = Map.space_of(map, {:player, player})
 
     {:next, Gald.Screen.DiceMoveResult, ~m{player_space roll}a}
   end
@@ -41,5 +52,15 @@ defmodule Gald.Screen.DiceMove do
       pictures: [],
       options: ["Roll"]
     }
+  end
+
+  defp roll_dice(rng, {:d, dice_count, dice_size}) do
+    for _ <- 1..dice_count do
+      Rng.pos_integer(rng, dice_size)
+    end
+  end
+
+  defp sum_roll(roll) do
+    Enum.sum(roll)
   end
 end

@@ -1,25 +1,14 @@
 defmodule Gald.Rng.Production do
   @moduledoc false
+  @behavior Gald.Rng
   
-  use GenServer
-
-  # Client
-  def start_link(%{}, otp_opts \\ []) do
-    GenServer.start_link(__MODULE__, %{}, otp_opts)
-  end
-
-  def positive_int(rng, i) do
-    GenServer.call(rng, {:positive_int, i})
-  end
-
-  # Server
-  def init(%{}) do
+  def init() do
     << a :: 32, b :: 32, c :: 32 >> = :crypto.rand_bytes(12)
     :random.seed(a,b,c)
-    {:ok, %{}}
+    nil
   end
 
-  def handle_call({:positive_int, i}, _from, %{}) do
-    {:reply, :ok, :random.uniform(i)}
+  def pos_integer(i, nil) do
+    {:reply, :random.uniform(i), nil}
   end
 end
