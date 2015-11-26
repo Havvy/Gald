@@ -55,7 +55,7 @@ defmodule Gald.FullGameTest do
     assert {:turn_start, name} = next_event(race_out)
 
     assert {:screen, %Gald.ScreenDisplay{
-      # TODO(Havvy): More details here.
+      title: "Roll Dice"
     }} = next_event(race_out)
 
     Logger.info("Player #{name} rolling.")
@@ -68,7 +68,7 @@ defmodule Gald.FullGameTest do
     }} = next_event(race_out)
 
     assert {:screen, %Gald.ScreenDisplay{
-      # TODO(Havvy): More details here.
+      title: "Movement!"
     }} = next_event(race_out)
 
     Logger.info("Player #{name} confirming dice move result.")
