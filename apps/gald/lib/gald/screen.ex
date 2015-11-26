@@ -17,6 +17,16 @@ defmodule Gald.Screen do
   @typep state :: %{race: Race.t, player: Playter.t, screen: screen}
   @typep player_option :: atom | String.t
 
+  defmacro __using__(_opts) do
+    quote do
+      @behaviour Gald.Screen
+      alias Gald.ScreenDisplay
+      use Gald.Race
+    end
+  end
+
+  # Behaviour
+
   @doc """
   Invoked when the screen sequence is started.
 

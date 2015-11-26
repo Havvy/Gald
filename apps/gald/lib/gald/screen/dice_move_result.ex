@@ -36,8 +36,6 @@ defmodule Gald.Screen.DiceMoveResult do
     %Gald.ScreenDisplay {
       title: "Movement!",
       body: "#{who} moved forward #{rel} spaces to position #{abs}.",
-      pictures: %Gald.ScreenPictures{},
-      options: ["Continue"]
     }
   end
 end

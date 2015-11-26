@@ -15,7 +15,7 @@ defmodule GaldSite.RaceController do
   # def new(conn, _params), do: nil
 
   def create(conn, ~m{visible_name}) do
-    config = %Gald.Config{end_space: 25, name: visible_name}
+    config = %Gald.Config{name: visible_name}
     internal_race_name = GaldSite.RaceManager.start_race(config)
     redirect conn, to: "/race/#{internal_race_name}"
   end

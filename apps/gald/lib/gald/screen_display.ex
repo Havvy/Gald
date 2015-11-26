@@ -2,11 +2,11 @@ defmodule Gald.ScreenDisplay do
   @moduledoc false
 
   defstruct [
-    title: "",
-    body: "",
-    pictures: %Gald.ScreenPictures{},
-    options: [],
-    time: nil # TODO(Havvy): Figure out how to do time limited screens.
+    title: {:error, "Missing title"},
+    body: {:error, "Missing body"},
+    pictures: %Gald.ScreenPictures{}, # Default: No pictures
+    options: ["Continue"],            # Default: Single continue button.
+    time: 8 # Default: 8 seconds; TODO(Havvy): Figure out how to do time limited screens.
   ]
 
   def start_link(%{race: race}, otp_opts) do

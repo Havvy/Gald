@@ -5,6 +5,7 @@ defmodule Gald.Screen.DiceMove do
   alias Gald.Map
   alias Gald.ScreenDisplay
   alias Gald.Rng
+  alias Gald.Player
 
   @moduledoc """
   The screen for requesting a player roll the dice for movement.
@@ -19,7 +20,11 @@ defmodule Gald.Screen.DiceMove do
   ]
 
   def init(~m{race player}a) do
+    has_haste = Player.has_status_effect(Race.player(race, player), :haste)
+    dice_size = if has_haste do 8 else 6 end
+
     %Gald.Screen.DiceMove{
+      roll: {:d, 2, dice_size},
       map: Race.map(race),
       rng: Race.rng(race),
       player: player
@@ -42,13 +47,15 @@ defmodule Gald.Screen.DiceMove do
     Map.move(map, {:player, player}, {:relative, total})
     player_space = Map.space_of(map, {:player, player})
 
+    IO.puts(player)
+
     {:next, Gald.Screen.DiceMoveResult, ~m{player_space roll}a}
   end
 
-  def get_display(%Gald.Screen.DiceMove{roll: {:d, _dice_count, _dice_size}, player: player}) do
+  def get_display(%Gald.Screen.DiceMove{roll: {:d, dice_count, dice_size}, player: player}) do
     %ScreenDisplay{
       title: "Roll Dice",
-      body: "It's #{player}'s turn.",
+      body: "It's #{player}'s turn. #{player} is rolling #{dice_count}d#{dice_size}",
       pictures: [],
       options: ["Roll"]
     }
