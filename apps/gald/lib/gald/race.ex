@@ -36,7 +36,7 @@ defmodule Gald.Race do
   def stop(race), do: Process.exit(race, :shutdown)
 
   # Server
-  def init(config = %Config{rng: rng_module}) do
+  def init(config = %Config{}) do
     children = [
       worker(Gald.Controller, [self, config, [name: controller(self)]]),
       worker(GenEvent, [[name: out(self)]]),
@@ -54,7 +54,7 @@ defmodule Gald.Race do
   def controller(race), do: who(race, :controller)
   def out(race), do: who(race, :out)
   def players(race), do: who(race, :players)
-  def player(race, name), do: who(race, {:player, name})
+  def player(race, name), do: Gald.Players.pid_of(players(race), name)
   def victory(race), do: who(race, :victory)
   def map(race), do: who(race, :map)
   def display(race), do: who(race, :display)

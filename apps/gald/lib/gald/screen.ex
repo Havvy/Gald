@@ -84,23 +84,28 @@ defmodule Gald.Screen do
 
   # Client
   @spec init(term) :: state
-  def init(~m{race player screen}a) do
+  def init(~m{race player_name screen}a) do
+    player = Race.player(race, player_name)
     {:ok, %{
       race: race,
+      player_name: player_name,
       player: player,
-      screen: initialize_screen(race, screen, ~m{race player}a)
+      screen: initialize_screen(race, screen, ~m{race player player_name}a)
     }}
   end
 
-  def handle_cast({:player_option, option}, %{race: race, player: player, screen: {screen_name, screen_data}}) do
+  def handle_cast({:player_option, option}, state = %{screen: {screen_name, screen_data}, race: race}) do
     case apply(screen_name, :handle_player_option, [option, screen_data]) do
       {:next, screen_name, screen_init_args} ->
-        screen_init_args = Map.put(screen_init_args, :race, race)
-        screen_init_args = Map.put(screen_init_args, :player, player)
+        screen_init_args = screen_init_args
+        |> Map.put(:race, race)
+        |> Map.put(:player, state.player)
+        |> Map.put(:player_name, state.player_name)
+
         screen = initialize_screen(race, screen_name, screen_init_args)
-        {:noreply, %{race: race, player: player, screen: screen}}
+        {:noreply, %{ state | screen: screen }}
       :end_sequence ->
-        {:stop, :normal, %{race: race, player: player, screen: nil}}
+        {:stop, :normal, %{ state | screen: nil}}
     end
   end
 

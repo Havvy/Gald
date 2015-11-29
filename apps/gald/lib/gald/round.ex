@@ -24,6 +24,7 @@ defmodule Gald.Round do
 
     {:ok, %{
       new_turn_order: turn_order,
+      # TODO(Havvy): Make turn_order be `[{player_name, pid}]`
       turn_order: [],
       round: 0,
       turn: nil, # nil | Reference
@@ -44,10 +45,10 @@ defmodule Gald.Round do
     Race.notify(race, {:round_start, round})
     handle_cast(:next, %{state | turn_order: new_turn_order, round: round})
   end
-  def handle_cast(:next, state = %{turn_order: [player | turn_order], race: race}) do
-    {:ok, turn} = Race.start_turn(race, ~m{player}a)
+  def handle_cast(:next, state = %{turn_order: [player_name | turn_order], race: race}) do
+    {:ok, turn} = Race.start_turn(race, ~m{player_name}a)
     turn = Process.monitor(turn)
-    {:noreply, %{state | turn_order: turn_order, turn: turn, turn_player: player}}
+    {:noreply, %{state | turn_order: turn_order, turn: turn, turn_player: player_name}}
   end
 
   @doc false

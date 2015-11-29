@@ -25,24 +25,24 @@ defmodule Gald.Turn do
 
   # Client
   @doc false
-  def init(~m{race player}a) do
-    Logger.info "Turn Start for #{player}"
-    Race.notify(race, {:turn_start, player})
+  def init(~m{race player_name}a) do
+    Logger.debug "Turn Start for #{player_name}"
+    Race.notify(race, {:turn_start, player_name})
     GenServer.cast(self, {:start_screen_sequence, Gald.Screen.DiceMove})
     screen_ref = nil
     phase = :dice
-    {:ok, ~m{race player screen_ref phase}a}
+    {:ok, ~m{race player_name screen_ref phase}a}
   end
 
   @doc false
-  def handle_cast({:start_screen_sequence, screen}, state = %{race: race, player: player, screen_ref: nil}) do
-    {:ok, screen} = Race.start_screen(race, ~m{player screen}a)
+  def handle_cast({:start_screen_sequence, screen}, state = %{race: race, player_name: player_name, screen_ref: nil}) do
+    {:ok, screen} = Race.start_screen(race, ~m{player_name screen}a)
     screen_ref = Process.monitor(screen)
     {:noreply, %{state | screen_ref: screen_ref}}
   end
 
-  def handle_cast(:next_phase, state = %{phase: :dice, race: race, player: player}) do
-    initial_event_screen = Gald.EventManager.next(event_manager(race), player)
+  def handle_cast(:next_phase, state = %{phase: :dice, race: race, player_name: player_name}) do
+    initial_event_screen = Gald.EventManager.next(event_manager(race), player_name)
     GenServer.cast(self, {:start_screen_sequence, initial_event_screen})
     {:noreply, %{state | phase: :event}}
   end
@@ -57,7 +57,7 @@ defmodule Gald.Turn do
   end
 
   @doc false
-  def handle_call({:player_option, player, option}, _from, state = ~m{race player}a) do
+  def handle_call({:player_option, player_name, option}, _from, state = ~m{race player_name}a) do
     Screen.player_option(Race.screen(race), option)
     {:reply, :ok, state}
   end

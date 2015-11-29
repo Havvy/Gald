@@ -18,7 +18,9 @@ defmodule Gald.Players do
   def emit_stats(players), do: GenServer.cast(players, :emit_stats)
   def turn_order_deciding_data(players), do: GenServer.call(players, :turndata)
 
-  def by_name(players, name), do: GenServer.call(players, {:by_name, name})
+  def pid_of(players, name) when is_binary(name) do
+    GenServer.call(players, {:pid_of, name})
+  end
 
   # Server
   def init(race) do
@@ -33,7 +35,7 @@ defmodule Gald.Players do
     if Map.has_key?(names_to_pids, name) do
       {:reply, {:error, :duplicate_name}, state}
     else
-      {:ok, player} = Supervisor.start_child(sup, [~m{name race}a, [name: Race.player(race, name)]])
+      {:ok, player} = Supervisor.start_child(sup, [~m{name race}a, []])
       Race.notify(race, {:new_player, name})
       names_to_pids = Map.put(names_to_pids, name, %{pid: player, join_ix: join_ix})
       join_ix = join_ix + 1
@@ -58,7 +60,12 @@ defmodule Gald.Players do
     {:reply, res, state}
   end
 
+  def handle_call({:pid_of, name}, _from, state) do
+    {:reply, state.names_to_pids[name].pid, state}
+  end
+
   def handle_cast(:emit_stats, state = ~m{names_to_pids}a) do
+    IO.puts "Emitting stats for all players"
     for {_, %{pid: pid}} <- names_to_pids do
       Player.emit_stats(pid)
     end

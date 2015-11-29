@@ -7,12 +7,14 @@ defmodule Gald.Screen.DeificIntervention.MotusGood do
   import ShortMaps
   alias Gald.Player
   alias Gald.Race
+  alias Gald.Player
+  alias Gald.Player.Controller
+  alias Gald.Player.Stats
 
   def init(~m{race player}a) do
-    # TODO(Havvy):
-    player_process = Race.player(race, player)
-    Player.put_status_effect(player_process, :haste)
-    Player.emit_stats(player_process)
+    stats = Player.stats(player)
+    Stats.put_status_effect(stats, :haste)
+    Player.emit_stats(player)
 
     ~m{}a
   end

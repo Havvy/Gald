@@ -1,9 +1,10 @@
 defmodule Gald.Controller do
   @moduledoc """
-  This module controls the supervisor and configuration of the race.
+  This module controls top level actions for the race that don't really
+  fit anywhere specific. Like holding onto the config and lifecycle status.
 
   You should never call the functions on this module directly - instead, use
-  the re-exports on Gald.Race.
+  the proper functions on Gald.Race.
   """
 
   # TODO(Havvy): Change to a :gen_fsm?
@@ -53,7 +54,6 @@ defmodule Gald.Controller do
 
   def handle_cast(:begin, state = ~m{race config}a) do
     require Logger
-    Logger.debug("Beginning race.")
     state = %{state | status: :play}
     # Determine turn order
     turn_order = TurnOrder.calculate(players(race))
@@ -80,7 +80,6 @@ defmodule Gald.Controller do
 
     snapshot = Snapshot.new(%{state | status: :beginning})
 
-    Logger.debug("Notifying :begin")
     GenEvent.notify(out(race), {:begin, snapshot.data})
     Players.emit_stats(players(race))
 
@@ -98,6 +97,4 @@ defmodule Gald.Controller do
     GenEvent.notify(out(race), {:finish, snapshot.data})
     {:noreply, state}
   end
-
-  # TODO(Havvy): Have a way to terminate a race.
 end

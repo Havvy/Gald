@@ -3,6 +3,7 @@ defmodule GaldSite.RaceChannel do
   require Logger
   import ShortMaps
   alias GaldSite.RaceManager
+  alias Gald.Player.Input, as: PlayerInput
 
   defp get_race(socket), do: socket.assigns.race
   defp get_internal_name(socket), do: socket.assigns.internal_name
@@ -60,7 +61,7 @@ defmodule GaldSite.RaceChannel do
   def handle_in("option", ~m{option}, socket) do
     # race = get_race(socket)
     player_input = get_player_input(socket)
-    Gald.Player.In.select_option(player_input, option)
+    PlayerInput.select_option(player_input, option)
     {:reply, {:ok, %{}}, socket}
   end
 

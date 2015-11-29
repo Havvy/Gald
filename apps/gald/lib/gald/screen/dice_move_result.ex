@@ -6,7 +6,7 @@ defmodule Gald.Screen.DiceMoveResult do
   The structue for a screen showing the result of rolling dice
   for movement.
 
-  * who: `{:player, player_name}`
+  * player_name: `player_name`
   * roll: `{{:d, 6}, [positive_integer]}`
   * to: `{relative, absolute} - e.g., rolling a total of 10 from space 15 gives `{10, 25}`.
 
@@ -15,14 +15,18 @@ defmodule Gald.Screen.DiceMoveResult do
   The `to` is used for the textual description of how the move happened.
   """
 
-  defstruct who: {:player, "$no_player$"}, to: {2, 2}, roll: {{:d, 6}, [1, 1]}
+  defstruct [
+    player_name: "$player",
+    to: {2, 2},
+    roll: {{:d, 6}, [1, 1]}
+  ]
 
-  def init(~m{player_space roll player}a) do
+  def init(~m{player_space roll player_name}a) do
     {_dice, relative} = roll
     relative = Enum.sum(relative)
 
     %Gald.Screen.DiceMoveResult{
-      who: {:player, player},
+      player_name: player_name,
       to: {relative, player_space},
       roll: roll
     }
@@ -32,10 +36,10 @@ defmodule Gald.Screen.DiceMoveResult do
     :end_sequence
   end
 
-  def get_display(%Gald.Screen.DiceMoveResult{who: {:player, who}, to: {rel, abs}}) do
+  def get_display(%Gald.Screen.DiceMoveResult{player_name: player_name, to: {rel, abs}}) do
     %Gald.ScreenDisplay {
       title: "Movement!",
-      body: "#{who} moved forward #{rel} spaces to position #{abs}.",
+      body: "#{player_name} moved forward #{rel} spaces to position #{abs}.",
     }
   end
 end
