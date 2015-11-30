@@ -56,4 +56,8 @@ defmodule Gald.Player.Stats do
   def has_status_effect(stats, status) do
     Agent.get(stats, &has_status_effect(&1, status))
   end
+
+  def update_health(stats, updater) do
+    Agent.update(stats, &%Gald.Player.Stats{ &1 | health: updater.(&1.health) })
+  end
 end

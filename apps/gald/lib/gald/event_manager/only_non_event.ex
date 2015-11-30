@@ -8,8 +8,8 @@ defmodule Gald.EventManager.OnlyNonEvent do
   @behaviour Gald.EventManager
 
   def init(_config, _race), do: nil
-  def next(_state, _player), do: %{
+  def next(state, _player), do: %{
     screen: Gald.Screen.NonEvent,
-    state: nil
+    state: state
   }
 end

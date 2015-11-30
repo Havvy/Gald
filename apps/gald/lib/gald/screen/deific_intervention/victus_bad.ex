@@ -1,6 +1,6 @@
-defmodule Gald.Screen.DeificIntervention.MotusGood do
+defmodule Gald.Screen.DeificIntervention.VictusBad do
   @moduledoc """
-  Grant Haste
+  Take away half of the player's current health.
   """
 
   use Gald.Screen
@@ -10,7 +10,7 @@ defmodule Gald.Screen.DeificIntervention.MotusGood do
 
   def init(~m{player}a) do
     stats = Player.stats(player)
-    Stats.put_status_effect(stats, :haste)
+    Stats.update_health(stats, &Kernel.round(&1 / 2))
     Player.emit_stats(player)
 
     ~m{}a
@@ -19,7 +19,7 @@ defmodule Gald.Screen.DeificIntervention.MotusGood do
   def get_display(~m{}a) do
     %ScreenDisplay{
       title: "Deific Intervention!",
-      body: "Motus has blessed you. You are now <i>hasted</i>."
+      body: "Victus has cursed you. You feel drained of health."
     }
   end
 
