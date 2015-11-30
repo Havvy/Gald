@@ -196,6 +196,7 @@ const Ui = {
                 const {
                     status_effects,
                     health,
+                    max_health,
                     defense,
                     damage,
                     attack
@@ -203,7 +204,7 @@ const Ui = {
 
                 let html = `<h3>Stats</h3>
                  <ul>
-                     <li>Health: ${health}</li>
+                     <li>Health: ${health}/${max_health}</li>
                      <li>Defense: +${defense}</li>
                      <li>Attack: +${attack}</li>
                      <li>Damage: 2 Physical</li>

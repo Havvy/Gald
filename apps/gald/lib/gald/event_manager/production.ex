@@ -24,7 +24,9 @@ defmodule Gald.EventManager.Production do
   def events do
     [
       Gald.Screen.DeificIntervention.MotusGood,
-      Gald.Screen.DeificIntervention.VictusBad
+      Gald.Screen.DeificIntervention.VictusBad,
+
+      Gald.Screen.HotSprings
     ]
     |> Enum.with_index
     |> Enum.map(fn ({screen, index}) -> {index, screen} end)
