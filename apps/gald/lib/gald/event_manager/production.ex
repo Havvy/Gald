@@ -23,10 +23,10 @@ defmodule Gald.EventManager.Production do
   #               it is called.
   def events do
     [
-      Gald.Screen.DeificIntervention.MotusGood,
-      Gald.Screen.DeificIntervention.VictusBad,
+      DeificIntervention.MotusGood,
+      DeificIntervention.VictusBad,
 
-      Gald.Screen.HotSprings
+      HotSprings
     ]
     |> Enum.with_index
     |> Enum.map(fn ({screen, index}) -> {index, screen} end)

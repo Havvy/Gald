@@ -1,14 +1,23 @@
 # TODO(Havvy): Rename to Gald.Phase
 defmodule Gald.Screen do
   @moduledoc """
-  A server for the handling of a sequence of screens.
+  This module is both a server for handling a sequence of screens
+  and a behaviour
 
-  This will be Gald.Phase in the future.
+  A screen being a page shown to everybody detailing the actions of
+  what's happened while also showing and handling which options the
+  current player can take.
 
-  <Curernt Player>
-  <Sequence>
-  <No Screen>
+  All individual screens must implement this behaviour and must
+  be in the Gald.Screen namespace. When passing a screen to this
+  server (either in the start_link function or one of the behaviour
+  callback return values), do not prefix the module with Gald.Screen -
+  the server will do that for you.
   """
+
+  use GenServer
+  import ShortMaps
+  alias Gald.Race
 
   @type init_arg :: %{}
   @type data :: term
@@ -17,6 +26,8 @@ defmodule Gald.Screen do
   @typep state :: %{race: Race.t, player: Playter.t, screen: screen}
   @typep player_option :: atom | String.t
 
+  # Behaviour
+
   defmacro __using__(_opts) do
     quote do
       @behaviour Gald.Screen
@@ -24,8 +35,6 @@ defmodule Gald.Screen do
       use Gald.Race
     end
   end
-
-  # Behaviour
 
   @doc """
   Invoked when the screen sequence is started.
@@ -50,10 +59,6 @@ defmodule Gald.Screen do
   """
   @callback handle_player_option(player_option, data) ::
     {:next, {module, data}} | :end_sequence
-
-  use GenServer
-  import ShortMaps
-  alias Gald.Race
 
   # Server
   @doc """
@@ -83,6 +88,7 @@ defmodule Gald.Screen do
   end
 
   # Client
+  # TODO(Havvy): init should take screen_module, not screen.
   @spec init(term) :: state
   def init(~m{race player_name screen}a) do
     player = Race.player(race, player_name)
@@ -110,6 +116,7 @@ defmodule Gald.Screen do
   end
 
   defp initialize_screen(race, screen_name, screen_init_arg) do
+    screen_name = Module.safe_concat(Gald.Screen, screen_name)
     screen_data = apply(screen_name, :init, [screen_init_arg])
     Gald.ScreenDisplay.set(Race.display(race), {screen_name, screen_data})
     {screen_name, screen_data}

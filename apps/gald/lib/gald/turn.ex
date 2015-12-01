@@ -1,9 +1,4 @@
 defmodule Gald.Turn do
-  # TODO(Havvy): This should probably be a gen_fsm,
-  #              not because of having to handle which
-  #              screen is live, but instead because it
-  #              has to handle which screen sequence is
-  #              be shown next, if any.
   use GenServer
   use Gald.Race
   import ShortMaps
@@ -28,7 +23,7 @@ defmodule Gald.Turn do
   def init(~m{race player_name}a) do
     Logger.debug "Turn Start for #{player_name}"
     Race.notify(race, {:turn_start, player_name})
-    GenServer.cast(self, {:start_screen_sequence, Gald.Screen.DiceMove})
+    GenServer.cast(self, {:start_screen_sequence, DiceMove})
     screen_ref = nil
     phase = :dice
     {:ok, ~m{race player_name screen_ref phase}a}

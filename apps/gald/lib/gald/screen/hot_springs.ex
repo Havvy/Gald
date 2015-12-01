@@ -17,6 +17,6 @@ defmodule Gald.Screen.HotSprings do
   end
 
   def handle_player_option(_option, _state) do
-    {:next, Gald.Screen.RelaxingBath, %{}}
+    {:next, RelaxingBath, %{}}
   end
 end

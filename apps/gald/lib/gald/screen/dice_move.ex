@@ -49,7 +49,7 @@ defmodule Gald.Screen.DiceMove do
     Map.move(map, {:player, player_name}, {:relative, total})
     player_space = Map.space_of(map, {:player, player_name})
 
-    {:next, Gald.Screen.DiceMoveResult, ~m{player_space roll}a}
+    {:next, DiceMoveResult, ~m{player_space roll}a}
   end
 
   def get_display(%Gald.Screen.DiceMove{roll: {:d, dice_count, dice_size}, player_name: player_name}) do
