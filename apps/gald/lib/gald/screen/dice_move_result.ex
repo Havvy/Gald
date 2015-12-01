@@ -39,7 +39,8 @@ defmodule Gald.Screen.DiceMoveResult do
   def get_display(%Gald.Screen.DiceMoveResult{player_name: player_name, to: {rel, abs}}) do
     %Gald.ScreenDisplay {
       title: "Movement!",
-      body: "#{player_name} moved forward #{rel} spaces to position #{abs}.",
+      body: "#{player_name} moves forward #{rel} spaces to position #{abs}.",
+      log: "#{player_name} moved forward #{rel} spaces to position #{abs}."
     }
   end
 end

@@ -219,37 +219,36 @@ const Ui = {
 
 chan.onJoinPromise
 .then(function onJoinOk (snapshot) {
-    gameLog.append("Welcome to the Race!");
+    Ui.gameLog.append("Welcome to the Race!");
     gald = Gald(snapshot);
-    gameLog.append("The race is known to us.");
 
     switch (gald.getLifecycleStatus()) {
         case "lobby":
-            gameLog.append("The game has not yet been started.");
-            map.update();
+            Ui.gameLog.append("The game has not yet been started.");
+            Ui.map.update();
             break;
         case "play":
-            gameLog.append("The game is currently going!");
-            map.update();
+            Ui.gameLog.append("The game is currently going!");
+            Ui.map.update();
             break;
         case "over":
-            gameLog.append("The game is over.");
-            map.update();
+            Ui.gameLog.append("The game is over.");
+            Ui.map.update();
             break;
         default:
-            gameLog.append(`Game in unknown state, ${gald.getLifecycleStatus()}!`);
+            Ui.gameLog.append(`Game in unknown state, ${gald.getLifecycleStatus()}!`);
     }
 }, function onJoinError (error) {
-    gameLog.append("Sorry, unable to join the race.");
-    gameLog.append(`Reason: ${error.reason}`);
+    Ui.gameLog.append("Sorry, unable to join the race.");
+    Ui.gameLog.append(`Reason: ${error.reason}`);
     if (error.stack) {
-      gamelog.append(error.stack);
+      Ui.gamelog.append(error.stack);
     }
 })
 .catch(function (err) {
-    gameLog.append("Error while trying to connect to the channel!");
+    Ui.gameLog.append("Error while trying to connect to the channel!");
     console.error(err);
-    gameLog.append(String(err));
+    Ui.gameLog.append(String(err));
 });
 
 void function joinGameHandler () {
@@ -258,27 +257,27 @@ void function joinGameHandler () {
 
     joinGameButton.addEventListener("click", function (event) {
         if (typeof controlledPlayer !== "undefined") {
-            gameLog.append("You are already playing.");
+            Ui.gameLog.append("You are already playing.");
             return;
         }
 
         if (gald.getLifecycleStatus() !== "lobby") {
-            gameLog.append("The game has already started. You cannot join.");
+            Ui.gameLog.append("The game has already started. You cannot join.");
             return;
         }
 
         if (/[^a-zA-Z0-9-]/.test(joinGameNameInput.value)) {
-            gameLog.append("Your name can only contain letters, numbers, and dashes.");
+            Ui.gameLog.append("Your name can only contain letters, numbers, and dashes.");
             return;
         }
 
         chan.request("join", {name: joinGameNameInput.value})
         .then(function ({name}) {
             controlledPlayer = ControlledPlayer(name);
-            map.update();
-            gameLog.append(`You are ${name}.`);
+            Ui.map.update();
+            Ui.gameLog.append(`You are ${name}.`);
         }, function ({reason}) {
-            gameLog.append(reason);
+            Ui.gameLog.append(reason);
         });
     }, false);
 }();
@@ -294,45 +293,49 @@ startGameButton.addEventListener("click", function (event) {
 const publicHandlers = {
     "new_player": function ({player_name}) {
         gald.putPlayer(player_name);
-        map.update();
-        gameLog.append(`${player_name} has joined the game.`);
+        Ui.map.update();
+        Ui.gameLog.append(`${player_name} has joined the game.`);
     },
 
     "begin": function ({snapshot}) {
-        gameLog.append("Starting game!");
         gald = Gald({
             status: "play",
             data: snapshot,
             controlledPlayer: gald.getControlledPlayer()
         });
-        map.update();
-        screen.update();
+        Ui.gameLog.append("Starting game!");
+        Ui.map.update();
+        Ui.screen.update();
     },
 
     "finish": function ({snapshot}) {
-        gameLog.append("Game over!");
         gald = Gald({
             status: "over",
             data: snapshot,
             controlledPlayer: gald.getControlledPlayer()
         });
-        map.update();
-        screen.update();
+        Ui.gameLog.append("Game over!");
+        Ui.map.update();
+        Ui.screen.update();
     },
 
     "round_start": function ({round_number}) {
-        gameLog.append(`Round ${round_number} started.`);
+        Ui.gameLog.append(`Round ${round_number} started.`);
     },
 
     "turn_start": function ({player_name}) {
         gald.setTurn(player_name);
-        map.update();
-        gameLog.append(`Turn start for ${player_name}.`);
+        Ui.map.update();
+        Ui.gameLog.append(`Turn start for ${player_name}.`);
     },
 
     "screen": function ({screen: screenData}) {
         gald.setScreen(screenData);
         screen.update();
+
+        if (screenData.log) {
+          Ui.gameLog.append(screenData.log);
+        }
     },
 
     "move": function ({to, entity_type, entity_name}) {
@@ -342,8 +345,7 @@ const publicHandlers = {
         }
 
         gald.setPlayerSpace(entity_name, to);
-        gameLog.append(`${entity_name} moved to space ${to}.`);
-        map.update();
+        Ui.map.update();
     }
 };
 

@@ -8,18 +8,19 @@ defmodule Gald.Screen.DeificIntervention.VictusBad do
   alias Gald.Player
   alias Gald.Player.Stats
 
-  def init(~m{player}a) do
+  def init(~m{player player_name}a) do
     stats = Player.stats(player)
     Stats.update_health(stats, &Kernel.round(&1 / 2))
     Player.emit_stats(player)
 
-    ~m{}a
+    ~m{player_name}a
   end
 
-  def get_display(~m{}a) do
+  def get_display(~m{player_name}a) do
     %ScreenDisplay{
       title: "Deific Intervention!",
-      body: "Victus has cursed you. You feel drained of health."
+      body: "Victus curses. You feel drained of health.",
+      log: "Victus took half of #{player_name}'s health."
     }
   end
 

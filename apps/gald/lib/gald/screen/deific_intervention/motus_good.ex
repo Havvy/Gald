@@ -8,18 +8,19 @@ defmodule Gald.Screen.DeificIntervention.MotusGood do
   alias Gald.Player
   alias Gald.Player.Stats
 
-  def init(~m{player}a) do
+  def init(~m{player player_name}a) do
     stats = Player.stats(player)
     Stats.put_status_effect(stats, :haste)
     Player.emit_stats(player)
 
-    ~m{}a
+    ~m{player_name}a
   end
 
-  def get_display(~m{}a) do
+  def get_display(~m{player_name}a) do
     %ScreenDisplay{
       title: "Deific Intervention!",
-      body: "Motus has blessed you. You are now <i>hasted</i>."
+      body: "Motus blesses you with <i>haste</i>. You now roll 2d8 for movement.",
+      log: "Motus has hasted #{player_name}."
     }
   end
 

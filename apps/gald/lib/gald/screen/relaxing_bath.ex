@@ -5,17 +5,18 @@ defmodule Gald.Screen.RelaxingBath do
   alias Gald.Player
   alias Gald.Player.Stats
 
-  def init(%{player: player}) do
+  def init(%{player: player, player_name: player_name}) do
     stats = Player.stats(player)
     Stats.update_health(stats, fn (_current, max) -> max end)
     Player.emit_stats(player)
-    %{}
+    %{player_name: player_name}
   end
 
-  def get_display(_state) do
+  def get_display(%{player_name: player_name}) do
     %ScreenDisplay {
       title: "Hot Springs",
-      body: "You decide to take a rejuvinating bath, restoring your health."
+      body: "You decide to take a rejuvinating bath, restoring your health.",
+      log: "#{player_name} took a relaxing bath."
     }
   end
 
