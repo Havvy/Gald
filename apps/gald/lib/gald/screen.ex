@@ -20,9 +20,9 @@ defmodule Gald.Screen do
   alias Gald.Race
 
   @type init_arg :: %{}
-  @type data :: term
+  @type screen_state :: term
   @type screen_name :: module
-  @type screen :: nil | {screen_name, data}
+  @type screen :: nil | {screen_name, screen_state}
   @typep state :: %{race: Race.t, player: Playter.t, screen: screen}
   @typep player_option :: atom | String.t
 
@@ -40,25 +40,35 @@ defmodule Gald.Screen do
   Invoked when the screen sequence is started.
 
   `init_arg` is a map with data dependent upon the individual screen sequence.
-  For the beginning of a sequence, the map will contain only `race` and `player`.
+  For the beginning of a sequence, the map will contain the `race`, `player`,
+  and `player_name`. After that, it will be whatever the previous screen
+  passed when sending a `{:next, screen_name, data}`, with `race`, `player`,
+  and `player_name` always being injected.
 
-  The return value is data that is sent to the other callbacks. Kind of like
-  `state` in a GenServer.
+  The return value is state that is sent to the other callbacks. This is
+  analogous to the `state` in a GenServer.
 
-  If you need the player's name for display, save it in your data.
+  When you screen has side effects as a result of initialization, this is
+  where those side effects are located.
   """
-  @callback init(init_arg) :: data
+  @callback init(init_arg) :: screen_state
 
   @doc """
   Called when generating shapshots screen events.
+
+  This must be a pure function.
   """
-  @callback get_display(data) :: %Gald.ScreenDisplay{}
+  @callback get_display(screen_state) :: %Gald.ScreenDisplay{}
 
   @doc """
-  Called when the current player selects an option.
+  Called when the current player selects an available option.
+
+  The option will be a valid option for the screen.
+
+  Side effects related to picking an option are located in this function.
   """
-  @callback handle_player_option(player_option, data) ::
-    {:next, {module, data}} | :end_sequence
+  @callback handle_player_option(player_option, screen_state) ::
+    {:next, {module, screen_state}} | :end_sequence
 
   # Server
   @doc """
@@ -69,8 +79,8 @@ defmodule Gald.Screen do
   end
 
   @doc """
-  Tells the current screen that the current player selected one of the options
-  that it gave.
+  Tells the current screen that the current player selected one of the valid
+  options.
   """
   def player_option(screen, option) do
     GenServer.cast(screen, {:player_option, option})
@@ -100,8 +110,8 @@ defmodule Gald.Screen do
     }}
   end
 
-  def handle_cast({:player_option, option}, state = %{screen: {screen_name, screen_data}, race: race}) do
-    case apply(screen_name, :handle_player_option, [option, screen_data]) do
+  def handle_cast({:player_option, option}, state = %{screen: {screen_name, screen_state}, race: race}) do
+    case apply(screen_name, :handle_player_option, [option, screen_state]) do
       {:next, screen_name, screen_init_args} ->
         screen_init_args = screen_init_args
         |> Map.put(:race, race)
@@ -117,8 +127,8 @@ defmodule Gald.Screen do
 
   defp initialize_screen(race, screen_name, screen_init_arg) do
     screen_name = Module.safe_concat(Gald.Screen, screen_name)
-    screen_data = apply(screen_name, :init, [screen_init_arg])
-    Gald.ScreenDisplay.set(Race.display(race), {screen_name, screen_data})
-    {screen_name, screen_data}
+    screen_state = apply(screen_name, :init, [screen_init_arg])
+    Gald.ScreenDisplay.set(Race.display(race), {screen_name, screen_state})
+    {screen_name, screen_state}
   end
 end
