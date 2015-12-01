@@ -40,6 +40,8 @@ defmodule Gald.FullGameTest do
     assert {:finish, %Gald.Snapshot.Over{}} = next_event(race_out)
 
     EventQueue.stop(race_out)
+    EventQueue.stop(p1_out)
+    EventQueue.stop(p2_out)
     Race.stop(race)
   end
 
@@ -48,13 +50,13 @@ defmodule Gald.FullGameTest do
   end
 
   defp round(n, race_out, p1_name, p1_in, p2_name, p2_in) do
-    assert {:round_start, n} = next_event(race_out)
+    assert {:round_start, ^n} = next_event(race_out)
     turn(race_out, p1_name, p1_in, n)
     turn(race_out, p2_name, p2_in, n)
   end
 
   defp turn(race_out, name, player_in, round) do
-    assert {:turn_start, name} = next_event(race_out)
+    assert {:turn_start, ^name} = next_event(race_out)
 
     assert {:screen, %StandardDisplay{
       title: "Roll Dice"

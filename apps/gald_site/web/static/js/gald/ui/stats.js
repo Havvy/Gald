@@ -27,6 +27,7 @@ export default React.createClass({
         <li key="health">Health: {health}</li>
         <li key="defense">Defense: +{defense}</li>
         <li key="attack">Attack: +{attack}</li>
+        {/*TODO(Havvy): [DAMAGE-HARDCODE] Remove hardcoding of damage*/}
         <li key="damage">Damage: 2 Physical</li>
         <li key="status">Status: {status_effects}</li>
       </ul>

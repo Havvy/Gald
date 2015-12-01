@@ -9,7 +9,6 @@ defmodule Gald.Player do
   alias Gald.Player.Input
   alias Gald.Player.Stats
   alias Gald.Race
-  alias Gald.Player
 
   @opaque t :: pid
 
@@ -45,6 +44,10 @@ defmodule Gald.Player do
   end
   def emit_stats(race, player_name) when is_binary(player_name) do
     GenServer.cast(controller(Race.player(race, player_name)), :emit_stats)
+  end
+
+  def battle_card(player) do
+    GenServer.call(controller(player), :battle_card)
   end
 
   def name(player) when is_pid(player) do

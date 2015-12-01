@@ -60,6 +60,7 @@ defmodule Gald.Screen.DiceMove do
     }
   end
 
+  # TODO(Havvy): [DICE] Move to a dice module.
   defp roll_dice(rng, {:d, dice_count, dice_size}) do
     for _ <- 1..dice_count do
       Rng.pos_integer(rng, dice_size)

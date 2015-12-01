@@ -1,5 +1,5 @@
 defmodule Gald.EventManager do
-  @doc """
+  @moduledoc """
   Behaviour and server for event management.
 
   Specifically, this is the server that chooses which event to give to the

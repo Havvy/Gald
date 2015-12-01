@@ -14,6 +14,9 @@ defmodule Gald.Screen do
   @type screen_name :: module
   @type screen :: nil | {screen_name, screen_state}
   @typep player_option :: atom | String.t
+  @typep screen_display :: %Gald.Display.Standard{}
+    | %Gald.Display.Battle{}
+    | %Gald.Display.BattleResolution{}
 
   # Behaviour
 

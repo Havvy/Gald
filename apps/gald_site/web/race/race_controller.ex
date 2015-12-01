@@ -22,6 +22,6 @@ defmodule GaldSite.RaceController do
   def create(conn, _params) do
     conn
     |> put_flash(:error, "You did not pass in a name for the game.")
-    |> redirect to: "/race/"
+    |> redirect(to: "/race/")
   end
 end

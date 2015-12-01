@@ -1,4 +1,6 @@
 import React from "react";
+import BattleScreen from "./screen/battle";
+import BattleResolutionScreen from "./screen/battle-resolution";
 
 const JoinGameForm = function ({onRequestJoinGame}) {
   const onClick = function (clickEvent) {
@@ -78,8 +80,25 @@ const PlayScreen = function ({style, screendata, isCurrentTurn, onOption}) {
   switch (style) {
     case "Standard": return <StandardScreen
       isCurrentTurn={isCurrentTurn}
-      {...screendata}
       onOption={onOption}
+      title={screendata.turn}
+      body={screendata.body}
+      options={screendata.options}
+    />;
+    case "Battle": return <BattleScreen
+      isCurrentTurn={isCurrentTurn}
+      onOption={onOption}
+      monster={screendata.monster}
+      player={screendata.player}
+      previousActionDescriptions={screendata.previous_action_descriptions}
+    />;
+    case "BattleResolution": return <BattleResolutionScreen
+      isCurrentTurn={isCurrentTurn}
+      onOption={onOption}
+      playerName={screendata.player_name}
+      monsterName={screendata.monster_name}
+      resolution={screendata.resolution}
+      previousActionDescriptions={screendata.previous_action_descriptions}
     />;
     case undefined: return null; // Rare case of connecting between start of game and first screen.
     default: return <p>Unknown display style "{style}" given to screen.</p>;
@@ -123,6 +142,7 @@ export default React.createClass({
         }
         return <OverScreen winners={winners} />;
       case "loading": return <p>Loading Game</p>;
+      case "nonexistent": return <p>This game does not exist. Go <a href="../race">back</a>?</p>;
       default: return <p>Error: Unknown lifecycleStatus "{lifecycleStatus}".</p>;
     }
   },

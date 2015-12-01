@@ -3,6 +3,8 @@ defmodule Gald.Player.Stats do
   The various statistics of the player.
   """
 
+  import ShortMaps
+
   @opaque t :: pid
 
   # Struct
@@ -11,7 +13,7 @@ defmodule Gald.Player.Stats do
     max_health: 10,
     attack: 0,
     defense: 0,
-    damage: [physical: 2],
+    damage: %{physical: 2},
     status_effects: []
   ]
 
@@ -32,6 +34,16 @@ defmodule Gald.Player.Stats do
   def emit(stats, event_emitter) do
     stats = Agent.get(stats, &(&1))
     GenEvent.notify(event_emitter, {:stats, stats})
+  end
+
+  def battle_card(stats) do
+    Agent.get(stats, fn (~m{health max_health attack defense damage}a) ->
+      ~m{health max_health attack defense damage}a
+    end)
+  end
+
+  def is_alive(stats) do
+    Agent.get(stats, fn (~m{health}a) -> health > 0 end)
   end
 
   @spec put_status_effect(%Gald.Player.Stats{}, atom) :: %Gald.Player.Stats{}

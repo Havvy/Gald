@@ -31,10 +31,15 @@ defmodule Gald.EventManager.Production do
 
   def generate_events do
     [
+      # Deific Intervention
       DeificIntervention.MotusGood,
       DeificIntervention.VictusBad,
 
-      HotSprings
+      # Random Events
+      HotSprings,
+
+      # Random Combat
+      Combat.Unicat
     ]
     |> Enum.with_index
     |> Enum.map(fn ({screen, index}) -> {index, screen} end)

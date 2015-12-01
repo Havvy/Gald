@@ -1,6 +1,6 @@
 defmodule GaldSite.RaceManager do
   import ShortMaps
-  import Logger
+  require Logger
   alias Gald.Config
 
   defmodule State do

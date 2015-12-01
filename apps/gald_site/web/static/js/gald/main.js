@@ -77,6 +77,8 @@ const screen = function () {
         const winners = Gald.getWinners(gald);
         screen.$setLifecycleStatus(lifecycleStatus);
         screen.$setWinners(winners);
+      } else if (lifecycleStatus === "nonexistent") {
+        screen.$setLifecycleStatus(lifecycleStatus);
       }
     },
 
@@ -178,6 +180,8 @@ chan.onJoinPromise
   if (error.stack) {
     Ui.gamelog.append(error.stack);
   }
+  gald = Gald.create({status: "nonexistent", data: {}});
+  Ui.screen.update();
 })
 .catch(function (err) {
   Ui.gameLog.append("Error while trying to connect to the channel!");

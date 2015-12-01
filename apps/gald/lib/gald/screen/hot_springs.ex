@@ -1,5 +1,10 @@
 defmodule Gald.Screen.HotSprings do
-  @moduledoc false
+  @moduledoc """
+  The Hot Springs is an event.
+
+  Players can choose to take a relaxing bath to restore their health.
+  """
+
   use Gald.Screen
 
   def init(%{}) do

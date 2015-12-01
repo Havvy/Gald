@@ -1,7 +1,7 @@
 defmodule Gald.Player.Controller do
   @moduledoc """
   You should never call the functions on this module directly - instead, use
-  the proper functions on Gald.Race.
+  the proper functions on Gald.Player.
   """
   
   use GenServer
@@ -28,5 +28,22 @@ defmodule Gald.Player.Controller do
 
   def handle_call(:name, _from, state) do
     {:reply, state.name, state}
+  end
+
+  def handle_call(:battle_card, _from, state) do
+    alias Gald.Display.Battle.PlayerCard
+
+    stats = Stats.battle_card(Player.stats(state.player))
+
+    card = %PlayerCard{
+      name: state.name,
+      health: stats.health,
+      max_health: stats.max_health,
+      attack: stats.attack,
+      defense: stats.defense,
+      damage: stats.damage
+    }
+
+    {:reply, card, state}
   end
 end
