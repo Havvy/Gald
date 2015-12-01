@@ -32,7 +32,9 @@ defmodule Gald.EventManager.Production do
       DeificIntervention.MotusGood,
       DeificIntervention.VictusBad,
 
-      HotSprings
+      HotSprings,
+
+      Unicat
     ]
     |> Enum.with_index
     |> Enum.map(fn ({screen, index}) -> {index, screen} end)

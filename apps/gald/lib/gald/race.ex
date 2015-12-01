@@ -5,7 +5,7 @@ defmodule Gald.Race do
   When you `use` this module, you import the functions
   `controller`, `out`, `players`, `player`, `supervisor`,
   `map`, `round`, `turn`, `phase`, `victory`, `display`,
-  and `rng.
+  `rng`, and `monsters`.
   """
 
   @opaque t :: pid
@@ -23,7 +23,8 @@ defmodule Gald.Race do
         controller: 1, out: 1, players: 1,
         player: 2, supervisor: 1, victory: 1,
         map: 1, round: 1, turn: 1, phase: 1,
-        display: 1, event_manager: 1, rng: 1
+        display: 1, event_manager: 1, rng: 1,
+        monsters: 1
       ]
     end
   end
@@ -42,7 +43,8 @@ defmodule Gald.Race do
       worker(Gald.Controller, [self, config, [name: controller(self)]]),
       worker(Gald.Players, [self, [name: players(self)]]),
       worker(Gald.Rng, [%{module: config.rng}, [name: rng(self)]]),
-      worker(Gald.Display, [%{race: self}, [name: display(self)]])
+      worker(Gald.Display, [%{race: self}, [name: display(self)]]),
+      worker(Gald.Monsters, [nil, [name: monsters(self)]]),
       # Other children started dynamically.
     ]
 
@@ -64,6 +66,7 @@ defmodule Gald.Race do
   def phase(race), do: who(race, :phase)
   def event_manager(race), do: who(race, :event_manager)
   def rng(race), do: who(race, :rng)
+  def monsters(race), do: who(race, :monsters)
 
   ## Dynamic Components
   # @spec start_map(Race.t, %Race.Map.Config{}) :: {:ok, pid}
