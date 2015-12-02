@@ -38,10 +38,11 @@ defmodule Gald.Race do
   # Server
   def init(config = %Config{}) do
     children = [
-      worker(Gald.Controller, [self, config, [name: controller(self)]]),
       worker(GenEvent, [[name: out(self)]]),
+      worker(Gald.Controller, [self, config, [name: controller(self)]]),
       worker(Gald.Players, [self, [name: players(self)]]),
       worker(Gald.Rng, [%{module: config.rng}, [name: rng(self)]]),
+      worker(Gald.Display, [%{race: self}, [name: display(self)]])
       # Other children started dynamically.
     ]
 
@@ -87,11 +88,6 @@ defmodule Gald.Race do
 
   def delete_turn(race) do
     Supervisor.delete_child(race, Gald.Turn)
-  end
-
-  # @spec start_display(Race.t, %Race.ScreenDisplay.Config{}) :: {:ok, pid}
-  def start_display(race, arg) do
-    start_worker(race, Gald.ScreenDisplay, [arg, [name: display(race)]])
   end
 
   # @spec start_screen(Race.t, %Race.Screen.Config{}) :: {:ok, pid}

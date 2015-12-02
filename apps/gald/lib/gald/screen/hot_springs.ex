@@ -9,7 +9,7 @@ defmodule Gald.Screen.HotSprings do
   end
 
   def get_display(_state) do
-    %ScreenDisplay {
+    %StandardDisplay{
       title: "Hot Springs",
       body: "You stumble upon a natural hot spring. What do you want to do?",
       options: ["Take a bath"]

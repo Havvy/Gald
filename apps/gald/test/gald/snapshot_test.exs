@@ -1,12 +1,14 @@
 defmodule Gald.SnapshotTest do
   use ExUnit.Case, async: true
+  require Logger
   alias Gald.Race
   alias Gald.Snapshot.Lobby
   alias Gald.Snapshot.Play
   alias Gald.Snapshot.Over
-  alias Gald.ScreenDisplay
+  alias Gald.Display.Standard, as: StandardDisplay
+  alias Gald.Display
+  alias Gald.Map
   alias Gald.TestHelpers.EventWaiter
-  require Logger
 
   @p1 "Alice"
   @p2 "Bob"
@@ -65,7 +67,7 @@ defmodule Gald.SnapshotTest do
       players: [@p1],
       map: %{@p1 => 0},
       turn: @p1,
-      screen: %ScreenDisplay{
+      screen: %StandardDisplay{
         title: "Roll Dice",
         options: ["Roll"]
       }
@@ -78,7 +80,7 @@ defmodule Gald.SnapshotTest do
     Race.new_player(race, @p1)
     Race.begin(race)
     EventWaiter.await(race_out, :screen)
-    Gald.Map.move(Race.map(race), {:player, @p1}, {:relative, 10})
+    Map.move(Race.map(race), {:player, @p1}, {:relative, 10})
     EventWaiter.await(race_out, :move)
     snapshot = Race.snapshot(race)
 
@@ -87,7 +89,7 @@ defmodule Gald.SnapshotTest do
       players: [@p1],
       map: %{@p1 => 10},
       turn: @p1,
-      screen: %ScreenDisplay{
+      screen: %StandardDisplay{
         title: "Roll Dice",
         options: ["Roll"]
       }

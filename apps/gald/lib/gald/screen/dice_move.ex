@@ -1,10 +1,9 @@
 defmodule Gald.Screen.DiceMove do
-  @behaviour Gald.Screen
+  use Gald.Screen
   import ShortMaps
   require Logger
   alias Gald.Race
   alias Gald.Map
-  alias Gald.ScreenDisplay
   alias Gald.Rng
   alias Gald.Player
   alias Gald.Player.Stats
@@ -53,7 +52,7 @@ defmodule Gald.Screen.DiceMove do
   end
 
   def get_display(%Gald.Screen.DiceMove{roll: {:d, dice_count, dice_size}, player_name: player_name}) do
-    %ScreenDisplay{
+    %StandardDisplay{
       title: "Roll Dice",
       body: "It's #{player_name}'s turn. #{player_name} is rolling #{dice_count}d#{dice_size}",
       pictures: [],

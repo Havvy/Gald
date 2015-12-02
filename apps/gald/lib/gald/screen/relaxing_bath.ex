@@ -13,7 +13,7 @@ defmodule Gald.Screen.RelaxingBath do
   end
 
   def get_display(%{player_name: player_name}) do
-    %ScreenDisplay {
+    %StandardDisplay {
       title: "Hot Springs",
       body: "You decide to take a rejuvinating bath, restoring your health.",
       log: "#{player_name} took a relaxing bath."

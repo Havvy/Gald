@@ -71,9 +71,6 @@ defmodule Gald.Controller do
     }
     {:ok, _map} = Race.start_map(race, map_config)
 
-    # Start the screen monitoring processing.
-    {:ok, _display} = Race.start_display(race, %{})
-
     # Start the event choosing process.
     event_manager_config = ~m{config}a
     {:ok, _event_manager} = Race.start_event_manager(race, event_manager_config)

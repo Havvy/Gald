@@ -1,10 +1,14 @@
 defmodule Gald.Screen.DiceMoveResult do
-  @behaviour Gald.Screen
+  use Gald.Screen
   import ShortMaps
 
   @moduledoc """
-  The structue for a screen showing the result of rolling dice
-  for movement.
+  ### Screen
+
+  This screen shows the result of movement.
+
+  ### Struct
+  The structue for this screen
 
   * player_name: `player_name`
   * roll: `{{:d, 6}, [positive_integer]}`
@@ -37,7 +41,7 @@ defmodule Gald.Screen.DiceMoveResult do
   end
 
   def get_display(%Gald.Screen.DiceMoveResult{player_name: player_name, to: {rel, abs}}) do
-    %Gald.ScreenDisplay {
+    %StandardDisplay {
       title: "Movement!",
       body: "#{player_name} moves forward #{rel} spaces to position #{abs}.",
       log: "#{player_name} moved forward #{rel} spaces to position #{abs}."

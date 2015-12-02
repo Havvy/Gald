@@ -3,6 +3,7 @@ defmodule Gald.FullGameTest do
   use ExUnit.Case, async: true
   alias Gald.TestHelpers.EventQueue
   alias Gald.Race
+  alias Gald.Display.Standard, as: StandardDisplay
 
   @p1 "alice"
   @p2 "bob"
@@ -54,7 +55,7 @@ defmodule Gald.FullGameTest do
   defp turn(race_out, name, player_in, round) do
     assert {:turn_start, name} = next_event(race_out)
 
-    assert {:screen, %Gald.ScreenDisplay{
+    assert {:screen, %StandardDisplay{
       title: "Roll Dice"
     }} = next_event(race_out)
 
@@ -67,14 +68,14 @@ defmodule Gald.FullGameTest do
       to: ^end_space
     }} = next_event(race_out)
 
-    assert {:screen, %Gald.ScreenDisplay{
+    assert {:screen, %StandardDisplay{
       title: "Movement!"
     }} = next_event(race_out)
 
     Logger.info("Player #{name} confirming dice move result.")
     assert :ok = Gald.Player.Input.select_option(player_in, "Continue")
 
-    assert {:screen, %Gald.ScreenDisplay{
+    assert {:screen, %StandardDisplay{
       title: "Nothing Happened"
     }} = next_event(race_out)
 

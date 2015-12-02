@@ -11,6 +11,7 @@ export default function Gald ({status: state, data: snapshot, controlledPlayer})
   let map;
   let turn;
   let screen;
+  let screenStyle;
 
   // Won only data
   let winners;
@@ -65,10 +66,11 @@ export default function Gald ({status: state, data: snapshot, controlledPlayer})
     },
 
     getScreen () {
-      return screen;
+      return {style: screenStyle, screen};
     },
 
-    setScreen (newScreen) {
+    setScreen (newStyle, newScreen) {
+      screenStyle = newStyle;
       screen = newScreen;
     },
 

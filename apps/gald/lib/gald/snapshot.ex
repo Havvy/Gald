@@ -5,7 +5,6 @@ defmodule Gald.Snapshot.Lobby do
   ]
 end
 
-# TODO(Havvy): Player stats
 defmodule Gald.Snapshot.Play do
   defstruct [
     config: %Gald.Config{},
@@ -27,12 +26,18 @@ end
 defmodule Gald.Snapshot do
   use Gald.Race
   import ShortMaps
+  alias Gald.Controller
+  alias Gald.Display
+  alias Gald.Round
+  alias Gald.Map
+  alias Gald.Victory
+  alias Gald.Players
 
   @moduledoc """
   This module is tightly coupled with Gald.Race.
   """
 
-  @type t :: {Gald.Controller.status, any}
+  @type t :: {Controller.status, any}
 
   def new(~m{race status config}a) do
     new(race, status, config)
@@ -47,25 +52,25 @@ defmodule Gald.Snapshot do
 
   def new(race, :beginning, config) do
     players = get_players(race)
-    map = Gald.Map.player_spaces(map(race)) |> Enum.into(%{})
+    map = Map.player_spaces(map(race)) |> Enum.into(%{})
     %{status: :play, data: ~m{%Play config players map}a}
   end
 
   def new(race, :play, config) do
     players = get_players(race)
-    map = Gald.Map.player_spaces(map(race)) |> Enum.into(%{})
-    turn = Gald.Round.current(round(race))
-    screen = Gald.ScreenDisplay.get(display(race))
+    map = Map.player_spaces(map(race)) |> Enum.into(%{})
+    turn = Round.current(round(race))
+    screen = Display.get(display(race))
 
     %{status: :play, data: ~m{%Play config players map turn screen}a}
   end
 
   def new(race, :over, config) do
     players = get_players(race)
-    winners = Gald.Victory.winners(victory(race))
+    winners = Victory.winners(victory(race))
 
     %{status: :over, data: ~m{%Over config players winners}a}
   end
 
-  defp get_players(race), do: Gald.Players.names(players(race))
+  defp get_players(race), do: Players.names(players(race))
 end

@@ -16,7 +16,7 @@ defmodule Gald.Player.Controller do
   end
 
   # Server
-  def init(state = ~m{race player name}a) do
+  def init(state = %{race: _race, player: _player, name: _name}) do
     {:ok, state}
   end
 

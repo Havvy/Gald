@@ -17,7 +17,7 @@ defmodule Gald.Screen.DeificIntervention.VictusBad do
   end
 
   def get_display(~m{player_name}a) do
-    %ScreenDisplay{
+    %StandardDisplay{
       title: "Deific Intervention!",
       body: "Victus curses. You feel drained of health.",
       log: "Victus took half of #{player_name}'s health."

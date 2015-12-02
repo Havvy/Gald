@@ -18,6 +18,7 @@ defmodule Gald.Screen do
   use GenServer
   import ShortMaps
   alias Gald.Race
+  alias Gald.Display
 
   @type init_arg :: %{}
   @type screen_state :: term
@@ -31,7 +32,7 @@ defmodule Gald.Screen do
   defmacro __using__(_opts) do
     quote do
       @behaviour Gald.Screen
-      alias Gald.ScreenDisplay
+      alias Gald.Display.Standard, as: StandardDisplay
       use Gald.Race
     end
   end
@@ -58,7 +59,7 @@ defmodule Gald.Screen do
 
   This must be a pure function.
   """
-  @callback get_display(screen_state) :: %Gald.ScreenDisplay{}
+  @callback get_display(screen_state) :: %Gald.Display.Standard{}
 
   @doc """
   Called when the current player selects an available option.
@@ -128,7 +129,7 @@ defmodule Gald.Screen do
   defp initialize_screen(race, screen_name, screen_init_arg) do
     screen_name = Module.safe_concat(Gald.Screen, screen_name)
     screen_state = apply(screen_name, :init, [screen_init_arg])
-    Gald.ScreenDisplay.set(Race.display(race), {screen_name, screen_state})
+    Display.set(Race.display(race), {screen_name, screen_state})
     {screen_name, screen_state}
   end
 end

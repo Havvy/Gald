@@ -17,7 +17,7 @@ defmodule Gald.Screen.DeificIntervention.MotusGood do
   end
 
   def get_display(~m{player_name}a) do
-    %ScreenDisplay{
+    %StandardDisplay{
       title: "Deific Intervention!",
       body: "Motus blesses you with <i>haste</i>. You now roll 2d8 for movement.",
       log: "Motus has hasted #{player_name}."

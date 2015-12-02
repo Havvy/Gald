@@ -61,21 +61,31 @@ const screen = function () {
         chan.emit("option", {option: clickEvent.target.value});
     });
 
+    const styles = {
+        "Standard": function (screen) {
+            titleElement.innerHTML = screen.title;
+            bodyElement.innerHTML = screen.body;
+            updateOptionsElement(screen.options);
+        }
+    }
+
     return {
         update () {
             const lifecycleStatus = gald.getLifecycleStatus();
             if (lifecycleStatus === "play") {
-                const screen = gald.getScreen();
+                const {style, screen} = gald.getScreen();
 
                 if (!screen) {
-                    // Game hasn't started yet,
-                    // or between start and first screen.
+                    // Between game start and first screen.
+                    // Extremely rare edge case.
                     return;
                 }
 
-                titleElement.innerHTML = screen.title;
-                bodyElement.innerHTML = screen.body;
-                updateOptionsElement(screen.options);
+                if (!style in styles) {
+                    Ui.gameLog.append("Unknown display style ${style} given by screen.");
+                }
+
+                styles[style](screen);
             } else if (lifecycleStatus === "over") {
                 const winners = gald.getWinners();
 
@@ -329,8 +339,8 @@ const publicHandlers = {
         Ui.gameLog.append(`Turn start for ${player_name}.`);
     },
 
-    "screen": function ({screen: screenData}) {
-        gald.setScreen(screenData);
+    "screen": function ({style, screen: screenData}) {
+        gald.setScreen(style, screenData);
         screen.update();
 
         if (screenData.log) {

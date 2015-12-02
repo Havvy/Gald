@@ -1,6 +1,5 @@
 defmodule Gald.Screen.NonEvent do
-  @behaviour Gald.Screen
-  alias Gald.ScreenDisplay
+  use Gald.Screen
 
   @moduledoc """
   The screen is for testing purposes.
@@ -17,11 +16,9 @@ defmodule Gald.Screen.NonEvent do
   end
 
   def get_display(_data) do
-    %ScreenDisplay{
+    %StandardDisplay{
       title: "Nothing Happened",
       body: "How disappointing.",
-      pictures: [],
-      options: ["Continue"]
     }
   end
 end
