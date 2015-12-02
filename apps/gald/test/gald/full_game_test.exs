@@ -9,7 +9,8 @@ defmodule Gald.FullGameTest do
   @p2 "bob"
   @config %Gald.Config{
     end_space: 25,
-    manager: Gald.EventManager.OnlyNonEvent,
+    manager: Gald.EventManager.Singular,
+    manager_config: %{event: NonEvent},
     rng: Gald.Rng.FullGameTest
   }
 

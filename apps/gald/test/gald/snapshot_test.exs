@@ -13,7 +13,8 @@ defmodule Gald.SnapshotTest do
   @p1 "Alice"
   @p2 "Bob"
   @config %Gald.Config{
-    manager: Gald.EventManager.OnlyNonEvent
+    manager: Gald.EventManager.Singular,
+    manager_config: %{event: NonEvent}
   }
   @config_short_race %Gald.Config{ @config | end_space: 25}
 
