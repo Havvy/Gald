@@ -7,11 +7,19 @@ defmodule Gald.EventManager.Production do
   alias Gald.Race
   alias Gald.Rng
 
-  def init(_config, race), do: %{rng: Race.rng(race)}
+  def init(_config, race) do
+    events = generate_events()
+    events_size = Map.size(events)
+    %{
+      rng: Race.rng(race),
+      events: events,
+      events_size: events_size
+    }
+  end
+
   def next(state, _player) do
-    event_size = Map.size(events)
-    index = Rng.pos_integer(state.rng, event_size) - 1
-    screen = events[index]
+    index = Rng.pos_integer(state.rng, state.events_size) - 1
+    screen = state.events[index]
 
     %{
       screen: screen,
@@ -19,9 +27,7 @@ defmodule Gald.EventManager.Production do
     }
   end
 
-  # FIXME(Havvy): Make sure this doesn't recreate the dict each time
-  #               it is called.
-  def events do
+  def generate_events do
     [
       DeificIntervention.MotusGood,
       DeificIntervention.VictusBad,
