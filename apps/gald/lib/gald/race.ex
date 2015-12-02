@@ -4,7 +4,7 @@ defmodule Gald.Race do
 
   When you `use` this module, you import the functions
   `controller`, `out`, `players`, `player`, `supervisor`,
-  `map`, `round`, `turn`, `screen`, `victory`, `display`,
+  `map`, `round`, `turn`, `phase`, `victory`, `display`,
   and `rng.
   """
 
@@ -22,7 +22,7 @@ defmodule Gald.Race do
       import Gald.Race, only: [
         controller: 1, out: 1, players: 1,
         player: 2, supervisor: 1, victory: 1,
-        map: 1, round: 1, turn: 1, screen: 1,
+        map: 1, round: 1, turn: 1, phase: 1,
         display: 1, event_manager: 1, rng: 1
       ]
     end
@@ -61,7 +61,7 @@ defmodule Gald.Race do
   def display(race), do: who(race, :display)
   def round(race), do: who(race, :rounds)
   def turn(race), do: who(race, :turn)
-  def screen(race), do: who(race, :screen)
+  def phase(race), do: who(race, :phase)
   def event_manager(race), do: who(race, :event_manager)
   def rng(race), do: who(race, :rng)
 
@@ -90,13 +90,13 @@ defmodule Gald.Race do
     Supervisor.delete_child(race, Gald.Turn)
   end
 
-  # @spec start_screen(Race.t, %Race.Screen.Config{}) :: {:ok, pid}
-  def start_screen(race, arg) do
-    start_worker(race, Gald.Screen, [arg, [name: screen(race)]], :transient)
+  # @spec start_phase(Race.t, %Race.Phase.Config{}) :: {:ok, pid}
+  def start_phase(race, arg) do
+    start_worker(race, Gald.Phase, [arg, [name: phase(race)]], :transient)
   end
 
-  def delete_screen(race) do
-    Supervisor.delete_child(race, Gald.Screen)
+  def delete_phase(race) do
+    Supervisor.delete_child(race, Gald.Phase)
   end
 
   # @spec start_event_manager(Race.t, %Race.EventManager.Config{}) :: {:ok, pid}

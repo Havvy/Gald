@@ -4,7 +4,7 @@ defmodule Gald.Turn do
   import ShortMaps
   require Logger
   alias Gald.Race
-  alias Gald.Screen
+  alias Gald.Phase
 
   # Server
   def start_link(init_arg, opts \\ []) do
@@ -23,22 +23,22 @@ defmodule Gald.Turn do
   def init(~m{race player_name}a) do
     Logger.debug "Turn Start for #{player_name}"
     Race.notify(race, {:turn_start, player_name})
-    GenServer.cast(self, {:start_screen_sequence, DiceMove})
+    GenServer.cast(self, {:start_phase, DiceMove})
     screen_ref = nil
     phase = :dice
     {:ok, ~m{race player_name screen_ref phase}a}
   end
 
   @doc false
-  def handle_cast({:start_screen_sequence, screen}, state = %{race: race, player_name: player_name, screen_ref: nil}) do
-    {:ok, screen} = Race.start_screen(race, ~m{player_name screen}a)
+  def handle_cast({:start_phase, screen}, state = %{race: race, player_name: player_name, screen_ref: nil}) do
+    {:ok, screen} = Race.start_phase(race, ~m{player_name screen}a)
     screen_ref = Process.monitor(screen)
     {:noreply, %{state | screen_ref: screen_ref}}
   end
 
   def handle_cast(:next_phase, state = %{phase: :dice, race: race, player_name: player_name}) do
     initial_event_screen = Gald.EventManager.next(event_manager(race), player_name)
-    GenServer.cast(self, {:start_screen_sequence, initial_event_screen})
+    GenServer.cast(self, {:start_phase, initial_event_screen})
     {:noreply, %{state | phase: :event}}
   end
   def handle_cast(:next_phase, state = %{phase: :event}) do
@@ -53,7 +53,7 @@ defmodule Gald.Turn do
 
   @doc false
   def handle_call({:player_option, player_name, option}, _from, state = ~m{race player_name}a) do
-    Screen.player_option(Race.screen(race), option)
+    Phase.player_option(Race.phase(race), option)
     {:reply, :ok, state}
   end
   def handle_call({:player_option, _player, _option}, _from, state) do
@@ -62,7 +62,7 @@ defmodule Gald.Turn do
 
   @doc false
   def handle_info({:DOWN, screen_ref, :process, _pid, _reason}, state = ~m{race screen_ref}a) do
-    Gald.Race.delete_screen(race)
+    Gald.Race.delete_phase(race)
     GenServer.cast(self, :next_phase)
     {:noreply, %{state | screen_ref: nil}}
   end
