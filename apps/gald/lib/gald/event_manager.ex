@@ -1,6 +1,9 @@
 defmodule Gald.EventManager do
   @doc """
-  Manages events.
+  Behaviour and server for event management.
+
+  Specifically, this is the server that chooses which event to give to the
+  player after the movement phase.
   """
 
   use GenServer
@@ -16,16 +19,15 @@ defmodule Gald.EventManager do
   @doc """
   Initializes the event manager.
   """
-  @callback init(%Gald.Config{}, Race.t) :: em_state
+  @callback init(init_arg :: em_init, race :: Race.t) :: em_state
 
   @doc """
   Requests the next event to give to the specified player.
   """
-  @callback next(em_state, Gald.Player.t) :: %{
+  @callback next(state :: em_state, player :: Gald.Player.t) :: %{
     screen: Screen.screen,
     state: em_state
   }
-
 
   # Client
   @spec start_link(Map.t, GenServer.opts) :: {:ok, t}
