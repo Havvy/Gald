@@ -15,5 +15,5 @@ defmodule Gald.Rng.FullGameTest do
     5, # @P1 Round 3 DiceRoll, 2nd die;
   ]
 
-  def pos_integer(i, [reply | state]), do: {:reply, reply, state}
+  def pos_integer(_i, [reply | state]), do: {:reply, reply, state}
 end

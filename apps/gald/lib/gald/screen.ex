@@ -13,7 +13,6 @@ defmodule Gald.Screen do
   @type screen_state :: term
   @type screen_name :: module
   @type screen :: nil | {screen_name, screen_state}
-  @typep state :: %{race: Race.t, player: Playter.t, screen: screen}
   @typep player_option :: atom | String.t
 
   # Behaviour

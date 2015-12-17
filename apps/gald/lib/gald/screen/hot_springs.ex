@@ -1,8 +1,6 @@
 defmodule Gald.Screen.HotSprings do
   @moduledoc false
   use Gald.Screen
-  alias Gald.Player
-  alias Gald.Player.Stats
 
   def init(%{}) do
     %{}

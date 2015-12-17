@@ -6,7 +6,6 @@ defmodule Gald.SnapshotTest do
   alias Gald.Snapshot.Play
   alias Gald.Snapshot.Over
   alias Gald.Display.Standard, as: StandardDisplay
-  alias Gald.Display
   alias Gald.Map
   alias Gald.TestHelpers.EventWaiter
 

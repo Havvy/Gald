@@ -9,7 +9,7 @@ defmodule Gald.Player do
   alias Gald.Player.Input
   alias Gald.Player.Stats
   alias Gald.Race
-  alias Gald.Players
+  alias Gald.Player
 
   @opaque t :: pid
 

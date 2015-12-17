@@ -1,3 +1,5 @@
+if :code.is_loaded(Gald.EventManager.Production), do: IO.puts Gald.EventManager.Production.__info__(:compile)[:source]
+
 defmodule Gald.EventManager.Production do
   @moduledoc """
   The Event Manager used in production.

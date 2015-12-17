@@ -1,6 +1,6 @@
 defmodule Gald.Rng.Production do
   @moduledoc false
-  @behavior Gald.Rng
+  @behaviour Gald.Rng
   
   def init() do
     << a :: 32, b :: 32, c :: 32 >> = :crypto.rand_bytes(12)
