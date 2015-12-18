@@ -11,12 +11,13 @@ export default function Channel (name) {
     socket.connect();
     let chan = socket.channel(name, {});
 
-    chan.join()
+    chan.join(10e3)
     .receive("ok", resolve)
     .receive("error", reject)
-    .after(10e3, reject.bind(null, {reason: "Connection timed out after 5 seconds."}));
+    .receive("timeout", reject.bind(null, {reason: "Connection timed out after 10 seconds."}));
 
     return {
+        /// A promise that
         onJoinPromise,
 
         // All global messages are preceded with a "public:".
@@ -42,10 +43,10 @@ export default function Channel (name) {
         request: function (topic, payload) {
             let {resolve, reject, promise} = Deferred(Promise);
 
-            chan.push(topic, payload)
+            chan.push(topic, payload, 10e3)
             .receive("ok", resolve)
             .receive("error", reject)
-            .after(10e3, reject.bind(null, {reason: "Connection timed out after 10 seconds."}));
+            .receive("timeout", reject.bind(null, {reason: "Connection timed out after 10 seconds."}));
 
             return promise;
         }
