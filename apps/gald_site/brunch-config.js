@@ -3,7 +3,7 @@ exports.config = {
   files: {
     javascripts: {
       joinTo: {
-        'js/util.js': /^(web\/static\/js\/util)|(\.\.\/\.\.\/deps\/phoenix(_html)?\/web\/static\/js)/,
+        'js/util.js': /^(web\/static\/js\/util)|(\.\.\/\.\.\/deps\/phoenix(_html)?\/web\/static\/js)|(bower_components)/,
         'js/gald.js': /^(web\/static\/js\/gald)/,
         'js/lobby.js': /^(web\/static\/js\/lobby)/
       }

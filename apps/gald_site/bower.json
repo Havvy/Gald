@@ -1,0 +1,22 @@
+{
+  "name": "gald_site",
+  "description": "",
+  "main": "",
+  "authors": [
+    "Ryan Scheel (Havvy) <ryan.havvy@gmail.com>"
+  ],
+  "license": "UNLICENSED",
+  "homepage": "https://github.com/Havvy/Gald",
+  "moduleType": [],
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "react": "~0.14.3"
+  }
+}

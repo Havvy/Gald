@@ -11,10 +11,14 @@
 
 <h3>Current Games</h3>
 <ul id="gr-current-games">
-    <%= for {url, name} <- @races do %>
-        <li><a href="/race/<%=url%>"><%=name%></a></li>
+    <%= for %{internal_name: url, visible_name: name} <- @races do %>
+        <li><a href="/race/<%= url %>"><%= name %></a></li>
     <% end %>
 </ul>
 
+<script type="text/json" id="js-state">
+  <% "FIXME(Havvy): Make sure close script tag is not possible." %>
+  <%= raw Poison.encode!(@js_state) %>
+</script>
 <script src="<%= static_path(@conn, "/js/util.js") %>"></script>
 <script src="<%= static_path(@conn, "/js/lobby.js") %>"></script>

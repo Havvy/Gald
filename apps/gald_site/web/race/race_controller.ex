@@ -4,7 +4,11 @@ defmodule GaldSite.RaceController do
 
   def index(conn, _params) do
     token = Plug.CSRFProtection.get_csrf_token()
-    render conn, "lobby.html", races: GaldSite.RaceManager.all(), csrf: token
+    render conn, "lobby.html", [
+      races: GaldSite.RaceManager.all(),
+      js_state: %{races: GaldSite.RaceManager.all()},
+      csrf: token
+    ]
   end
 
   def show(conn, _params) do

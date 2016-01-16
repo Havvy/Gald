@@ -1,8 +1,9 @@
 {
+  "license": "UNLICENSED",
   "repository": {},
   "dependencies": {
-    "brunch": "^1.8.5",
     "babel-brunch": "^5.1.1",
+    "brunch": "^1.8.5",
     "clean-css-brunch": ">= 1.0 < 1.8",
     "css-brunch": ">= 1.0 < 1.8",
     "javascript-brunch": ">= 1.0 < 1.8",
@@ -14,5 +15,10 @@
   },
   "scripts": {
     "lint": "eslint src"
+  },
+  "overrides": {
+    "react": {
+      "main": "dist/react.js"
+    }
   }
 }
