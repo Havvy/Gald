@@ -5,6 +5,10 @@
 import Gald from "./gald";
 import ControlledPlayer from "./player";
 import Channel from "../util/channel";
+import {GameLog} from "./ui";
+// TODO(Havvy): These next imports should be done in the view, when that gets moved out.
+import React from "react";
+import ReactDom from "react-dom";
 // import UserController from "./user/main";
 // import View from "./view/main";
 // import Dom from "./???/main";
@@ -24,16 +28,17 @@ const gameLog = function () {
     // TODO(Havvy): Make the game log have a scrollbar when it gets big enough.
     // And then make new lines show up at the bottom again.
 
-    const element = document.querySelector("#gr-game-log");
+    const container = document.querySelector("#gr-game-log");
+    let log;
+
 
     return {
         append (line) {
-            // XXX(Havvy): This is an XSS vulnerability.
-            element.innerHTML = `<p>${line}</p>` + element.innerHTML;
+            log.$append([line]);
         },
 
         initialize () {
-            element.innerHTML = "<p>Application initialized.</p>";
+            log = ReactDom.render(<GameLog />, container);
         }
     };
 }();

@@ -25,4 +25,5 @@
 </div>
 
 <script src="<%= static_path(@conn, "/js/util.js") %>"></script>
+<script src="<%= static_path(@conn, "/js/react.js") %>"></script>
 <script src="<%= static_path(@conn, "/js/gald.js") %>"></script>
