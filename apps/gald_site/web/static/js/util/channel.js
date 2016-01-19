@@ -2,7 +2,7 @@
 
 import Deferred$ from "./deferred";
 const Deferred = Deferred$(Promise);
-import {Socket} from "../../../../deps/phoenix/web/static/js/phoenix";
+import {Socket} from "phoenix";
 
 export default function Channel (name) {
     let {resolve, reject, promise: onJoinPromise} = Deferred(Promise);

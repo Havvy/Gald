@@ -33,7 +33,7 @@ defmodule GaldSite.Mixfile do
 
   defp deps do
     [
-      {:phoenix, "~> 1.1"},
+      {:phoenix, "~> 1.1.2"},
       #{:phoenix_ecto, "~> 1.1"},
       #{:postgrex, ">= 0.0.0"},
       {:phoenix_html, "~> 2.3"},
