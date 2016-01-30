@@ -3,7 +3,6 @@
 export default function Player(name) {
     let stats;
 
-
     return {
         getName () {
             return name;

@@ -137,38 +137,25 @@ const map = function () {
 }();
 
 const stats = function () {
-    const element = document.querySelector("#gr-stats");
+    const container = document.querySelector("#gr-stats");
+    let stats;
 
     return {
-        update: function () {
-            if (typeof controlledPlayer === "undefined") {
-                return;
-            }
-
-            if (gald.getLifecycleStatus() !== "play") {
-                element.innerHTML = "";
-            }
-
-            const {
-                status_effects,
-                health,
-                defense,
-                damage,
-                attack
-            } = controlledPlayer.getStats();
-
-            let html = `<h3>Stats</h3>
-            <ul>
-                <li>Health: ${health}</li>
-                <li>Defense: +${defense}</li>
-                <li>Attack: +${attack}</li>
-                <li>Damage: 2 Physical</li>
-                <li>Status: ${status_effects.join(", ")}</li>
-            </ul>`;
-
-            element.innerHTML = html;
+      update: function () {
+        if (typeof controlledPlayer === "undefined") {
+          return;
         }
-    }
+
+        const lifecycleStatus = gald.getLifecycleStatus();
+        const stats = controlledPlayer.getStats();
+
+        stats.$update(lifecycleStatus, stats);
+      },
+
+      initialize () {
+        stats = ReactDom.render(<Stats />, container);
+      }
+    };
 }();
 
 const Ui = {
