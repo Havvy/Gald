@@ -50,7 +50,7 @@ export default function Gald ({status: state, data: snapshot, controlledPlayer})
     },
 
     getPlayerSpaces () {
-      return map;
+      return Object.keys(map).map((playerName) => ({name: playerName, space: map[playerName]}));
     },
 
     setPlayerSpace(playerName, space) {

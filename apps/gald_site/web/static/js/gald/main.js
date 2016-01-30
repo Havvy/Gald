@@ -5,7 +5,7 @@
 import Gald from "./gald";
 import ControlledPlayer from "./player";
 import Channel from "../util/channel";
-import {GameLog} from "./ui";
+import {GameLog, Map} from "./ui";
 // TODO(Havvy): These next imports should be done in the view, when that gets moved out.
 import React from "react";
 import ReactDom from "react-dom";
@@ -109,49 +109,31 @@ const screen = function () {
 }();
 
 const map = function () {
-    const element = document.querySelector("#gr-map");
+  const container = document.querySelector("#gr-map");
+  let map;
 
-    return {
-        update () {
-            let html = "<ul>";
+  return {
+    update () {
+      const lifecycleStatus = gald.getLifecycleStatus();
 
-            if (gald.getLifecycleStatus() === "play") {
-                const playerSpaces = gald.getPlayerSpaces();
-                const turn = gald.getTurn();
+      if (lifecycleStatus === "play") {
+        const playerSpaces = gald.getPlayerSpaces().slice();
+        const turn = gald.getTurn();
+        const finishLine = gald.getEndSpace();
 
-                html += Object.keys(playerSpaces).map(function (playerName) {
-                    const playerSpace = playerSpaces[playerName];
-                    if (playerName === turn) {
-                        return `<li><b>${playerName}</b>: ${playerSpace}</li>`
-                    } else {
-                        return `<li>${playerName}: ${playerSpace}</li>`;
-                    }
-                }).join("");
+        map.$update({lifecycleStatus, playerSpaces, turn, finishLine});
+      } else {
+        const players = gald.getPlayers().slice();
+        const winners = gald.getWinners().slice();
 
-                const finishLine = gald.getEndSpace();
-                html += `<li>Finish Line: ${finishLine}</li>`;
-            } else {
-                const players = gald.getPlayers();
-                const winners = gald.getWinners();
+        map.$update({lifecycleStatus, players, winners});
+      }
+    },
 
-                html += players.map(function (playerName) {
-                    if (winners.indexOf(playerName) !== -1) {
-                        return `<li>${playerName} [Winner]</li>`;
-                    } else {
-                        return `<li>${playerName}</li>`;
-                    }
-                }).join("");
-            }
-
-            html += "</ul>";
-
-            element.innerHTML = html;
-        },
-
-        initialize: function () {
-            return;
-        }
-    }; 
+    initialize: function () {
+      map = ReactDom.render(<Map initialState={{lifecycleStatus: "lobby", players: [], winners: []}} />, container);
+    }
+  };
 }();
 
 const stats = function () {
@@ -205,8 +187,6 @@ const Ui = {
                 if (gald.getLifecycleStatus() !== "play") {
                     element.innerHTML = "";
                 }
-
-                console.log(Object.keys(controlledPlayer));
 
                 const {
                     status_effects,

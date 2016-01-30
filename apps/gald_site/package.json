@@ -2,6 +2,7 @@
   "repository": {},
   "dependencies": {
     "babel-brunch": "^6.0.0",
+    "babel-plugin-transform-object-rest-spread": "^6.3.13",
     "babel-preset-react": "^6.3.13",
     "brunch": "^2.1.1",
     "clean-css-brunch": ">= 1.0 < 1.8",
