@@ -7,17 +7,7 @@
 </div>
 
 <h3>Screen</h3>
-<div id="gr-screen">
-  <h4 id="gr-screen-title">Lobby</h4>
-  <div id="gr-screen-body">
-    <p>People are joining.</p>
-    <br>
-    <label for="gr-join-game-name">Name:</label> <input id="gr-join-name" type="text" placeholder="Jacob"> <button type="button" id="gr-join-game" value="Join Game">Join Game</button>
-    <br>
-    <button type="button" id="gr-start-game" value="Start Game">Start Game</button>
-  </div>
-  <div id="gr-screen-options"></div>
-</div>
+<div id="gr-screen"></div>
 
 <h3>Game Log</h3>
 <div id="gr-game-log">
