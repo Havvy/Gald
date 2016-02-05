@@ -1,91 +1,72 @@
 "use-strict";
 
-export default function Gald ({status: state, data: snapshot, controlledPlayer}) {
-  // Shared data.
-  let players = snapshot.players;
-  let config = snapshot.config;
+import update from "react-addons-update";
 
-  // Lobby only data
+// Creates a `Gald` data structure. Even though it's POD, don't actually access
+// fields on it directly, but rather go through the other functions in this
+// module.
+export const create = function ({status, data}) {
+   return update(data, {
+     lifecycleStatus: {$set: status}
+   });
+};
 
-  // Play only data
-  let map;
-  let turn;
-  let screen;
-  let screenStyle;
+export const getLifecycleStatus = function (gald) {
+  return gald.lifecycleStatus;
+};
 
-  // Won only data
-  let winners;
+export const getPlayers = function (gald) {
+  return gald.players;
+};
 
-  if (state === "lobby") {
-
-  } else if (state === "play") {
-    map = snapshot.map;
-    turn = snapshot.turn;
-    screen = snapshot.screen;
-  } else if (state === "over") {
-    winners = snapshot.winners;
+export const putPlayer = function (gald, playerName) {
+  if (gald.lifecycleStatus !== "lobby") {
+    throw new TypeError();
   }
 
+  return update(gald, {
+    players: {$push: [playerName]}
+  });
+};
+
+export const getPlayerSpaces = function (gald) {
+  return Object.keys(gald.map).map((playerName) => ({name: playerName, space: gald.map[playerName]}));
+};
+
+export const setPlayerSpace = function (gald, playerName, space) {
+  return update(gald, { map: {[playerName]: {$set: space}} });
+};
+
+export const getTurn = function (gald) {
+  return gald.turn;
+};
+
+export const setTurn = function (gald, playerName) {
+  return update(gald, { turn: {$set: playerName} });
+};
+
+export const getScreen = function (gald) {
   return {
-    getLifecycleStatus () {
-      return state;
-    },
+    style: gald.screenStyle,
+    screen: gald.screen
+  };
+};
 
-    getControlledPlayer () {
-      return controlledPlayer
-    },
+export const setScreen = function (gald, newStyle, newScreen) {
+  return update(gald, {
+    screenStyle: {$set: newStyle},
+    screen: {$set: newScreen}
+  });
+};
 
-    setControlledPlayer (playerName) {
-      controlledPlayer = playerName;
-    },
-
-    getPlayers () {
-      return players;
-    },
-
-    putPlayer (playerName) {
-      if (state !== "lobby") { throw new TypeError(); }
-
-      players.push(playerName);
-    },
-
-    getPlayerSpaces () {
-      return Object.keys(map).map((playerName) => ({name: playerName, space: map[playerName]}));
-    },
-
-    setPlayerSpace(playerName, space) {
-      map[playerName] = space;
-    },
-
-    getTurn () {
-      return turn;
-    },
-
-    setTurn (playerName) {
-      turn = playerName;
-    },
-
-    getScreen () {
-      return {style: screenStyle, screen};
-    },
-
-    setScreen (newStyle, newScreen) {
-      screenStyle = newStyle;
-      screen = newScreen;
-    },
-
-    getWinners () {
-      if (state !== "over") {
-        return [];
-      } else {
-        return winners;
-      }
-    },
-
-    getEndSpace () {
-        return config.end_space;
-    },
-
-    _: "dummy field"
+export const getWinners = function (gald) {
+  if (gald.lifecycleStatus !== "over") {
+    return [];
+  } else {
+    return gald.winners;
   }
-}
+};
+
+export const getEndSpace = function (gald) {
+  return gald.config.end_space;
+};

@@ -1,8 +1,6 @@
-// TODO(Havvy): Look into React for the frontend?
-
 "use strict";
 
-import Gald from "./gald";
+import * as Gald from "./gald";
 import ControlledPlayer from "./player";
 import Channel from "../util/channel";
 import {GameLog, Map, Stats, Screen} from "./ui";
@@ -38,16 +36,6 @@ const screen = function () {
   let screen;
 
   const onRequestJoinGame = function ({name}) {
-    if (typeof controlledPlayer !== "undefined") {
-      Ui.gameLog.append("You are already playing.");
-      return;
-    }
-
-    if (gald.getLifecycleStatus() !== "lobby") {
-      Ui.gameLog.append("The game has already started. You cannot join.");
-      return;
-    }
-
     if (/[^a-zA-Z0-9-]/.test(name)) {
       Ui.gameLog.append("Your name can only contain letters, numbers, and dashes.");
       return;
@@ -76,19 +64,17 @@ const screen = function () {
 
   return {
     update () {
-      const lifecycleStatus = gald.getLifecycleStatus();
+      const lifecycleStatus = Gald.getLifecycleStatus(gald);
       if (lifecycleStatus === "lobby") {
         screen.$setLifecycleStatus(lifecycleStatus);
       } else if (lifecycleStatus === "play") {
-        const screendata = gald.getScreen();
+        const screendata = Gald.getScreen(gald);
 
-        screen.$setTurn(gald.getTurn());
+        screen.$setTurn(Gald.getTurn(gald));
         screen.$setLifecycleStatus(lifecycleStatus);
         screen.$setScreendata(screendata);
       } else if (lifecycleStatus === "over") {
-        const winners = gald.getWinners();
-        console.log("Winners");
-        console.log(winners);
+        const winners = Gald.getWinners(gald);
         screen.$setLifecycleStatus(lifecycleStatus);
         screen.$setWinners(winners);
       }
@@ -110,17 +96,17 @@ const map = function () {
 
   return {
     update () {
-      const lifecycleStatus = gald.getLifecycleStatus();
+      const lifecycleStatus = Gald.getLifecycleStatus(gald);
 
       if (lifecycleStatus === "play") {
-        const playerSpaces = gald.getPlayerSpaces().slice();
-        const turn = gald.getTurn();
-        const finishLine = gald.getEndSpace();
+        const playerSpaces = Gald.getPlayerSpaces(gald).slice();
+        const turn = Gald.getTurn(gald);
+        const finishLine = Gald.getEndSpace(gald);
 
         map.$update({lifecycleStatus, playerSpaces, turn, finishLine});
       } else {
-        const players = gald.getPlayers().slice();
-        const winners = gald.getWinners().slice();
+        const players = Gald.getPlayers(gald);
+        const winners = Gald.getWinners(gald);
 
         map.$update({lifecycleStatus, players, winners});
       }
@@ -142,7 +128,7 @@ const stats = function () {
         return;
       }
 
-      const lifecycleStatus = gald.getLifecycleStatus();
+      const lifecycleStatus = Gald.getLifecycleStatus(gald);
       const controlledPlayerStats = controlledPlayer.getStats();
 
       stats.$update(lifecycleStatus, controlledPlayerStats);
@@ -165,9 +151,9 @@ let chan = function () {
 chan.onJoinPromise
 .then(function onJoinOk (snapshot) {
   Ui.gameLog.append("Welcome to the Race!");
-  gald = Gald(snapshot);
+  gald = Gald.create(snapshot);
 
-  switch (gald.getLifecycleStatus()) {
+  switch (Gald.getLifecycleStatus(gald)) {
     case "lobby":
       Ui.gameLog.append("The game has not yet been started.");
       Ui.map.update();
@@ -184,7 +170,7 @@ chan.onJoinPromise
       Ui.screen.update();
       break;
     default:
-      Ui.gameLog.append(`Game in unknown state, ${gald.getLifecycleStatus()}!`);
+      Ui.gameLog.append(`Game in unknown state, ${Gald.getLifecycleStatus(gald)}!`);
   }
 }, function onJoinError (error) {
   Ui.gameLog.append("Sorry, unable to join the race.");
@@ -201,16 +187,15 @@ chan.onJoinPromise
 
 const publicHandlers = {
   "new_player": function ({player_name}) {
-    gald.putPlayer(player_name);
+    gald = Gald.putPlayer(gald, player_name);
     Ui.map.update();
     Ui.gameLog.append(`${player_name} has joined the game.`);
   },
 
   "begin": function ({snapshot}) {
-    gald = Gald({
+    gald = Gald.create({
         status: "play",
         data: snapshot,
-        controlledPlayer: gald.getControlledPlayer()
     });
     Ui.gameLog.append("Starting game!");
     Ui.map.update();
@@ -218,10 +203,9 @@ const publicHandlers = {
   },
 
   "finish": function ({snapshot}) {
-    gald = Gald({
+    gald = Gald.create({
       status: "over",
       data: snapshot,
-      controlledPlayer: gald.getControlledPlayer()
     });
     Ui.gameLog.append("Game over!");
     Ui.map.update();
@@ -233,13 +217,13 @@ const publicHandlers = {
   },
 
   "turn_start": function ({player_name}) {
-    gald.setTurn(player_name);
+    gald = Gald.setTurn(gald, player_name);
     Ui.map.update();
     Ui.gameLog.append(`Turn start for ${player_name}.`);
   },
 
   "screen": function ({style, screen: screenData}) {
-    gald.setScreen(style, screenData);
+    gald = Gald.setScreen(gald, style, screenData);
     screen.update();
 
     if (screenData.log) {
@@ -253,7 +237,7 @@ const publicHandlers = {
       return;
     }
 
-    gald.setPlayerSpace(entity_name, to);
+    gald = Gald.setPlayerSpace(gald, entity_name, to);
     Ui.map.update();
   }
 };
