@@ -1,21 +1,22 @@
 "use-strict";
 
-export default function Player(name) {
-    let stats;
+import update from "react-addons-update";
 
-    return {
-        getName () {
-            return name;
-        },
+export const create = function (name) {
+  return {
+    name,
+    stats: undefined
+  };
+};
 
-        getStats () {
-            return stats;
-        },
+export const getName = function (player) {
+  return player.name;
+};
 
-        setStats (newStats) {
-            stats = newStats;
-        },
+export const getStats = function (player) {
+  return player.stats;
+};
 
-        "_": undefined
-    };
+export const setStats = function (player, newStats) {
+  return update(player, {stats: {$set: newStats}});
 };

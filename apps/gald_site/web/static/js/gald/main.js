@@ -1,7 +1,7 @@
 "use strict";
 
 import * as Gald from "./gald";
-import ControlledPlayer from "./player";
+import * as ControlledPlayer from "./player";
 import Channel from "../util/channel";
 import {GameLog, Map, Stats, Screen} from "./ui";
 // TODO(Havvy): These next imports should be done in the view, when that gets moved out.
@@ -43,7 +43,7 @@ const screen = function () {
 
     chan.request("join", {name})
     .then(function ({name}) {
-      controlledPlayer = ControlledPlayer(name);
+      controlledPlayer = ControlledPlayer.create(name);
       Ui.map.update();
       Ui.screen.setControlledPlayerName();
       Ui.gameLog.append(`You are ${name}.`);
@@ -81,7 +81,7 @@ const screen = function () {
     },
 
     setControlledPlayerName () {
-      screen.$setControlledPlayerName(controlledPlayer.getName());
+      screen.$setControlledPlayerName(ControlledPlayer.getName(controlledPlayer));
     },
 
     initialize () {
@@ -129,7 +129,7 @@ const stats = function () {
       }
 
       const lifecycleStatus = Gald.getLifecycleStatus(gald);
-      const controlledPlayerStats = controlledPlayer.getStats();
+      const controlledPlayerStats = ControlledPlayer.getStats(controlledPlayer);
 
       stats.$update(lifecycleStatus, controlledPlayerStats);
     },
@@ -244,7 +244,7 @@ const publicHandlers = {
 
 const privateHandlers = {
   "stats": function (stats) {
-    controlledPlayer.setStats(stats);
+    controlledPlayer = ControlledPlayer.setStats(controlledPlayer, stats);
     Ui.stats.update();
   }
 };
