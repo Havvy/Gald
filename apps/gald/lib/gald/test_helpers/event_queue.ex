@@ -69,9 +69,9 @@ defmodule Gald.TestHelpers.EventQueue do
   def handle_call(:next, from, state = %{queue: @empty_queue, from: nil}) do
     {:noreply, %{ state | from: from }}
   end
-  def handle_call(:next, _from, %{queue: queue, from: nil }) do
+  def handle_call(:next, _from, state = %{queue: queue, from: nil }) do
     {{:value, event}, queue} = :queue.out(queue)
-    {:reply, event, queue}
+    {:reply, event, %{state | queue: queue}}
   end
 
   def terminate(:normal, _state), do: :ok
