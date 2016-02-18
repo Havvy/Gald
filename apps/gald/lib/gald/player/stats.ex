@@ -1,6 +1,16 @@
 defmodule Gald.Player.Stats do
   @moduledoc """
   The various statistics of the player.
+
+  health: Simple non-negative integer.
+  max_health: Simple positive integer
+  attack: Simple positive integer. Added to attack roll directly.
+  defense: Simple positive integer. Added to defense roll directly.
+  damage: Map from `damage type` to amount of damage to cause.
+  status_effects: List of tuples from the first value is the status name and the
+  second is the severity, a simple non-negative integer. This is temporary. In
+  the future, all status effects are going to be their own struct or process
+  that implement a protocol or behaviour. Probably a protocol...
   """
 
   import ShortMaps
@@ -46,28 +56,66 @@ defmodule Gald.Player.Stats do
     Agent.get(stats, fn (~m{health}a) -> health > 0 end)
   end
 
-  @spec put_status_effect(%Gald.Player.Stats{}, atom) :: %Gald.Player.Stats{}
-  def put_status_effect(stats = %Gald.Player.Stats{}, status) do
-    if !has_status_effect(stats, status) do
-      update_in(stats, [:status_effects], &[status | &1])
+  # TODO(Havvy): Make status effects their own processes.
+  @spec put_status_effect(%Gald.Player.Stats{}, atom | {atom, non_neg_integer}) :: %Gald.Player.Stats{}
+  def put_status_effect(stats = %Gald.Player.Stats{}, status) when is_atom(status) do
+    unless has_status_effect(stats, status) do
+      update_in(stats, [:status_effects], &[{status, 1} | &1])
     else
       stats
     end
   end
 
-  @spec put_status_effect(Agent.t, atom) :: :ok
+  def put_status_effect(stats = %Gald.Player.Stats{}, {status, severity}) do
+    unless has_status_effect(stats, status) do
+      update_in(stats, [:status_effects], &[{status, severity} | &1])
+    else
+      stats
+    end
+  end
+
+  @spec put_status_effect(Agent.t, atom | {atom, non_neg_integer}) :: :ok
   def put_status_effect(stats, status) do
     Agent.cast(stats, &put_status_effect(&1, status))
   end
 
+  @spec lower_severity_of_status(%Gald.Player.Stats{}, atom) :: non_neg_integer
+  def lower_severity_of_status(stats = %Gald.Player.Stats{status_effects: status_effects}, status) do
+    {status_effects, lowered_severity} = Enum.reduce(status_effects, {[], nil}, fn
+      ({^status, 1}, {status_effects, nil}) -> {status_effects, 0}
+      ({^status, severity}, {status_effects, nil}) -> {[{status, severity - 1} | status_effects], severity - 1}
+      (status, {status_effects, lowered_severity}) -> {[status | status_effects], lowered_severity}
+    end)
+
+    {lowered_severity, %{stats | status_effects: status_effects}}
+  end
+
+  @spec lower_severity_of_status(Agent.t, atom) :: non_neg_integer
+  def lower_severity_of_status(stats, status) do
+    Agent.get_and_update(stats, &lower_severity_of_status(&1, status))
+  end
+
   @spec has_status_effect(%Gald.Player.Stats{}, atom) :: boolean
   def has_status_effect(stats = %Gald.Player.Stats{}, status) do
-    Enum.member?(stats.status_effects, status)
+    Enum.any?(stats.status_effects, fn
+      {^status, _severity} -> true
+      _ -> false
+    end)
   end
 
   @spec has_status_effect(Agent.t, atom) :: boolean
   def has_status_effect(stats, status) do
     Agent.get(stats, &has_status_effect(&1, status))
+  end
+
+  @spec get_status_effects(%Gald.Player.Stats{}) :: [String.t]
+  def get_status_effects(%Gald.Player.Stats{status_effects: status_effects}) do
+    status_effects |> Enum.map(fn ({name, _severity}) -> name end)
+  end
+
+  @spec get_status_effects(Agent.t) :: boolean
+  def get_status_effects(stats) do
+    Agent.get(stats, &get_status_effects/1)
   end
 
   def update_health(stats, updater) when is_function(updater, 1) do

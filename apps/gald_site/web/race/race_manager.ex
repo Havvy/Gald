@@ -143,7 +143,7 @@ defmodule GaldSite.RaceManager do
     {:ok, race} = Gald.start_race(config)
     monitor = Process.monitor(race)
     race_out = Gald.Race.out(race)
-    GenEvent.add_handler(race_out, GaldSite.RaceOutToChannelHandler, %{channel: internal_name})
+    GenEvent.add_handler(race_out, GaldSite.RaceOutToTopicHandler, %{topic: internal_name})
 
     state = Map.put_new(state, internal_name, ~m{%Metadata visible_name race monitor}a)
     GaldSite.LobbyChannel.broadcast_put(~m{internal_name visible_name}a)

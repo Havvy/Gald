@@ -14,6 +14,8 @@ import ReactDom from "react-dom";
 // gald: Gald
 // Binding changed by start & finish events.
 let gald;
+// controlledPlayer: Player
+// Binding initialized by personal join game event.
 let controlledPlayer;
 
 const gameLog = function () {
@@ -105,11 +107,12 @@ const map = function () {
       const lifecycleStatus = Gald.getLifecycleStatus(gald);
 
       if (lifecycleStatus === "play") {
-        const playerSpaces = Gald.getPlayerSpaces(gald).slice();
+
+        const mapData = Gald.getMapData(gald);
         const turn = Gald.getTurn(gald);
         const finishLine = Gald.getEndSpace(gald);
 
-        map.$update({lifecycleStatus, playerSpaces, turn, finishLine});
+        map.$update({lifecycleStatus, mapData, turn, finishLine});
       } else {
         const players = Gald.getPlayers(gald);
         const winners = Gald.getWinners(gald);
@@ -247,6 +250,26 @@ const publicHandlers = {
 
     gald = Gald.setPlayerSpace(gald, entity_name, to);
     Ui.map.update();
+  },
+
+  // TODO(Havvy): Have a general player state change function.
+  //              Need to think about the shape of the event though,
+  //              so until then, just going with this specific event.
+//  "condition": function ({player_name, condition, change}) {
+//    if (change === "put") {
+//      gald.setPlayerCondition(player_name, condition);
+//    } else if (change === "delete") {
+//      // TODO(Havvy): Implement this function.
+//      gald.deletePlayerCondition(player_name, condition);
+//    }
+//  },
+
+  "death": function ({player_name}) {
+    gald = Gald.setPlayerStatusEffect(player_name, "death");
+  },
+
+  "respawn": function ({player_name}) {
+    gald = Gald.removePlayerStatusEffect(player_name, "death");
   },
 
   "crash": function () {

@@ -46,8 +46,45 @@ defmodule Gald.Player do
     GenServer.cast(controller(Race.player(race, player_name)), :emit_stats)
   end
 
-  def battle_card(player) do
+  @doc """
+  Gets the battle card of the specified player.
+  """
+  @spec battle_card(pid) :: %Gald.Display.Battle.PlayerCard{}
+  def battle_card(player) when is_pid(player) do
     GenServer.call(controller(player), :battle_card)
+  end
+
+  @doc """
+  Knocks out the player.
+
+  1. Set's player's health to 0.
+  2. Gives player the :ko status.
+  """
+  def kill(player) when is_pid(player) do
+    GenServer.call(controller(player), :kill)
+  end
+
+  def is_alive(player) when is_pid(player) do
+    GenServer.call(controller(player), :is_alive)
+  end
+  def is_alive(race, player_name) when is_binary(player_name) do
+    GenServer.call(controller(Race.player(race, player_name)), :is_alive)
+  end
+
+  def lower_severity_of_status(race, player_name, status) when is_binary(player_name) do
+    GenServer.call(controller(Race.player(race, player_name)), {:lower_severity_of_status, status})
+  end
+
+  def lower_severity_of_status(player, status) when is_pid(player) do
+    GenServer.call(controller(player), {:lower_severity_of_status, status})
+  end
+
+  def get_status_effects(player) when is_pid(player) do
+    GenServer.call(controller(player), :get_status_effects)
+  end
+
+  def get_status_effects(race, player_name) when is_binary(player_name) do
+    GenServer.call(controller(Race.player(race, player_name)), :get_status_effects)
   end
 
   def name(player) when is_pid(player) do

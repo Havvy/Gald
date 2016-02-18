@@ -7,6 +7,7 @@ defmodule Gald.Player.Controller do
   use GenServer
   import ShortMaps
   require Logger
+  alias Gald.Race
   alias Gald.Player
   alias Gald.Player.Stats
 
@@ -45,5 +46,25 @@ defmodule Gald.Player.Controller do
     }
 
     {:reply, card, state}
+  end
+
+  def handle_call(:kill, _from, state = ~m{name player race}a) do
+    stats = Player.stats(player)
+    Stats.put_status_effect(stats, {:dead, 2})
+    Stats.update_health(stats, fn (_health) -> 0 end)
+    Race.notify(race, {:death, name})
+    {:reply, :ok, state}
+  end
+
+  def handle_call(:is_alive, _from, state = ~m{player}a) do
+    {:reply, not Player.Stats.has_status_effect(Player.stats(player), :dead), state}
+  end
+
+  def handle_call({:lower_severity_of_status, status}, _from, state = ~m{player}a) do
+    {:reply, Player.Stats.lower_severity_of_status(Player.stats(player), status), state}
+  end
+
+  def handle_call(:get_status_effects, _from, state = ~m{player}a) do
+    {:reply, Player.Stats.get_status_effects(Player.stats(player)), state}
   end
 end

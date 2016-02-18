@@ -23,9 +23,13 @@ defmodule Gald.Turn do
   def init(~m{race player_name}a) do
     Logger.debug "Turn Start for #{player_name}"
     Race.notify(race, {:turn_start, player_name})
-    GenServer.cast(self, {:start_phase, DiceMove})
+    {starting_screen, phase} = if Gald.Player.is_alive(race, player_name) do
+      {DiceMove, :dice}
+    else
+      {Respawn, :respawn}
+    end
+    GenServer.cast(self, {:start_phase, starting_screen})
     screen_ref = nil
-    phase = :dice
     {:ok, ~m{race player_name screen_ref phase}a}
   end
 
@@ -42,6 +46,10 @@ defmodule Gald.Turn do
     {:noreply, %{state | phase: :event}}
   end
   def handle_cast(:next_phase, state = %{phase: :event}) do
+    GenServer.cast(self, :stop)
+    {:noreply, state}
+  end
+  def handle_cast(:next_phase, state = %{phase: :respawn}) do
     GenServer.cast(self, :stop)
     {:noreply, state}
   end

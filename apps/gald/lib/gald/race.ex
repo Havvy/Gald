@@ -2,10 +2,10 @@ defmodule Gald.Race do
   @moduledoc """
   The top level Supervisor for a Gald race.
 
-  When you `use` this module, you import the functions
+  When a module `use`s this module, it imports the functions
   `controller`, `out`, `players`, `player`, `supervisor`,
   `map`, `round`, `turn`, `phase`, `victory`, `display`,
-  `rng`, and `monsters`.
+  `rng`, and `monsters`. Note that this shadows Kernel.round/1.
   """
 
   @opaque t :: pid
@@ -143,8 +143,11 @@ defmodule Gald.Race do
     GenServer.call(controller(race), :config)
   end
 
-  @spec notify(t, term) :: :ok
-  def notify(race, event), do: GenEvent.notify(out(race), event)
+  @spec notify(t, {atom, term}) :: :ok
+  @doc """
+  Send the specified event and its payload out of the system for app clients.
+  """
+  def notify(race, event = {_name, _payload}), do: GenEvent.notify(out(race), event)
 
   @doc """
   Used to test the stability of things that use the Race, such that if the

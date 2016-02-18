@@ -4,9 +4,12 @@ const bold = function (value) {
   return <b>{value}</b>;
 };
 
-const PlayMap = function ({playerSpaces, finishLine, turn}) {
-  const players = playerSpaces.map(function ({name, space}) {
-    return <li key={name}>{name === turn ? bold(name) : name}: {space}</li>
+const PlayMap = function ({mapData, finishLine, turn}) {
+  const players = mapData.map(function ({name, space, statusEffects}) {
+    statusEffects = statusEffects ? `[${statusEffects.join(", ")}]` : "";
+    return <li key={name}>
+      {name === turn ? bold(name) : name}: {space} {statusEffects}
+    </li>
   });
 
   const finish = <li>Finish Line: {finishLine}</li>;
@@ -41,13 +44,13 @@ export default React.createClass({
     return this.props.initialState;
   },
 
-  $update ({players, playerSpaces, finishLine, lifecycleStatus, winners, turn}) {
+  $update ({players, mapData, finishLine, lifecycleStatus, winners, turn}) {
     if (players) {
       this.setState({players});
     }
 
-    if (playerSpaces) {
-      this.setState({playerSpaces});
+    if (mapData) {
+      this.setState({mapData});
     }
 
     if (finishLine) {

@@ -33,9 +33,41 @@ export const getPlayerSpaces = function (gald) {
   return Object.keys(gald.map).map((playerName) => ({name: playerName, space: gald.map[playerName]}));
 };
 
+export const getMapData = function (gald) {
+  return Object.keys(gald.map).map((playerName) => ({
+    name: playerName,
+    space: gald.map[playerName],
+    statusEffects: gald.status_effects[playerName].slice()
+  }));
+}
+
 export const setPlayerSpace = function (gald, playerName, space) {
   return update(gald, { map: {[playerName]: {$set: space}} });
 };
+
+export const setPlayerStatusEffect = function (gald, playerName, statusEffect) {
+  if (gald.status_effects[playerName].indexOf(statusEffect) !== -1) {
+    return gald;
+  }
+
+  return update(gald, { status_effects: {[playerName]: {$push: statusEffect}} });
+}
+
+export const removePlayerStatusEffect = function (gald, playerName, statusEffect) {
+  if (gald.status_effects[playerName].indexOf(statusEffect) === -1) {
+    return gald;
+  }
+
+  return update(gald, {
+    status_effects: {
+      [playerName]: {
+        $apply: function (statusEffects) {
+          return statusEffects.filter(playerStatusEffects => playerStatusEffects !== statusEffect);
+        }
+      }
+    }
+  });
+}
 
 export const getTurn = function (gald) {
   return gald.turn;

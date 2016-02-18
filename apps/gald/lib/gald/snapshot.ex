@@ -1,3 +1,5 @@
+# TODO(Havvy): Make snapshots from listening to the output socket.
+
 defmodule Gald.Snapshot.Lobby do
   defstruct [
     config: %Gald.Config{}, # %Gald.Config{}
@@ -9,6 +11,7 @@ defmodule Gald.Snapshot.Play do
   defstruct [
     config: %Gald.Config{},
     players: [],
+    status_effects: %{},
     turn: nil,
     map: %{},
     screen: nil
@@ -32,6 +35,7 @@ defmodule Gald.Snapshot do
   alias Gald.Map
   alias Gald.Victory
   alias Gald.Players
+  alias Gald.Player
 
   @moduledoc """
   This module is tightly coupled with Gald.Race.
@@ -53,7 +57,8 @@ defmodule Gald.Snapshot do
   def new(race, :beginning, config) do
     players = get_players(race)
     map = Map.player_spaces(map(race)) |> Enum.into(%{})
-    %{status: :play, data: ~m{%Play config players map}a}
+    status_effects = players |> Enum.map(&{&1, []}) |> Enum.into(%{})
+    %{status: :play, data: ~m{%Play config players map status_effects}a}
   end
 
   def new(race, :play, config) do
@@ -61,8 +66,11 @@ defmodule Gald.Snapshot do
     map = Map.player_spaces(map(race)) |> Enum.into(%{})
     turn = Round.current(round(race))
     screen = Display.get(display(race))
+    status_effects = players
+      |> Enum.map(&{&1, Player.get_status_effects(race, &1)})
+      |> Enum.into(%{})
 
-    %{status: :play, data: ~m{%Play config players map turn screen}a}
+    %{status: :play, data: ~m{%Play config players map turn screen status_effects}a}
   end
 
   def new(race, :over, config) do

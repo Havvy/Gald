@@ -1,4 +1,4 @@
-defmodule GaldSite.RaceOutToChannelHandler do
+defmodule GaldSite.RaceOutToTopicHandler do
   @moduledoc """
   The race event emitter emits events in the form of {event, payload}.
   This event handler forwards events to every listener of a channel with an
@@ -25,17 +25,17 @@ defmodule GaldSite.RaceOutToChannelHandler do
 
   # Callbacks
   @doc false
-  def init(~m{channel}a) do
-    channel = "race:#{channel}"
-    {:ok, ~m{channel}a}
+  def init(~m{topic}a) do
+    topic = "race:#{topic}"
+    {:ok, ~m{topic}a}
   end
 
   @doc false
-  def handle_event({topic, payload}, ~m{channel}a) do
-    payload = serialize_payload(topic, payload)
-    topic = "public:#{Atom.to_string(topic)}"
-    GaldSite.Endpoint.broadcast!(channel, topic, payload)
-    {:ok, ~m{channel}a}
+  def handle_event({event, payload}, ~m{topic}a) do
+    payload = serialize_payload(event, payload)
+    event = "public:#{Atom.to_string(event)}"
+    GaldSite.Endpoint.broadcast!(topic, event, payload)
+    {:ok, ~m{topic}a}
   end
 
   # def handle_call(_msg, state) do
@@ -58,5 +58,7 @@ defmodule GaldSite.RaceOutToChannelHandler do
     style = screen.__struct__ |> Module.split() |> List.last()
     ~m{screen style}a
   end
+  defp serialize_payload(:death, player_name), do: ~m{player_name}a
+  defp serialize_payload(:respawn, player_name), do: ~m{player_name}a
   defp serialize_payload(topic, _payload), do: raise "Unknown event '#{inspect topic}'."
 end
