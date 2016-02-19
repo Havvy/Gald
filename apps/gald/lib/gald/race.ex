@@ -145,4 +145,10 @@ defmodule Gald.Race do
 
   @spec notify(t, term) :: :ok
   def notify(race, event), do: GenEvent.notify(out(race), event)
+
+  @doc """
+  Used to test the stability of things that use the Race, such that if the
+  Race ever crashes accidentally, they handle it properly.
+  """
+  def force_crash(race), do: GenServer.cast(controller(race), :force_crash)
 end

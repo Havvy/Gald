@@ -94,4 +94,8 @@ defmodule Gald.Controller do
     GenEvent.notify(out(race), {:finish, snapshot.data})
     {:noreply, state}
   end
+
+  def handle_cast(:force_crash, _state) do
+    {:stop, :force_crash}
+  end
 end
