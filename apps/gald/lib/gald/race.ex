@@ -34,7 +34,7 @@ defmodule Gald.Race do
   @spec start(%Config{}, [term]) :: Supervisor.on_start
   def start_link(config, opts \\ []), do: Supervisor.start_link(__MODULE__, config, opts)
   def start(config, opts \\[]), do: Supervisor.start(__MODULE__, config, opts)
-  def stop(race), do: Process.exit(race, :shutdown)
+  def stop(race), do: Supervisor.stop(race, :normal)
 
   # Server
   def init(config = %Config{}) do

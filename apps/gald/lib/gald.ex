@@ -1,4 +1,5 @@
 defmodule Gald do
+  # TODO(Havvy): [Docs] Describe what a Race is...
   @moduledoc """
   "The Gald Race" game
 
@@ -7,17 +8,21 @@ defmodule Gald do
   use Application
 
   # Application Callback
+  # TODO(Havvy): [Docs] Make this better.
   @doc """
   Starts the :gald application.
 
-  Creates a non-module backed SimpleSupervisor for Gald Races.
+  Creates an anonymous SimpleSupervisor for Gald Races.
 
   You can start a new race with start_race/1 and stop it with Gald.Race.stop/1.
   """
   def start(_type, _arg) do
     import Supervisor.Spec
-    child = [supervisor(Gald.Race, [])]
-    Supervisor.start_link(child, [strategy: :simple_one_for_one, name: Gald.Supervisor])
+    child = [supervisor(Gald.Race, [], [restart: :temporary])]
+    Supervisor.start_link(child, [
+      name: Gald.Supervisor,
+      strategy: :simple_one_for_one,
+    ])
   end
 
   @spec start_race(%Gald.Config{}) :: {:ok, pid}
