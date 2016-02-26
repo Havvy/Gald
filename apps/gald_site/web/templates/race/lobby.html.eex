@@ -5,7 +5,12 @@
 <form action="/race/create" method="post">
     <input type="hidden" name="_csrf_token" value="<%= @csrf %>">
     <label for="gl-new-game-name">Name:</label>
-    <input type="text" placeholder="name" name="visible_name">
+    <input type="text" placeholder="My Race" name="visible_name">
+    <label for="gl-new-game-profile">Profile:</label>
+    <select name="profile">
+      <option value="standard">Standard</option>
+      <option value="crash">Crash</option>
+    </select>
     <button type="submit">Submit</button>
 </form>
 

@@ -1,6 +1,7 @@
 defmodule GaldSite.RaceController do
   use GaldSite.Web, :controller
   import ShortMaps
+  require Logger
 
   def index(conn, _params) do
     token = Plug.CSRFProtection.get_csrf_token()
@@ -14,8 +15,17 @@ defmodule GaldSite.RaceController do
   # TODO(Havvy): New game page.
   # def new(conn, _params), do: nil
 
-  def create(conn, ~m{visible_name}) do
-    config = %Gald.Config{name: visible_name}
+  def create(conn, ~m{visible_name profile}) do
+    Logger.debug("Profile is #{profile}")
+    config = case profile do
+      "standard" -> %Gald.Config{name: visible_name}
+      "crash" -> %Gald.Config{
+        name: visible_name,
+        manager: Gald.EventManager.Singular,
+        manager_config: %{event: CrashGame.Index},
+      }
+    end
+    Logger.debug(inspect config)
     internal_race_name = GaldSite.RaceManager.start_race(config)
     redirect conn, to: "/race/#{internal_race_name}"
   end

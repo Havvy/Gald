@@ -1,11 +1,14 @@
 defmodule GaldSite.RaceOutToChannelHandler do
   @moduledoc """
-  The race event emitter emits events in the form of
-  {topic, payload}. This event handler orwards events
-  to every listener of a channel with a topic of
-  "public:topic".
+  The race event emitter emits events in the form of {event, payload}.
+  This event handler forwards events to every listener of a channel with an
+  event name of "public:{event}"
 
-  ## Topics
+  The only other event that is sent outside of this GenEvent is `public:crash`
+  for when a race crashes. And it is the RaceManager that handles that. It has
+  no payload.
+
+  ## Events
 
   * public:new_player, %{player_name: String}
   * public:begin, %{snapshot: %Gald.Snapshot{}}
@@ -18,6 +21,7 @@ defmodule GaldSite.RaceOutToChannelHandler do
   
   use GenEvent
   import ShortMaps
+  require Logger
 
   # Callbacks
   @doc false

@@ -143,6 +143,7 @@ export default React.createClass({
         return <OverScreen winners={winners} />;
       case "loading": return <p>Loading Game</p>;
       case "nonexistent": return <p>This game does not exist. Go <a href="../race">back</a>?</p>;
+      case "crashed": return <p>:( Sorry, the game has crashed. :( Go <a href="../race">back</a>? :(</p>;
       default: return <p>Error: Unknown lifecycleStatus "{lifecycleStatus}".</p>;
     }
   },
@@ -170,7 +171,9 @@ export default React.createClass({
   },
 
   $setLifecycleStatus (lifecycleStatus) {
-    this.setState({lifecycleStatus});
+    if (this.lifecycleStatus !== "crashed") {
+      this.setState({lifecycleStatus});
+    }
   },
 
   $setWinners (winners) {

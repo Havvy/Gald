@@ -8,7 +8,6 @@ defmodule Gald.CrashTest do
   alias Gald.Display.Standard, as: StandardDisplay
 
   @config %Gald.Config{
-    end_space: 25,
     manager: Gald.EventManager.Singular,
     manager_config: %{event: CrashGame.Index},
     rng: Gald.Rng.FullGameTest

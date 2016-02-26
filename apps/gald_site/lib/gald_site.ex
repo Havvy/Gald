@@ -5,9 +5,8 @@ defmodule GaldSite do
     import Supervisor.Spec, warn: false
 
     children = [
-      # Start the endpoint when the application starts
       supervisor(GaldSite.Endpoint, []),
-      worker(GaldSite.RaceManager, [])
+      worker(GaldSite.RaceManager, [[name: GaldSite.RaceManager]])
       # Start the Ecto repository
       # worker(GaldSite.Repo, []),
     ]

@@ -1,4 +1,10 @@
 <div class="jumbotron">
   <h2>Welcome to the Gald Race!</h2>
-  <p class="lead">A <i>Board Game Online</i><br />variant that is safe for children.</p>
+  <p class="lead">
+    A <i>Board Game Online</i>
+    <br />
+    variant that is safe for children.
+    <br />
+    <a href="race">Create a new game?</a>
+  </p>
 </div>

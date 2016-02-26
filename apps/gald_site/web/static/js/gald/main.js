@@ -82,6 +82,10 @@ const screen = function () {
       }
     },
 
+    crash () {
+      screen.$setLifecycleStatus("crashed");
+    },
+
     setControlledPlayerName () {
       screen.$setControlledPlayerName(ControlledPlayer.getName(controlledPlayer));
     },
@@ -243,6 +247,10 @@ const publicHandlers = {
 
     gald = Gald.setPlayerSpace(gald, entity_name, to);
     Ui.map.update();
+  },
+
+  "crash": function () {
+    Ui.screen.crash();
   }
 };
 
