@@ -1,7 +1,7 @@
 defmodule Gald.Players do
   # TODO(Havvy): Players should be a Supervisor...
   use GenServer
-  import ShortMaps
+  import Destructure
   alias Gald.Race
   alias Gald.Player
 
@@ -28,14 +28,14 @@ defmodule Gald.Players do
     {:ok, sup} = Supervisor.start_link([player_spec], strategy: :simple_one_for_one)
     names_to_pids = %{}
     join_ix = 0
-    {:ok, ~m{sup names_to_pids join_ix race}a}
+    {:ok, d%{sup, names_to_pids, join_ix, race}}
   end
 
-  def handle_call({:new_player, name}, _from, state = ~m{names_to_pids join_ix sup race}a) do
+  def handle_call({:new_player, name}, _from, state = d%{names_to_pids, join_ix, sup, race}) do
     if Map.has_key?(names_to_pids, name) do
       {:reply, {:error, :duplicate_name}, state}
     else
-      {:ok, player} = Supervisor.start_child(sup, [~m{name race}a, []])
+      {:ok, player} = Supervisor.start_child(sup, [d(%{name, race}), []])
       Race.notify(race, {:new_player, name})
       names_to_pids = Map.put(names_to_pids, name, %{pid: player, join_ix: join_ix})
       join_ix = join_ix + 1
@@ -43,7 +43,7 @@ defmodule Gald.Players do
     end
   end
 
-  def handle_call(:names, _from, state = ~m{names_to_pids}a) do
+  def handle_call(:names, _from, state = d%{names_to_pids}) do
     names = names_to_pids
     |> Enum.sort_by(fn ({_k, %{join_ix: join_ix}}) -> join_ix end)
     |> Enum.map(fn ({k, _v}) -> k end)
@@ -52,7 +52,7 @@ defmodule Gald.Players do
     {:reply, names, state}
   end
 
-  def handle_call(:turndata, _from, state = ~m{names_to_pids}a) do
+  def handle_call(:turndata, _from, state = d%{names_to_pids}) do
     res = names_to_pids
     |> Enum.map(fn ({k, %{join_ix: join_ix}}) -> {k, %{join_ix: join_ix}} end)
     |> Enum.into(%{})
@@ -64,8 +64,8 @@ defmodule Gald.Players do
     {:reply, state.names_to_pids[name].pid, state}
   end
 
-  def handle_cast(:emit_stats, state = ~m{names_to_pids}a) do
-    IO.puts "Emitting stats for all players"
+  def handle_cast(:emit_stats, state = d%{names_to_pids}) do
+    #IO.puts "Emitting stats for all players"
     for {_, %{pid: pid}} <- names_to_pids do
       Player.emit_stats(pid)
     end

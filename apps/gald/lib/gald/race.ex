@@ -31,9 +31,7 @@ defmodule Gald.Race do
 
   ## Starting and Stopping
   @spec start_link(%Config{}, [term]) :: Supervisor.on_start
-  @spec start(%Config{}, [term]) :: Supervisor.on_start
   def start_link(config, opts \\ []), do: Supervisor.start_link(__MODULE__, config, opts)
-  def start(config, opts \\[]), do: Supervisor.start(__MODULE__, config, opts)
   def stop(race), do: Supervisor.stop(race, :normal)
 
   # Server
@@ -42,7 +40,7 @@ defmodule Gald.Race do
       worker(GenEvent, [[name: out(self)]]),
       worker(Gald.Controller, [self, config, [name: controller(self)]]),
       worker(Gald.Players, [self, [name: players(self)]]),
-      worker(Gald.Rng, [%{module: config.rng}, [name: rng(self)]]),
+      worker(Gald.Rng, [%{module: config.rng, config: config.rng_config}, [name: rng(self)]]),
       worker(Gald.Display, [%{race: self}, [name: display(self)]]),
       worker(Gald.Monsters, [nil, [name: monsters(self)]]),
       # Other children started dynamically.

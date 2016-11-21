@@ -2,7 +2,7 @@ defmodule Gald.Rng.Production do
   @moduledoc false
   @behaviour Gald.Rng
   
-  def init() do
+  def init(_) do
     << a :: 32, b :: 32, c :: 32 >> = :crypto.rand_bytes(12)
     :random.seed(a,b,c)
     nil

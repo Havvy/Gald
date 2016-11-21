@@ -8,13 +8,6 @@ use Mix.Config
 # if you want to provide default values for your application for third-
 # party users, it should be done in your mix.exs file.
 
-# Sample configuration:
-#
-#     config :logger, :console,
-#       level: :info,
-#       format: "$date $time [$level] $metadata$message\n",
-#       metadata: [:user_id]
-
 # It is also possible to import configuration files, relative to this
 # directory. For example, you can emulate configuration per environment
 # by uncommenting the line below and defining dev.exs, test.exs and such.
@@ -22,9 +15,6 @@ use Mix.Config
 # here (which is why it is important to import them last).
 #
 #     import_config "#{Mix.env}.exs"
-# This file is responsible for configuring your application
-# and its dependencies with the aid of the Mix.Config module.
-use Mix.Config
 
 # The configuration defined here will only affect the dependencies
 # in the apps directory when commands are executed from the umbrella
@@ -32,9 +22,9 @@ use Mix.Config
 # application directly and import its configuration, as done below.
 import_config "../apps/*/config/config.exs"
 
-# Sample configuration (overrides the imported configuration above):
-#
-#     config :logger, :console,
-#       level: :info,
-#       format: "$date $time [$level] $metadata$message\n",
-#       metadata: [:user_id]
+config :logger,
+  handle_sasl_reports: false,
+  level: :debug
+
+config :logger, :console,
+  format: "$metadata[$level] $message\n"

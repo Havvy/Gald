@@ -1,6 +1,6 @@
 defmodule Gald.Screen.Combat.Unicat do
   @moduledoc """
-  Test screen for combat.
+  test screen for combat.
   """
 
   use Gald.Screen

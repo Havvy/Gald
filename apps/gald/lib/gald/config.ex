@@ -4,7 +4,8 @@ defmodule Gald.Config do
     end_space: 120,
     manager: Gald.EventManager.Production,
     manager_config: nil,
-    rng: Gald.Rng.Production
+    rng: Gald.Rng.Production,
+    rng_config: %{}
   ]
 
   def get_and_update(state, key, updater) do

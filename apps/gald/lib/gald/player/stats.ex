@@ -65,7 +65,6 @@ defmodule Gald.Player.Stats do
       stats
     end
   end
-
   def put_status_effect(stats = %Gald.Player.Stats{}, {status, severity}) do
     unless has_status_effect(stats, status) do
       update_in(stats, [:status_effects], &[{status, severity} | &1])
@@ -106,6 +105,11 @@ defmodule Gald.Player.Stats do
   @spec has_status_effect(Agent.t, atom) :: boolean
   def has_status_effect(stats, status) do
     Agent.get(stats, &has_status_effect(&1, status))
+  end
+
+  @spec has_status_effect_in_category(Agent.t, atom) :: boolean
+  def has_status_effect_in_category(stats, :start_turn) do
+    Agent.get(stats, &has_status_effect(&1, Gald.Status.Poison))
   end
 
   @spec get_status_effects(%Gald.Player.Stats{}) :: [String.t]

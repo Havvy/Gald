@@ -4,7 +4,7 @@ defmodule Gald.Rng do
   use GenServer
 
   # Behaviour
-  @callback init() :: any
+  @callback init(any) :: any
   @callback pos_integer(non_neg_integer, any) :: {:reply, non_neg_integer, any}
 
   # Client
@@ -17,8 +17,8 @@ defmodule Gald.Rng do
   end
 
   # Server
-  def init(%{module: module}) do
-    rng_state = apply(module, :init, [])
+  def init(%{module: module, config: config}) do
+    rng_state = apply(module, :init, [config])
     {:ok, %{module: module, rng_state: rng_state}}
   end
 

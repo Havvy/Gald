@@ -120,17 +120,17 @@ defmodule GaldSite.RaceManager do
 
   def handle_call({:put_viewer, internal_name, viewer}, _from, state) do
     Logger.debug("Adding viewer to #{internal_name}.")
-    reply = if Map.has_key?(state, internal_name) do
+    {reply, state} = if Map.has_key?(state, internal_name) do
       if state[internal_name].crashed do
-        {:error, "This race crashed earlier."}
+        {{:error, "This race crashed earlier."}, state}
       else
         Logger.debug("Race exists. Adding viewer.")
-        state = update_in(state, [internal_name, :viewers], &MapSet.put(&1, viewer))
-        :ok
+        new_state = update_in(state, [internal_name, :viewers], &MapSet.put(&1, viewer))
+        {:ok, new_state}
       end
     else
       Logger.debug("No such race. Sorry.")
-      {:error, no_such_race(internal_name)}
+      {{:error, no_such_race(internal_name)}, state}
     end
     {:reply, reply, state}
   end
@@ -152,13 +152,14 @@ defmodule GaldSite.RaceManager do
   end
 
   def handle_cast({:delete_viewer, internal_name, viewer}, state) do
-    cond do
+    state = cond do
       MapSet.size(state[internal_name].viewers) > 1 ->
-        state = update_in(state, [internal_name, :viewers], &MapSet.delete(&1, viewer))
+        update_in(state, [internal_name, :viewers], &MapSet.delete(&1, viewer))
       state[internal_name].crashed ->
-        state = Map.delete(state, internal_name)
+        Map.delete(state, internal_name)
       true ->
         Gald.Race.stop(state[internal_name].race)
+        state
     end
 
     {:noreply, state}

@@ -67,4 +67,8 @@ defmodule Gald.Player.Controller do
   def handle_call(:get_status_effects, _from, state = ~m{player}a) do
     {:reply, Player.Stats.get_status_effects(Player.stats(player)), state}
   end
+
+  def handle_call({:has_status_effect_category, :start_turn}, _from, state = ~m{player}a) do
+    {:reply, Player.Stats.has_status_effect_in_category(Player.stats(player), :start_turn), state}
+  end
 end

@@ -2,7 +2,7 @@ defmodule Gald.Rng.UnicatTest do
   @moduledoc false
   @behaviour Gald.Rng
 
-  def init(), do: [
+  def init(_), do: [
     1, # @P1 Round 1 DiceRoll, 1st die;
     1, # @P1 Round 1 DiceRoll, 2nd die;
     1, # @P1 Round 1 Battle, Action 1, Player Attack, 1st die;

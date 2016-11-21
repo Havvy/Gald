@@ -8,6 +8,10 @@ defmodule GaldUmbrella.Mixfile do
      deps: deps]
   end
 
+  def application, do: [
+    applications: [:logger]
+  ]
+
   # Dependencies can be Hex packages:
   #
   #   {:mydep, "~> 0.3.0"}

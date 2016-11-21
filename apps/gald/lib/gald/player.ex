@@ -74,7 +74,6 @@ defmodule Gald.Player do
   def lower_severity_of_status(race, player_name, status) when is_binary(player_name) do
     GenServer.call(controller(Race.player(race, player_name)), {:lower_severity_of_status, status})
   end
-
   def lower_severity_of_status(player, status) when is_pid(player) do
     GenServer.call(controller(player), {:lower_severity_of_status, status})
   end
@@ -82,9 +81,12 @@ defmodule Gald.Player do
   def get_status_effects(player) when is_pid(player) do
     GenServer.call(controller(player), :get_status_effects)
   end
-
   def get_status_effects(race, player_name) when is_binary(player_name) do
     GenServer.call(controller(Race.player(race, player_name)), :get_status_effects)
+  end
+
+  def has_status_effect_start_turn(race, player_name) when is_binary(player_name) do
+    GenServer.call(controller(Race.player(race, player_name)), {:has_status_effect_category, :start_turn})
   end
 
   def name(player) when is_pid(player) do

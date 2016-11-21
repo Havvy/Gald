@@ -24,11 +24,12 @@ defmodule Gald.Mixfile do
   ]
 
   def application, do: [
-    applications: [:logger],
+    applications: [:logger, :destructure],
     mod: {Gald, []}
   ]
 
   defp deps, do: [
+    {:destructure, "~> 0.1.1"},
     {:short_maps, "~> 0.1.0"},
     {:dialyze, "~> 0.2.0", only: :dev},
     #{:credo, "~> 0.1.0", only: :dev},
