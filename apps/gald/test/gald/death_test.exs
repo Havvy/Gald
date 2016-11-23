@@ -45,7 +45,10 @@ defmodule Gald.DeathTest do
     assert :ok = Gald.Player.Input.select_option(player_in, "Continue")
 
     assert {:death, @p1} = next_event(race_out)
-
+    assert {:stats, %Gald.Player.Stats{
+      life: %Gald.Death{respawn_timer: 2},
+      health: 0
+    }} = next_event(player_out)
     assert {:screen, %StandardDisplay{
       title: "Die"
     }} = next_event(race_out)
@@ -57,6 +60,10 @@ defmodule Gald.DeathTest do
 
     assert {:turn_start, @p1} = next_event(race_out)
 
+    assert {:stats, %Gald.Player.Stats{
+      life: %Gald.Death{respawn_timer: 1},
+      health: 0
+    }} = next_event(player_out)
     assert {:screen, %StandardDisplay{
       title: "Respawn"
     }} = next_event(race_out)
@@ -69,6 +76,10 @@ defmodule Gald.DeathTest do
     assert {:turn_start, @p1} = next_event(race_out)
 
     assert {:respawn, @p1} = next_event(race_out)
+    assert {:stats, %Gald.Player.Stats{
+      life: :alive,
+      health: 10
+    }} = next_event(player_out)
     assert {:screen, %StandardDisplay{
       title: "Respawn"
     }} = next_event(race_out)

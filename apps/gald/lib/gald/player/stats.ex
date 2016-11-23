@@ -13,12 +13,38 @@ defmodule Gald.Player.Stats do
   that implement a protocol or behaviour. Probably a protocol...
   """
 
-  import ShortMaps
+  import Destructure
 
   @opaque t :: pid
+  @type life :: :alive | Gald.Death.t
+  @type health :: non_neg_integer
+  @type max_health :: pos_integer
+  @type attack :: non_neg_integer
+  @type defense :: non_neg_integer
+  @type damage :: %{
+    optional(:physical) => pos_integer
+  }
+  @type status_effects :: [any]
+  @typep ts :: %Gald.Player.Stats{
+    life: life,
+    health: health,
+    max_health: max_health,
+    attack: attack,
+    defense: defense,
+    damage: damage,
+    status_effects: status_effects
+  }
+  @typep battle_card :: %{
+    required(:health) => health,
+    required(:max_health) => max_health,
+    required(:attack) => attack,
+    required(:defense) => defense,
+    required(:damage) => damage
+  }
 
   # Struct
   defstruct [
+    life: :alive,
     health: 10,
     max_health: 10,
     attack: 0,
@@ -46,18 +72,19 @@ defmodule Gald.Player.Stats do
     GenEvent.notify(event_emitter, {:stats, stats})
   end
 
+  @spec battle_card(t) :: battle_card
   def battle_card(stats) do
-    Agent.get(stats, fn (~m{health max_health attack defense damage}a) ->
-      ~m{health max_health attack defense damage}a
+    Agent.get(stats, fn (d%{health, max_health, attack, defense, damage}) ->
+      d%{health, max_health, attack, defense, damage}
     end)
   end
 
   def is_alive(stats) do
-    Agent.get(stats, fn (~m{health}a) -> health > 0 end)
+    Agent.get(stats, fn (d%{life}) -> life == :alive end)
   end
 
   # TODO(Havvy): Make status effects their own processes.
-  @spec put_status_effect(%Gald.Player.Stats{}, atom | {atom, non_neg_integer}) :: %Gald.Player.Stats{}
+  @spec put_status_effect(ts, atom | {atom, non_neg_integer}) :: ts
   def put_status_effect(stats = %Gald.Player.Stats{}, status) when is_atom(status) do
     unless has_status_effect(stats, status) do
       update_in(stats, [:status_effects], &[{status, 1} | &1])
@@ -127,5 +154,18 @@ defmodule Gald.Player.Stats do
   end
   def update_health(stats, updater) when is_function(updater, 2) do
     Agent.update(stats, &%Gald.Player.Stats{ &1 | health: updater.(&1.health, &1.max_health) })
+  end
+
+  def kill(stats) do
+    Agent.update(stats, &%Gald.Player.Stats{ &1 | life: %Gald.Death{}, health: 0 })
+  end
+
+  def respawn_tick(stats) do
+    Agent.get_and_update(stats, &respawn_tick_impl/1)
+  end
+  defp respawn_tick_impl(stats = %Gald.Player.Stats{life: life, max_health: max_health}) do
+    {new_life, respawned} = Gald.RespawnTick.respawn_tick(life)
+    health = if respawned do max_health else 0 end
+    {respawned, %{stats | life: new_life, health: health}}
   end
 end

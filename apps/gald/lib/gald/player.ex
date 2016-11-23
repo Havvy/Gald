@@ -4,7 +4,7 @@ defmodule Gald.Player do
   """
 
   use Supervisor
-  import ShortMaps
+  import Destructure
   alias Gald.Player.Controller
   alias Gald.Player.Input
   alias Gald.Player.Stats
@@ -39,6 +39,8 @@ defmodule Gald.Player do
     Supervisor.start_link(__MODULE__, init_arg, otp_opts)
   end
 
+  # TODO(Havvy): Macro for these. Also include error cases.
+
   def emit_stats(player) when is_pid(player) do
     GenServer.cast(controller(player), :emit_stats)
   end
@@ -54,21 +56,28 @@ defmodule Gald.Player do
     GenServer.call(controller(player), :battle_card)
   end
 
-  @doc """
-  Knocks out the player.
-
-  1. Set's player's health to 0.
-  2. Gives player the :ko status.
-  """
-  def kill(player) when is_pid(player) do
-    GenServer.call(controller(player), :kill)
-  end
-
   def is_alive(player) when is_pid(player) do
     GenServer.call(controller(player), :is_alive)
   end
   def is_alive(race, player_name) when is_binary(player_name) do
     GenServer.call(controller(Race.player(race, player_name)), :is_alive)
+  end
+
+  def respawn_tick(player) when is_pid(player) do
+    GenServer.call(controller(player), :respawn_tick)
+  end
+  def respawn_tick(race, player_name) when is_binary(player_name) do
+    GenServer.call(controller(Race.player(race, player_name)), :respawn_tick)
+  end
+
+  @doc """
+  Knocks out the player.
+
+  1. Set's player's health to 0.
+  2. Sets player's life to `%Gald.Death{}`
+  """
+  def kill(player) when is_pid(player) do
+    GenServer.call(controller(player), :kill)
   end
 
   def lower_severity_of_status(race, player_name, status) when is_binary(player_name) do
@@ -94,7 +103,7 @@ defmodule Gald.Player do
   end
 
   # Server
-  def init(~m{race name}a) do
+  def init(d%{race, name}) do
     base_args = %{race: race, player: self}
     controller_args = Map.put(base_args, :name, name)
     children = [

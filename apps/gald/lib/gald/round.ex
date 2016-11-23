@@ -1,6 +1,6 @@
 defmodule Gald.Round do
   use GenServer
-  import ShortMaps
+  import Destructure
   use Gald.Race
   alias Gald.Race
   require Logger
@@ -19,7 +19,7 @@ defmodule Gald.Round do
   end
 
   # Server
-  def init(~m{turn_order race}a) do
+  def init(d%{turn_order, race}) do
     GenServer.cast(self, :next)
 
     {:ok, %{
@@ -34,7 +34,7 @@ defmodule Gald.Round do
   end
 
   @doc false
-  def handle_call(:current, _from, state = ~m{turn_player}a) do
+  def handle_call(:current, _from, state = d%{turn_player}) do
     {:reply, turn_player, state}
   end
 
@@ -46,7 +46,7 @@ defmodule Gald.Round do
     handle_cast(:next, %{state | turn_order: new_turn_order, round: round})
   end
   def handle_cast(:next, state = %{turn_order: [player_name | turn_order], race: race}) do
-    {:ok, turn} = Race.start_turn(race, ~m{player_name}a)
+    {:ok, turn} = Race.start_turn(race, d%{player_name})
     turn = Process.monitor(turn)
     {:noreply, %{state | turn_order: turn_order, turn: turn, turn_player: player_name}}
   end

@@ -41,9 +41,11 @@ defmodule Gald.Screen do
       alias Gald.Display.Standard, as: StandardDisplay
       use Gald.Race
 
+      def handle_player_option(_option, _data), do: :end_sequence
+
       def handle_dead_player_option(_option, _data), do: :end_sequence
 
-      defoverridable [handle_dead_player_option: 2]
+      defoverridable [handle_player_option: 2, handle_dead_player_option: 2]
     end
   end
 

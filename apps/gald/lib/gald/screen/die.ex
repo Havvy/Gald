@@ -10,6 +10,7 @@ defmodule Gald.Screen.Die do
 
   def init(%{player: player}) do
     Player.kill(player)
+    Player.emit_stats(player)
     %{}
   end
 

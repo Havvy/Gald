@@ -109,14 +109,14 @@ defmodule Gald.PoisonTest do
 
     assert {:turn_start, @p1} = next_event(race_out)
 
+    assert {:death, @p1} = next_event(race_out)
+    assert {:stats, %Gald.Player.Stats{
+      life: %Gald.Death{},
+      status_effects: []
+    }} = next_event(player_out)
     assert {:screen, %StandardDisplay{
       title: "Beginning of Turn Effects"
     }} = next_event(race_out)
-
-    assert {:stats, %Gald.Player.Stats{
-        health: 0,
-        status_effects: [{:dead, 2}]
-    }} = next_event(player_out)
 
     EventQueue.stop(race_out)
     EventQueue.stop(player_out)
