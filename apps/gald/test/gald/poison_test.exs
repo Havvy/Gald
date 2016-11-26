@@ -34,93 +34,124 @@ defmodule Gald.PoisonTest do
 
     assert {:round_start, 1} = next_event(race_out)
 
-    assert {:turn_start, @p1} = next_event(race_out)
+      assert {:turn_start, @p1} = next_event(race_out)
 
-    assert {:screen, %StandardDisplay{
-      title: "Roll Dice"
-    }} = next_event(race_out)
+        assert {:screen, %StandardDisplay{
+          title: "Roll Dice"
+        }} = next_event(race_out)
 
-    assert :ok = Gald.Player.Input.select_option(player_in, "Roll")
-    assert {:move, %Gald.Move{}} = next_event(race_out)
+        assert :ok = select_option(player_in, "Roll")
+        assert {:move, %Gald.Move{}} = next_event(race_out)
 
-    assert {:screen, %StandardDisplay{
-      title: "Movement!"
-    }} = next_event(race_out)
+        assert {:screen, %StandardDisplay{
+          title: "Movement!"
+        }} = next_event(race_out)
 
-    assert :ok = Gald.Player.Input.select_option(player_in, "Continue")
+        assert :ok = select_option(player_in)
 
-    assert {:stats, %Gald.Player.Stats{
-        health: 10,
-        status_effects: [{Gald.Status.Poison, 1}]
-    }} = next_event(player_out)
+        assert {:stats, %Gald.Player.Stats{
+            health: 10,
+            status_effects: [{Gald.Status.Poison, 1}]
+        }} = next_event(player_out)
 
-    assert {:screen, %StandardDisplay{
-        title: "Poison!"
-    }} = next_event(race_out)
+        assert {:screen, %StandardDisplay{
+            title: "Poison!"
+        }} = next_event(race_out)
 
-    assert :ok = Gald.Player.Input.select_option(player_in, "Continue")
+        assert :ok = select_option(player_in)
 
     assert {:round_start, 2} = next_event(race_out)
 
-    assert {:turn_start, @p1} = next_event(race_out)
+      assert {:turn_start, @p1} = next_event(race_out)
 
-    assert {:screen, %StandardDisplay{
-        title: "Beginning of Turn Effects"
-    }} = next_event(race_out)
+        assert {:screen, %StandardDisplay{
+            title: "Beginning of Turn Effects"
+        }} = next_event(race_out)
 
-    assert {:stats, %Gald.Player.Stats{
-        health: 9,
-        status_effects: [{Gald.Status.Poison, 1}]
-    }} = next_event(player_out)
+        assert {:stats, %Gald.Player.Stats{
+            health: 9,
+            status_effects: [{Gald.Status.Poison, 1}]
+        }} = next_event(player_out)
 
-    assert :ok = Gald.Player.Input.select_option(player_in, "Continue")
+        assert :ok = select_option(player_in)
 
-    assert {:screen, %StandardDisplay{
-      title: "Roll Dice"
-    }} = next_event(race_out)
+        assert {:screen, %StandardDisplay{
+          title: "Roll Dice"
+        }} = next_event(race_out)
 
-    assert :ok = Gald.Player.Input.select_option(player_in, "Roll")
-    assert {:move, %Gald.Move{}} = next_event(race_out)
+        assert :ok = select_option(player_in, "Roll")
+        assert {:move, %Gald.Move{}} = next_event(race_out)
 
-    assert {:screen, %StandardDisplay{
-      title: "Movement!"
-    }} = next_event(race_out)
+        assert {:screen, %StandardDisplay{
+          title: "Movement!"
+        }} = next_event(race_out)
 
-    assert :ok = Gald.Player.Input.select_option(player_in, "Continue")
+        assert :ok = select_option(player_in)
 
-    assert {:screen, %StandardDisplay{
-      title: "Set Health"
-    }} = next_event(race_out)
+        assert {:screen, %StandardDisplay{
+          title: "Set Health"
+        }} = next_event(race_out)
 
-    assert :ok = Gald.Player.Input.select_option(player_in, "1")
+        assert :ok = select_option(player_in, "1")
 
-    assert {:stats, %Gald.Player.Stats{
-        health: 1,
-        status_effects: [{Gald.Status.Poison, 1}]
-    }} = next_event(player_out)
+        assert {:stats, %Gald.Player.Stats{
+            health: 1,
+            status_effects: [{Gald.Status.Poison, 1}]
+        }} = next_event(player_out)
 
-    assert {:screen, %StandardDisplay{
-      title: "Health Set"
-    }} = next_event(race_out)
+        assert {:screen, %StandardDisplay{
+          title: "Health Set"
+        }} = next_event(race_out)
 
-    assert :ok = Gald.Player.Input.select_option(player_in, "Continue")
+        assert :ok = select_option(player_in)
 
     assert {:round_start, 3} = next_event(race_out)
 
-    assert {:turn_start, @p1} = next_event(race_out)
+      assert {:turn_start, @p1} = next_event(race_out)
 
-    assert {:death, @p1} = next_event(race_out)
-    assert {:stats, %Gald.Player.Stats{
-      life: %Gald.Death{},
-      status_effects: []
-    }} = next_event(player_out)
-    assert {:screen, %StandardDisplay{
-      title: "Beginning of Turn Effects"
-    }} = next_event(race_out)
+        assert {:death, @p1} = next_event(race_out)
+        assert {:stats, %Gald.Player.Stats{
+          life: %Gald.Death{},
+          status_effects: []
+        }} = next_event(player_out)
+        assert {:screen, %StandardDisplay{
+          title: "Beginning of Turn Effects"
+        }} = next_event(race_out)
+
+        assert :ok = select_option(player_in)
+
+        assert {:screen, %StandardDisplay{
+          title: "Respawn"
+        }} = next_event(race_out)
+
+        assert :ok = select_option(player_in)
+
+    assert {:round_start, 4} = next_event(race_out)
+
+      assert {:turn_start, @p1} = next_event(race_out)
+
+        assert {:respawn, @p1} = next_event(race_out)
+        assert {:screen, %StandardDisplay{
+          title: "Respawn"
+        }} = next_event(race_out)
+
+        assert :ok = select_option(player_in)
+
+    assert {:round_start, 5} = next_event(race_out)
+
+      assert {:turn_start, @p1} = next_event(race_out)
+
+        assert {:screen, %StandardDisplay{
+          title: "Roll Dice"
+        }} = next_event(race_out)
 
     EventQueue.stop(race_out)
     EventQueue.stop(player_out)
     Race.stop(race)
+  end
+  
+  defp select_option(player_in, option \\ "Continue") do
+    Gald.Player.Input.select_option(player_in, option)
   end
 
   defp next_event(eq) do

@@ -8,10 +8,10 @@ defmodule Gald.Screen.BeginTurnEffects do
   def init(d%{player, player_name}) do
     # FIXME: While poison is the only effect that can cause this screen to appear, we can hardcode.
     Gald.Status.Poison.on_player_turn_start(player)
-    log = if !Player.Stats.is_alive(Player.stats(player)) do
-      stats = Player.stats(player)
-      Player.Stats.put_status_effect(stats, {:dead, 2})
+    stats = Player.stats(player)
+    log = if Player.Stats.should_kill(stats) do
       Player.Stats.lower_severity_of_status(stats, Gald.Status.Poison)
+      Player.kill(player)
       "#{player_name} has succumbed to their poison."
     else
       nil

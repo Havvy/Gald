@@ -52,7 +52,7 @@ defmodule Gald.Screen.Combat.Battle do
 
     Player.emit_stats(player)
 
-    player_is_alive = Player.Stats.is_alive(Player.stats(player))
+    player_is_alive = !Player.Stats.should_kill(Player.stats(player))
     monster_is_alive = Monster.is_alive(monster)
 
     case {player_is_alive, monster_is_alive} do
@@ -67,19 +67,19 @@ defmodule Gald.Screen.Combat.Battle do
         ])
         resolve_combat(:victory, monster, monster_name, action_descriptions)
       {false, true} ->
-        Player.Stats.put_status_effect(Player.stats(player), {:dead, 2})
+        Player.kill(player)
         action_descriptions = Enum.concat([
           player_action_descriptions,
           monster_action_descriptions,
-          ["#{player_name} is knocked out."]
+          ["#{player_name} dies."]
         ])
         resolve_combat(:loss, monster, monster_name, action_descriptions)
       {false, false} ->
-        Player.Stats.put_status_effect(Player.stats(player), {:dead, 2})
+        Player.kill(player)
         action_descriptions = Enum.concat([
           player_action_descriptions,
           monster_action_descriptions,
-          ["#{player_name} is knocked out.", "#{monster_name} dies."]
+          ["#{player_name} dies.", "#{monster_name} dies."]
         ])
         resolve_combat(:draw, monster, monster_name, action_descriptions)
     end

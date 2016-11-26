@@ -79,10 +79,6 @@ defmodule Gald.Player.Stats do
     end)
   end
 
-  def is_alive(stats) do
-    Agent.get(stats, fn (d%{life}) -> life == :alive end)
-  end
-
   # TODO(Havvy): Make status effects their own processes.
   @spec put_status_effect(ts, atom | {atom, non_neg_integer}) :: ts
   def put_status_effect(stats = %Gald.Player.Stats{}, status) when is_atom(status) do
@@ -100,7 +96,7 @@ defmodule Gald.Player.Stats do
     end
   end
 
-  @spec put_status_effect(Agent.t, atom | {atom, non_neg_integer}) :: :ok
+  @spec put_status_effect(t, atom | {atom, non_neg_integer}) :: :ok
   def put_status_effect(stats, status) do
     Agent.cast(stats, &put_status_effect(&1, status))
   end
@@ -116,7 +112,7 @@ defmodule Gald.Player.Stats do
     {lowered_severity, %{stats | status_effects: status_effects}}
   end
 
-  @spec lower_severity_of_status(Agent.t, atom) :: non_neg_integer
+  @spec lower_severity_of_status(t, atom) :: non_neg_integer
   def lower_severity_of_status(stats, status) do
     Agent.get_and_update(stats, &lower_severity_of_status(&1, status))
   end
@@ -129,12 +125,12 @@ defmodule Gald.Player.Stats do
     end)
   end
 
-  @spec has_status_effect(Agent.t, atom) :: boolean
+  @spec has_status_effect(t, atom) :: boolean
   def has_status_effect(stats, status) do
     Agent.get(stats, &has_status_effect(&1, status))
   end
 
-  @spec has_status_effect_in_category(Agent.t, atom) :: boolean
+  @spec has_status_effect_in_category(t, atom) :: boolean
   def has_status_effect_in_category(stats, :start_turn) do
     Agent.get(stats, &has_status_effect(&1, Gald.Status.Poison))
   end
@@ -144,7 +140,7 @@ defmodule Gald.Player.Stats do
     status_effects |> Enum.map(fn ({name, _severity}) -> name end)
   end
 
-  @spec get_status_effects(Agent.t) :: boolean
+  @spec get_status_effects(t) :: boolean
   def get_status_effects(stats) do
     Agent.get(stats, &get_status_effects/1)
   end
@@ -156,10 +152,26 @@ defmodule Gald.Player.Stats do
     Agent.update(stats, &%Gald.Player.Stats{ &1 | health: updater.(&1.health, &1.max_health) })
   end
 
+  @doc "Whether or not the player is currently alive or not."
+  @spec is_alive(Agent.t) :: boolean
+  def is_alive(stats) do
+    Agent.get(stats, fn (d%{life}) -> life == :alive end)
+  end
+
+  @doc "Whether or not the player should be killed if there's no counter-effects."
+  @spec should_kill(t) :: boolean
+  def should_kill(stats) do
+    Agent.get(stats, fn(d%{health}) -> health == 0 end)
+  end
+
+  @doc "Kil the player."
+  @spec kill(t) :: :ok
   def kill(stats) do
     Agent.update(stats, &%Gald.Player.Stats{ &1 | life: %Gald.Death{}, health: 0 })
   end
 
+  @doc "Move the player one step closer to revival. Returns true when the player actually respawns."
+  @spec respawn_tick(t) :: boolean
   def respawn_tick(stats) do
     Agent.get_and_update(stats, &respawn_tick_impl/1)
   end
