@@ -1,4 +1,4 @@
-defmodule Gald.Screen.NonEvent do
+defmodule Gald.Screen.Test.NonEvent do
   use Gald.Screen
 
   @moduledoc """

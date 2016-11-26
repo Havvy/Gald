@@ -1,6 +1,6 @@
 defmodule Gald.Screen.NonEventTest do
   use ExUnit.Case, async: true
-  alias Gald.Screen.NonEvent
+  alias Gald.Screen.Test.NonEvent
   alias Gald.Display.Standard, as: StandardDisplay
 
   test "NonEvent Screen" do

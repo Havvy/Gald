@@ -10,7 +10,7 @@ defmodule Gald.FullGameTest do
   @config %Gald.Config{
     end_space: 25,
     manager: Gald.EventManager.Singular,
-    manager_config: %{event: NonEvent},
+    manager_config: %{event: Test.NonEvent},
     rng: Gald.Rng.FullGameTest
   }
 
