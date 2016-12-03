@@ -4,19 +4,18 @@ defmodule Gald.Screen.DeificIntervention.MotusGood do
   """
 
   use Gald.Screen
-  import ShortMaps
+  import Destructure
   alias Gald.Player
-  alias Gald.Player.Stats
+  alias Gald.Status.Haste
 
-  def init(~m{player player_name}a) do
-    stats = Player.stats(player)
-    Stats.put_status_effect(stats, :haste)
+  def init(d%{player, player_name}) do
+    Player.put_status(player, %Haste{})
     Player.emit_stats(player)
 
-    ~m{player_name}a
+    d%{player_name}
   end
 
-  def get_display(~m{player_name}a) do
+  def get_display(d%{player_name}) do
     %StandardDisplay{
       title: "Deific Intervention!",
       body: "Motus blesses you with <i>haste</i>. You now roll 2d8 for movement.",

@@ -1,6 +1,10 @@
 defmodule Gald.Death do
   @moduledoc """
-  The player status when killed by some means.
+  The player's life variant while respawning.
+
+  This variant represents the player actually being dead, waiting to be respawned back into the game.
+
+  This variant
 
   Not actually in the `Gald.Player.Stats.status_effects` because it interacts with everything.
 
@@ -9,14 +13,19 @@ defmodule Gald.Death do
 
   The other variant is `:alive` when the player is alive.
 
+  Gaining this effect causes the race event emitter to emit a `{:death, player_name}`
+  and losing the effect emits as `{:respawn, player_name}`.
+
   ## On Death Effects
 
   1. All death removable status effects are removed.
+  2. The player is given the 'Respawning' status effect.
 
   ## Death Effects
 
   * Player's phase after beginning-of-round effects is Respawn.
   * Player cannot use items.
+  * Player cannot win.
   """
 
   defstruct [
@@ -30,8 +39,8 @@ defprotocol Gald.RespawnTick do
   def respawn_tick(self)
 end
 
-defimpl Gald.RespawnTick, for: :alive do
-  def respawn_tick(self), do: {self, false}
+defimpl Gald.RespawnTick, for: Atom do
+  def respawn_tick(:alive), do: {:alive, false}
 end
 
 defimpl Gald.RespawnTick, for: Gald.Death do

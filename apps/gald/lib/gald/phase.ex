@@ -10,7 +10,7 @@ defmodule Gald.Phase do
   """
 
   use GenServer
-  import ShortMaps
+  import Destructure
   alias Gald.Race
   alias Gald.Screen
   alias Gald.Display
@@ -44,14 +44,14 @@ defmodule Gald.Phase do
 
   # Client
   # TODO(Havvy): init should take screen_module, not screen.
-  @spec init(Screen.state) :: Screen.state
-  def init(~m{race player_name screen}a) do
+  @spec init(Screen.state) :: {:ok, Screen.state}
+  def init(d%{race, player_name, screen}) do
     player = Race.player(race, player_name)
     {:ok, %{
       race: race,
       player_name: player_name,
       player: player,
-      screen: initialize_screen(race, screen, ~m{race player player_name}a)
+      screen: initialize_screen(race, screen, d%{race, player, player_name})
     }}
   end
 

@@ -5,25 +5,16 @@ defmodule Gald.Screen.BeginTurnEffects do
   use Gald.Screen
   alias Gald.Player
 
-  def init(d%{player, player_name}) do
-    # FIXME: While poison is the only effect that can cause this screen to appear, we can hardcode.
-    Gald.Status.Poison.on_player_turn_start(player)
-    stats = Player.stats(player)
-    log = if Player.Stats.should_kill(stats) do
-      Player.Stats.lower_severity_of_status(stats, Gald.Status.Poison)
-      Player.kill(player)
-      "#{player_name} has succumbed to their poison."
-    else
-      nil
-    end
+  def init(d%{player}) do
+    d(%{log, body}) = Gald.Player.on_turn_start(player)
     Player.emit_stats(player)
-    d%{player_name, log}
+    d%{log, body}
   end
 
-  def get_display(d%{player_name, log}) do
+  def get_display(d%{log, body}) do
     %StandardDisplay{
       title: "Beginning of Turn Effects",
-      body: "#{player_name} takes 1 damage from their poison.",
+      body: body,
       log: log
     }
   end

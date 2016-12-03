@@ -7,14 +7,13 @@ defmodule Gald.EventManager do
   """
 
   use GenServer
-  import ShortMaps
+  import Destructure
   alias Gald.Screen
   alias Gald.Race
   alias Gald.Player
 
   @type em_init :: any
   @type em_state :: any
-  @opaque t :: pid
 
   @doc """
   Initializes the event manager.
@@ -30,22 +29,22 @@ defmodule Gald.EventManager do
   }
 
   # Client
-  @spec start_link(Map.t, GenServer.opts) :: {:ok, t}
+  @spec start_link(Map.t, GenServer.opts) :: {:ok, GenServer.server}
   def start_link(init_arg, otp_opts \\ []) do
     GenServer.start_link(__MODULE__, init_arg, otp_opts)
   end
 
-  @spec next(t, Player.t) :: Screen.screen
+  @spec next(GenServer.server, Player.t) :: Screen.screen
   def next(event_manager, player) do
     GenServer.call(event_manager, {:next, player})
   end
 
   # Server
-  def init(~m{race config}a) do
+  def init(d%{race, config}) do
     manager = config.manager
     manager_config = config.manager_config
     manager_state = apply(config.manager, :init, [manager_config, race])
-    {:ok, ~m{race config manager manager_state}a}
+    {:ok, d%{race, config, manager, manager_state}}
   end
 
   def handle_call({:next, player}, _from, state) do

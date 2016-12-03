@@ -2,11 +2,9 @@ defmodule Gald.Screen.DiceMove do
   use Gald.Screen
   import Destructure
   require Logger
-  alias Gald.Race
-  alias Gald.Map
-  alias Gald.Rng
-  alias Gald.Player
-  alias Gald.Player.Stats
+  alias Gald.{Race, Map, Rng, Player, Status}
+  alias Player.Stats
+  alias Status.Haste
 
   @moduledoc """
   The screen for requesting a player roll the dice for movement.
@@ -21,7 +19,7 @@ defmodule Gald.Screen.DiceMove do
   ]
 
   def init(d%{race, player, player_name}) do
-    has_haste = Stats.has_status_effect(Player.stats(player), :haste)
+    has_haste = Stats.has_status_effect(Player.stats(player), Haste)
     dice_size = if has_haste do 8 else 6 end
 
     %Gald.Screen.DiceMove{

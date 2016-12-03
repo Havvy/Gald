@@ -17,7 +17,7 @@ export default function Channel (name) {
     .receive("timeout", reject.bind(null, {reason: "Connection timed out after 10 seconds."}));
 
     return {
-        /// A promise that
+        /// A promise
         onJoinPromise,
 
         // All global messages are preceded with a "public:".

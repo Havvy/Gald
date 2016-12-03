@@ -27,7 +27,7 @@ defmodule Gald.Screen do
   @type screen_state :: term
   @type screen_name :: module
   @type screen :: nil | {screen_name, screen_state}
-  @type screen_transition :: {:next, {module, screen_state}} | :end_sequence
+  @type screen_transition :: {:next, module, screen_state} | :end_sequence
   @typep player_option :: atom | String.t
   @typep screen_display :: %Gald.Display.Standard{}
     | %Gald.Display.Battle{}

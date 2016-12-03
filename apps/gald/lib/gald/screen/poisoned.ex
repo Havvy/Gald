@@ -9,7 +9,7 @@ defmodule Gald.Screen.Poisoned do
 
   def init(%{player: player, player_name: player_name}) do
     stats = Player.stats(player)
-    Stats.put_status_effect(stats, Gald.Status.Poison)
+    Stats.put_status_effect(stats, %Gald.Status.Poison{})
     Player.emit_stats(player)
     %{player_name: player_name}
   end

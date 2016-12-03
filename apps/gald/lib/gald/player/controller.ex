@@ -2,18 +2,17 @@ defmodule Gald.Player.Controller do
   @moduledoc """
   You should never call the functions on this module directly - instead, use the proper functions on Gald.Player.
   """
-  
+
   use GenServer
   import Destructure
   require Logger
-  alias Gald.Race
-  alias Gald.Player
+  alias Gald.{Race, Player}
   alias Gald.Player.Stats
 
   @typep state :: %{
-    required(:race) => Gald.Race.t,
-    required(:player) => Gald.Player.t,
-    required(:name) => String.t
+    required(:race) => Race.t,
+    required(:player) => Player.t,
+    required(:name) => Player.name
   }
   @type init_arg :: state
 
@@ -31,6 +30,11 @@ defmodule Gald.Player.Controller do
   def handle_cast(:emit_stats, state = d%{player}) do
     Stats.emit(Player.stats(player), Player.output(player))
 
+    {:noreply, state}
+  end
+
+  def handle_cast({:put_status_effect, status}, state = d%{player}) do
+    Player.Stats.put_status_effect(Player.stats(player), status)
     {:noreply, state}
   end
 
@@ -59,10 +63,8 @@ defmodule Gald.Player.Controller do
     {:reply, Player.Stats.is_alive(Player.stats(player)), state}
   end
 
-  def handle_call(:kill, _from, state = d%{name, player, race}) do
-    stats = Player.stats(player)
-    Stats.kill(stats)
-    Race.notify(race, {:death, name})
+  def handle_call(:kill, _from, state) do
+    kill(state)
     {:reply, :ok, state}
   end
 
@@ -75,15 +77,55 @@ defmodule Gald.Player.Controller do
     {:reply, respawned, state}
   end
 
-  def handle_call({:lower_severity_of_status, status}, _from, state = d%{player}) do
-    {:reply, Player.Stats.lower_severity_of_status(Player.stats(player), status), state}
-  end
-
   def handle_call(:get_status_effects, _from, state = d%{player}) do
     {:reply, Player.Stats.get_status_effects(Player.stats(player)), state}
   end
 
   def handle_call({:has_status_effect_category, :start_turn}, _from, state = d%{player}) do
-    {:reply, Player.Stats.has_status_effect_in_category(Player.stats(player), :start_turn), state}
+    {:reply, Player.Stats.has_status_effect_in_category(Player.stats(player), :on_turn_start), state}
   end
+
+  def handle_call(:on_turn_start, _from, state = d%{player}) do
+    stats = Player.stats(player)
+
+    reply = Stats.get_status_effects(stats, :on_turn_start)
+    |> emit_turn_start(d%{stats, player_name: state.name, race: state.race})
+
+    {:reply, reply, state}
+  end
+
+  defp kill(d%{name, player, race}) do
+    stats = Player.stats(player)
+    kill(d%{name, stats, race})
+  end
+  defp kill(d%{name, stats, race}) do
+    Stats.kill(stats)
+    Race.notify(race, {:death, name})
+  end
+
+  # TODO(Havvy): Rename this type/parameter.
+  @typep stuff :: %{
+    required(:player_name) => Player.name,
+    required(:race) => Race.t,
+    required(:stats) => Player.Stats.t
+  }
+  @spec emit_turn_start(StatusEffects.t, stuff) :: %{required(:log) => [String.t], required(:body) => [String.t]}
+  defp emit_turn_start(status_effects, stuff, log \\ [], body \\ [])
+  defp emit_turn_start([], _stuff, log, body), do: d%{log, body}
+  defp emit_turn_start([status | statuses], stuff = (d%{race, stats, player_name}), log, body) do
+    %{log: log_entry, body: body_entry} = Gald.Status.on_turn_start(status, stuff)
+    log = append_zero_one_or_many(log, log_entry)
+    body = append_zero_one_or_many(body, body_entry)
+
+    if Stats.should_kill(stats) do
+      kill(d%{stats, race, name: player_name})
+      d%{log, body}
+    else
+      emit_turn_start(statuses, stuff, log, body)
+    end
+  end
+
+  defp append_zero_one_or_many(list, nil), do: list
+  defp append_zero_one_or_many(list, one) when not is_list(one), do: list ++ [one]
+  defp append_zero_one_or_many(list, many), do: list ++ many
 end

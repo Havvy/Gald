@@ -13,7 +13,7 @@ defmodule Gald.Round do
   @doc """
   Return the player's name whose turn it is.
   """
-  @spec current(pid) :: nil | Gald.Player.name
+  @spec current(GenServer.server) :: nil | Gald.Player.name
   def current(round) do
     GenServer.call(round, :current)
   end

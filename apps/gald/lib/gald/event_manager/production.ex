@@ -37,6 +37,7 @@ defmodule Gald.EventManager.Production do
 
       # Random Events
       HotSprings,
+      Poisoned,
 
       # Random Combat
       Combat.Unicat

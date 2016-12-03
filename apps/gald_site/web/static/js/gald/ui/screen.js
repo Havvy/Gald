@@ -81,7 +81,7 @@ const PlayScreen = function ({style, screendata, isCurrentTurn, onOption}) {
     case "Standard": return <StandardScreen
       isCurrentTurn={isCurrentTurn}
       onOption={onOption}
-      title={screendata.turn}
+      title={screendata.title}
       body={screendata.body}
       options={screendata.options}
     />;

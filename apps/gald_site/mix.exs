@@ -18,6 +18,7 @@ defmodule GaldSite.Mixfile do
     mod: {GaldSite, []},
     applications: [
       :phoenix,
+      :phoenix_pubsub,
       :phoenix_html,
       :cowboy,
       :logger,
@@ -33,9 +34,10 @@ defmodule GaldSite.Mixfile do
 
   defp deps do
     [
-      {:phoenix, "~> 1.1.2"},
+      {:phoenix, "~> 1.2.0"},
       #{:phoenix_ecto, "~> 1.1"},
       #{:postgrex, ">= 0.0.0"},
+      {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_html, "~> 2.3"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:cowboy, "~> 1.0"},

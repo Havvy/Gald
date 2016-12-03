@@ -51,7 +51,7 @@ defmodule Gald.PoisonTest do
 
         assert {:stats, %Gald.Player.Stats{
             health: 10,
-            status_effects: [{Gald.Status.Poison, 1}]
+            status_effects: [%Gald.Status.Poison{}]
         }} = next_event(player_out)
 
         assert {:screen, %StandardDisplay{
@@ -70,7 +70,7 @@ defmodule Gald.PoisonTest do
 
         assert {:stats, %Gald.Player.Stats{
             health: 9,
-            status_effects: [{Gald.Status.Poison, 1}]
+            status_effects: [%Gald.Status.Poison{}]
         }} = next_event(player_out)
 
         assert :ok = select_option(player_in)
@@ -96,7 +96,7 @@ defmodule Gald.PoisonTest do
 
         assert {:stats, %Gald.Player.Stats{
             health: 1,
-            status_effects: [{Gald.Status.Poison, 1}]
+            status_effects: [%Gald.Status.Poison{}]
         }} = next_event(player_out)
 
         assert {:screen, %StandardDisplay{

@@ -10,7 +10,7 @@ defmodule Gald.Player do
   alias Gald.Player.Stats
   alias Gald.Race
 
-  @opaque t :: pid
+  @type name :: String.t
 
   # Components
   defp who(player, component) when is_pid(player), do: {:global, {player, component}}
@@ -80,11 +80,9 @@ defmodule Gald.Player do
     GenServer.call(controller(player), :kill)
   end
 
-  def lower_severity_of_status(race, player_name, status) when is_binary(player_name) do
-    GenServer.call(controller(Race.player(race, player_name)), {:lower_severity_of_status, status})
-  end
-  def lower_severity_of_status(player, status) when is_pid(player) do
-    GenServer.call(controller(player), {:lower_severity_of_status, status})
+  @spec put_status(Supervisor.supervisor, Gald.Status.t) :: :ok
+  def put_status(player, status) when is_pid(player) do
+    GenServer.cast(controller(player), {:put_status_effect, status})
   end
 
   def get_status_effects(player) when is_pid(player) do
@@ -100,6 +98,10 @@ defmodule Gald.Player do
 
   def name(player) when is_pid(player) do
     GenServer.call(controller(player), :name)
+  end
+
+  def on_turn_start(player) when is_pid(player) do
+    GenServer.call(controller(player), :on_turn_start)
   end
 
   # Server

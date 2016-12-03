@@ -3,7 +3,7 @@ exports.config = {
   files: {
     javascripts: {
       joinTo: {
-        'js/util.js': /^(web\/static\/js\/util)|(node_modules\/phoenix(_html)?)/,
+        'js/util.js': /^(web\/static\/js\/util)|(node_modules\/phoenix(_html)?)|(brunch\/node_modules\/deppack\/node_modules\/node-browser-modules\/node_modules\/process)/,
         'js/gald.js': /^(web\/static\/js\/gald)/,
         'js/lobby.js': /^(web\/static\/js\/lobby)/,
         'js/react.js': /^(node_modules\/react)/
