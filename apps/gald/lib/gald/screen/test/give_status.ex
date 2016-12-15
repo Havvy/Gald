@@ -58,8 +58,4 @@ defmodule Gald.Screen.Test.GiveStatusResult do
       log: "#{player_name} gains the '#{status}' status."
     }
   end
-
-  def handle_player_option(_option, _screen) do
-    :end_sequence
-  end
 end

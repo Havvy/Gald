@@ -13,6 +13,8 @@ defmodule Gald.Player.Stats do
   that implement a protocol or behaviour. Probably a protocol...
   """
 
+  # TODO(Havvy): Move status effects out?
+
   import Destructure
   alias Gald.Status
   alias Gald.Status.List, as: StatusEffects
@@ -67,10 +69,12 @@ defmodule Gald.Player.Stats do
     Agent.start_link(fn -> %Gald.Player.Stats{} end, otp_opts)
   end
 
-  @spec emit(Agent.agent, GenEvent.manager) :: :ok
-  def emit(stats, event_emitter) do
-    stats = Agent.get(stats, &(&1))
-    GenEvent.notify(event_emitter, {:stats, stats})
+  @spec display_info(Agent.agent) :: Map.t
+  @doc "Returns the info needed to be displayed to the player."
+  def display_info(stats) do
+    Agent.get(stats, fn (stats) ->
+      %{stats | status_effects: Enum.map(stats.status_effects, &Gald.Status.name/1)}
+    end)
   end
 
   @spec battle_card(Agent.agent) :: battle_card

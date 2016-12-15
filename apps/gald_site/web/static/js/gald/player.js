@@ -20,3 +20,11 @@ export const getStats = function (player) {
 export const setStats = function (player, newStats) {
   return update(player, {stats: {$set: newStats}});
 };
+
+export const getInventory = function (player) {
+  return player.inventory;
+};
+
+export const setInventory = function (player, inventory) {
+  return update(player, {inventory: {$set: inventory}})
+};

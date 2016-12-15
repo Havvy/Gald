@@ -24,6 +24,11 @@ defmodule GaldSite.RaceController do
         manager: Gald.EventManager.Singular,
         manager_config: %{event: CrashGame.Index},
       }
+      "test" -> %Gald.Config{
+        name: visible_name,
+        manager: Gald.EventManager.Singular,
+        manager_config: %{event: Test}
+      }
     end
     Logger.debug(inspect config)
     internal_race_name = GaldSite.RaceManager.start_race(config)

@@ -5,9 +5,7 @@ defmodule Gald.Player do
 
   use Supervisor
   import Destructure
-  alias Gald.Player.Controller
-  alias Gald.Player.Input
-  alias Gald.Player.Stats
+  alias Gald.Player.{Controller, Input, Stats, Inventory}
   alias Gald.Race
 
   @type name :: String.t
@@ -26,6 +24,8 @@ defmodule Gald.Player do
   def output(race, player) when is_binary(player), do: who(race, player, :output)
   def stats(player) when is_pid(player), do: who(player, :stats)
   def stats(race, player) when is_binary(player), do: who(race, player, :stats)
+  def inventory(player) when is_pid(player), do: who(player, :inventory)
+  def inventory(race, player) when is_binary(player), do: who(race, player, :inventory)
 
   @spec io(Player.t) :: {Input.t, GenEvent.t}
   @doc "Returns a tuple of the player input and output."
@@ -104,15 +104,21 @@ defmodule Gald.Player do
     GenServer.call(controller(player), :on_turn_start)
   end
 
+  @spec put_usable(Supervisor.supervisor, Gald.Usable.t) :: :ok
+  def put_usable(player, usable) when is_pid(player) do
+    GenServer.cast(controller(player), {:put_usable, usable})
+  end
+
   # Server
   def init(d%{race, name}) do
-    base_args = %{race: race, player: self}
+    base_args = d%{race, player: self}
     controller_args = Map.put(base_args, :name, name)
     children = [
       worker(Controller, [controller_args, [name: controller(self)]]),
       worker(Input, [base_args, [name: input(self)]]),
       worker(GenEvent, [[name: output(self)]]),
       worker(Stats, [base_args, [name: stats(self)]]),
+      worker(Inventory, [base_args, [name: inventory(self)]])
     ]
 
     supervise(children, [strategy: :one_for_all, max_restarts: 0])

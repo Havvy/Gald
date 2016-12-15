@@ -3,11 +3,13 @@ defmodule Gald.Player.Controller do
   You should never call the functions on this module directly - instead, use the proper functions on Gald.Player.
   """
 
+  #TODO(Havvy): Remove dependence upon Gald.Race
+
   use GenServer
   import Destructure
   require Logger
   alias Gald.{Race, Player}
-  alias Gald.Player.Stats
+  alias Gald.Player.{Inventory, Stats}
 
   @typep state :: %{
     required(:race) => Race.t,
@@ -28,13 +30,22 @@ defmodule Gald.Player.Controller do
   end
 
   def handle_cast(:emit_stats, state = d%{player}) do
-    Stats.emit(Player.stats(player), Player.output(player))
+    stats = Stats.display_info(Player.stats(player))
+    inventory = Inventory.display_info(Player.inventory(player))
 
+    display_info = Map.put(stats, :inventory, inventory)
+
+    GenEvent.notify(Player.output(player), {:stats, display_info})
     {:noreply, state}
   end
 
   def handle_cast({:put_status_effect, status}, state = d%{player}) do
     Player.Stats.put_status_effect(Player.stats(player), status)
+    {:noreply, state}
+  end
+
+  def handle_cast({:put_usable, usable}, state = d%{player}) do
+    Player.Inventory.put_usable(Player.inventory(player), usable)
     {:noreply, state}
   end
 

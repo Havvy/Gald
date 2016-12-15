@@ -10,6 +10,7 @@
     <select name="profile">
       <option value="standard">Standard</option>
       <option value="crash">Crash</option>
+      <option value="test">Test</option>
     </select>
     <button type="submit">Submit</button>
 </form>

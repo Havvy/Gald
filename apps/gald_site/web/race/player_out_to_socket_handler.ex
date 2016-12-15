@@ -27,10 +27,10 @@ defmodule GaldSite.PlayerOutToSocketHandler do
     {:ok, d%{socket}}
   end
 
-  defp serialize_payload(:stats, stats = d%{damage, status_effects}) do
+  # TODO(Havvy): Rename to something else.
+  defp serialize_payload(:stats, stats = d%{damage}) do
     damage = Enum.into(damage, %{})
-    status_effects = Enum.map(status_effects, &Gald.Status.name/1)
-    %{ stats | damage: damage, status_effects: status_effects }
+    %{ stats | damage: damage }
   end
   defp serialize_payload(topic, _payload), do: raise "Unknown event '#{inspect topic}'."
 end

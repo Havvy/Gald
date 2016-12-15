@@ -3,7 +3,7 @@
 import * as Gald from "./gald";
 import * as ControlledPlayer from "./player";
 import Channel from "../util/channel";
-import {GameLog, Map, Stats, Screen} from "./ui";
+import {GameLog, Map, Stats, Inventory, Screen} from "./ui";
 // TODO(Havvy): These next imports should be done in the view, when that gets moved out.
 import React from "react";
 import ReactDom from "react-dom";
@@ -18,7 +18,7 @@ let gald;
 // Binding initialized by personal join game event.
 let controlledPlayer;
 
-const gameLog = function () {
+const gameLog = function iife () {
   const container = document.querySelector("#gr-game-log");
   let log;
 
@@ -33,7 +33,7 @@ const gameLog = function () {
   };
 }();
 
-const screen = function () {
+const screen = function iife () {
   const container = document.getElementById("gr-screen");
   let screen;
 
@@ -98,7 +98,7 @@ const screen = function () {
   };
 }();
 
-const map = function () {
+const map = function iife () {
   const container = document.querySelector("#gr-map");
   let map;
 
@@ -127,7 +127,7 @@ const map = function () {
   };
 }();
 
-const stats = function () {
+const stats = function iife () {
   const container = document.querySelector("#gr-stats");
   let stats;
 
@@ -149,7 +149,29 @@ const stats = function () {
   };
 }();
 
-const Ui = {gameLog, screen, map, stats};
+const inventory = function iife () {
+  const container = document.querySelector("#gr-inventory");
+  let inventory;
+
+  return {
+    update: function () {
+      if (typeof controlledPlayer === "undefined") {
+        return;
+      }
+
+      const lifecycleStatus = Gald.getLifecycleStatus(gald);
+      const controlledPlayerInventory = ControlledPlayer.getInventory(controlledPlayer);
+
+      inventory.$update(lifecycleStatus, controlledPlayerInventory);
+    },
+
+    initialize () {
+      inventory = ReactDom.render(<Inventory />, container);
+    }
+  };
+}();
+
+const Ui = {gameLog, screen, map, inventory, stats};
 
 let chan = function () {
   const pathname = window.location.pathname;
@@ -278,9 +300,12 @@ const publicHandlers = {
 };
 
 const privateHandlers = {
-  "stats": function (stats) {
+  "stats": function (playerInfo) {
+    const {inventory, ...stats} = playerInfo;
     controlledPlayer = ControlledPlayer.setStats(controlledPlayer, stats);
+    controlledPlayer = ControlledPlayer.setInventory(controlledPlayer, inventory);
     Ui.stats.update();
+    Ui.inventory.update();
   }
 };
 
@@ -296,3 +321,4 @@ Ui.gameLog.initialize();
 Ui.map.initialize();
 Ui.screen.initialize();
 Ui.stats.initialize();
+Ui.inventory.initialize();
