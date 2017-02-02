@@ -2,16 +2,16 @@
 defmodule Gald.TestHelpers.EventQueue.Handler do
   require Logger
   use GenEvent
-  import ShortMaps
+  import Destructure
 
-  def init(~m{event_queue name}a) do
-    {:ok, ~m{event_queue name}a}
+  def init(d%{event_queue, name}) do
+    {:ok, d%{event_queue, name}}
   end
 
-  def handle_event(event, ~m{event_queue name}a) do
+  def handle_event(event, d%{event_queue, name}) do
     Logger.info("EVENT[#{name}]: #{inspect event}")
     GenServer.cast(event_queue, {:event, event})
-    {:ok, ~m{event_queue name}a}
+    {:ok, d%{event_queue, name}}
   end
 end
 

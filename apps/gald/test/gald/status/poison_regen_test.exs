@@ -61,7 +61,7 @@ defmodule Gald.PoisonRegenTest do
         assert :ok = select_option(player_in, "Regen")
         assert {:stats, %PlayerStats{
             health: 10,
-            status_effects: [%Regen{}]
+            status_effects: ["Regen"]
         }} = next_event(player_out)
 
         assert {:screen, %StandardDisplay{
@@ -76,7 +76,7 @@ defmodule Gald.PoisonRegenTest do
 
         assert {:stats, %PlayerStats{
             health: 10,
-            status_effects: [%Regen{}]
+            status_effects: ["Regen"]
         }} = next_event(player_out)
         assert {:screen, %StandardDisplay{
             title: "Beginning of Turn Effects"
@@ -105,7 +105,7 @@ defmodule Gald.PoisonRegenTest do
 
         assert {:stats, %PlayerStats{
             health: 10,
-            status_effects: [%Regen{}, %Poison{}]
+            status_effects: ["Regen", "Poison"]
         }} = next_event(player_out)
         assert {:screen, %StandardDisplay{
           title: "Status Given"
@@ -119,7 +119,7 @@ defmodule Gald.PoisonRegenTest do
 
         assert {:stats, %PlayerStats{
             health: 9,
-            status_effects: [%Regen{}, %Poison{}]
+            status_effects: ["Regen", "Poison"]
         }} = next_event(player_out)
         assert {:screen, %StandardDisplay{
             title: "Beginning of Turn Effects"
@@ -148,7 +148,7 @@ defmodule Gald.PoisonRegenTest do
 
         assert {:stats, %PlayerStats{
             health: 1,
-            status_effects: [%Regen{}, %Poison{}]
+            status_effects: ["Regen", "Poison"]
         }} = next_event(player_out)
         assert {:screen, %StandardDisplay{
           title: "Health Set"
@@ -162,7 +162,7 @@ defmodule Gald.PoisonRegenTest do
 
         assert {:stats, %PlayerStats{
             health: 1,
-            status_effects: [%Regen{}, %Poison{}]
+            status_effects: ["Regen", "Poison"]
         }} = next_event(player_out)
         assert {:screen, %StandardDisplay{
             title: "Beginning of Turn Effects"
@@ -215,7 +215,7 @@ defmodule Gald.PoisonRegenTest do
           assert :ok = select_option(player_in, "Poison")
           assert {:stats, %PlayerStats{
               health: 10,
-              status_effects: [%Poison{}]
+              status_effects: ["Poison"]
           }} = next_event(player_out)
 
           assert {:screen, %StandardDisplay{
@@ -230,7 +230,7 @@ defmodule Gald.PoisonRegenTest do
 
           assert {:stats, %PlayerStats{
               health: 9,
-              status_effects: [%Poison{}]
+              status_effects: ["Poison"]
           }} = next_event(player_out)
           assert {:screen, %StandardDisplay{
               title: "Beginning of Turn Effects"
@@ -259,7 +259,7 @@ defmodule Gald.PoisonRegenTest do
 
           assert {:stats, %PlayerStats{
               health: 9,
-              status_effects: [%Poison{}, %Regen{}]
+              status_effects: ["Poison", "Regen"]
           }} = next_event(player_out)
           assert {:screen, %StandardDisplay{
             title: "Status Given"
@@ -273,7 +273,7 @@ defmodule Gald.PoisonRegenTest do
 
           assert {:stats, %PlayerStats{
               health: 9,
-              status_effects: [%Poison{}, %Regen{}]
+              status_effects: ["Poison", "Regen"]
           }} = next_event(player_out)
           assert {:screen, %StandardDisplay{
               title: "Beginning of Turn Effects"
@@ -302,7 +302,7 @@ defmodule Gald.PoisonRegenTest do
 
           assert {:stats, %PlayerStats{
               health: 1,
-              status_effects: [%Poison{}, %Regen{}]
+              status_effects: ["Poison", "Regen"]
           }} = next_event(player_out)
           assert {:screen, %StandardDisplay{
             title: "Health Set"

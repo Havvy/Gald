@@ -25,7 +25,7 @@ defmodule Gald.Players do
   # Server
   def init(race) do
     player_spec = Supervisor.Spec.worker(Player, [])
-    {:ok, sup} = Supervisor.start_link([player_spec], strategy: :simple_one_for_one)
+    {:ok, sup} = Supervisor.start_link([player_spec], [strategy: :simple_one_for_one, max_restarts: 0])
     names_to_pids = %{}
     join_ix = 0
     {:ok, d%{sup, names_to_pids, join_ix, race}}

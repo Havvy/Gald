@@ -22,7 +22,7 @@ defmodule Gald.Snapshot.Over do
   defstruct [
     config: %Gald.Config{},
     players: [],
-    winners: HashSet.new()
+    winners: MapSet.new()
   ]
 end
 

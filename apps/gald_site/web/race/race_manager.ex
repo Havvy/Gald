@@ -39,10 +39,10 @@ defmodule GaldSite.RaceManager do
   # Types
   @opaque t :: pid
 
-  @doctype "The internal name for the race. Used for the URL and channel."
+  @typedoc "The internal name for the race. Used for the URL and channel."
   @type internal_name :: String.t
 
-  @doctype "The visible name for a race."
+  @typedoc "The visible name for a race."
   @type visible_name :: String.t
 
   @type viewer :: any

@@ -20,7 +20,7 @@ defmodule Gald.Round do
 
   # Server
   def init(d%{turn_order, race}) do
-    GenServer.cast(self, :next)
+    GenServer.cast(self(), :next)
 
     {:ok, %{
       new_turn_order: turn_order,
@@ -56,7 +56,7 @@ defmodule Gald.Round do
     Gald.Race.delete_turn(race)
 
     if !Gald.Victory.check(victory(race)) do
-      GenServer.cast(self, :next)
+      GenServer.cast(self(), :next)
     end
 
     {:noreply, %{state | turn: nil, turn_player: nil}}

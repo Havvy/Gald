@@ -49,6 +49,21 @@ defmodule Gald.Player.Controller do
     {:noreply, state}
   end
 
+  def handle_cast({:update_health, updater}, state = d%{player}) do
+    Stats.update_health(Player.stats(player), updater)
+    {:noreply, state}
+  end
+
+  def handle_cast({:unborrow_usable, use_result}, state=d%{player}) do
+    Player.Inventory.unborrow_usable(Player.inventory(player), use_result)
+    {:noreply, state}
+  end
+
+  def handle_call({:borrow_usable, usable_name}, _from, state = d%{player}) do
+    reply = Player.Inventory.borrow_usable(Player.inventory(player), usable_name)
+    {:reply, reply, state}
+  end
+
   def handle_call(:name, _from, state) do
     {:reply, state.name, state}
   end

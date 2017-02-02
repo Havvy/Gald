@@ -153,6 +153,10 @@ const inventory = function iife () {
   const container = document.querySelector("#gr-inventory");
   let inventory;
 
+  const onUsable = function (usable_name) {
+    chan.emit("usable", {name: usable_name});
+  };
+
   return {
     update: function () {
       if (typeof controlledPlayer === "undefined") {
@@ -166,7 +170,7 @@ const inventory = function iife () {
     },
 
     initialize () {
-      inventory = ReactDom.render(<Inventory />, container);
+      inventory = ReactDom.render(<Inventory onUsable={onUsable} />, container);
     }
   };
 }();
@@ -287,11 +291,11 @@ const publicHandlers = {
 //  },
 
   "death": function ({player_name}) {
-    gald = Gald.setPlayerStatusEffect(player_name, "death");
+    gald = Gald.setPlayerStatusEffect(gald, player_name, "death");
   },
 
   "respawn": function ({player_name}) {
-    gald = Gald.removePlayerStatusEffect(player_name, "death");
+    gald = Gald.removePlayerStatusEffect(gald, player_name, "death");
   },
 
   "crash": function () {

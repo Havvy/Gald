@@ -4,14 +4,14 @@ defmodule Gald.Screen.Combat.Resolution do
   resolution screen.
   """
 
-  import ShortMaps
+  import Destructure
   alias Gald.Display.BattleResolution, as: BattleResolutionDisplay
 
-  def init(~m{player_name monster_name resolution previous_action_descriptions}a) do
-    ~m{player_name monster_name resolution previous_action_descriptions}a
+  def init(d%{player_name, monster_name, resolution, previous_action_descriptions}) do
+    d%{player_name, monster_name, resolution, previous_action_descriptions}
   end
 
-  def get_display(~m{player_name monster_name resolution previous_action_descriptions}a) do
+  def get_display(d%{player_name, monster_name, resolution, previous_action_descriptions}) do
     %BattleResolutionDisplay{
       player_name: player_name,
       monster_name: monster_name,

@@ -37,6 +37,7 @@ export default function Channel (name) {
         },
 
         emit: function (topic, payload) {
+
             chan.push(topic, payload);
         },
 

@@ -10,7 +10,7 @@ defmodule Gald.Controller do
   # TODO(Havvy): Change to a :gen_fsm?
   use GenServer
   use Gald.Race
-  import ShortMaps
+  import Destructure
   alias Gald.Race
   alias Gald.Config
   alias Gald.Players
@@ -23,15 +23,15 @@ defmodule Gald.Controller do
   @spec start_link(Race.t, %Config{}) :: {:ok, pid}
   @spec start_link(Race.t, %Config{}, GenServer.opts) :: {:ok, pid}
   def start_link(race, config, opts \\ []) do
-    GenServer.start_link(__MODULE__, ~m{race config}a, opts)
+    GenServer.start_link(__MODULE__, d(%{race, config}), opts)
   end
 
-  def init(~m{race config}a) do
+  def init(d%{race, config}) do
     status = :lobby
-    {:ok, ~m{race config status}a}
+    {:ok, d%{race, config, status}}
   end
 
-  def handle_call({:new_player, name}, _from, state = ~m{race status}a) do
+  def handle_call({:new_player, name}, _from, state = d%{race, status}) do
     reply = if status == :lobby do
       case Players.new_player(players(race), name) do
         {:ok, player} ->
@@ -52,7 +52,7 @@ defmodule Gald.Controller do
 
   def handle_call(:config, _from, state), do: {:reply, state.config, state}
 
-  def handle_cast(:begin, state = ~m{race config}a) do
+  def handle_cast(:begin, state = d%{race, config}) do
     require Logger
     state = %{state | status: :play}
     # Determine turn order
@@ -72,7 +72,7 @@ defmodule Gald.Controller do
     {:ok, _map} = Race.start_map(race, map_config)
 
     # Start the event choosing process.
-    event_manager_config = ~m{config}a
+    event_manager_config = d%{config}
     {:ok, _event_manager} = Race.start_event_manager(race, event_manager_config)
 
     snapshot = Snapshot.new(%{state | status: :beginning})
@@ -88,7 +88,7 @@ defmodule Gald.Controller do
     {:noreply, state}
   end
 
-  def handle_cast(:finish, state = ~m{race}a) do
+  def handle_cast(:finish, state = d%{race}) do
     state = %{state | status: :over}
     snapshot = Snapshot.new(state)
     GenEvent.notify(out(race), {:finish, snapshot.data})

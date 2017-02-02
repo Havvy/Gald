@@ -9,7 +9,7 @@ defmodule Gald.Mixfile do
     elixir: "~> 1.1",
     build_embedded: Mix.env == :prod,
     start_permanent: Mix.env == :prod,
-    deps: deps,
+    deps: deps(),
     name: "Gald",
     source_url: "https://github.com/havvy/gald",
     docs: [
@@ -29,10 +29,8 @@ defmodule Gald.Mixfile do
   ]
 
   defp deps, do: [
-    {:destructure, git: "https://github.com/danielberkompas/destructure.git", ref: "ab353d017d5c529b82497a4479d149c1f30480ce"},
-    {:short_maps, "~> 0.1.0"},
-    {:dialyze, "~> 0.2.0", only: :dev},
-    #{:credo, "~> 0.1.0", only: :dev},
+    {:destructure, "~> 0.2.2"},
+    {:dialyxir, "~> 0.4", only: [:dev], runtime: false},
     {:ex_doc, "~> 0.14.5", only: :dev},
     {:earmark, "~> 1.0.0", only: :dev}
   ]

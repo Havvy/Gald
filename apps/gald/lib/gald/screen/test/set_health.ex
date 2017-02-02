@@ -6,7 +6,6 @@ defmodule Gald.Screen.Test.SetHealth do
   import Destructure
   use Gald.Screen
   alias Gald.Player
-  alias Gald.Player.Stats
 
   def init(d%{player}) do
     d%{player}
@@ -21,8 +20,7 @@ defmodule Gald.Screen.Test.SetHealth do
   end
 
   def handle_player_option("1", d%{player}) do
-    stats = Player.stats(player)
-    Stats.update_health(stats, fn (_current, _max) -> 1 end)
+    Player.update_health(player, fn (_current, _max) -> 1 end)
     Player.emit_stats(player)
 
     {:next, Test.SetHealthResult, %{health: 1}}

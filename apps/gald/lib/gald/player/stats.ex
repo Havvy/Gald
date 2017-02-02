@@ -18,6 +18,7 @@ defmodule Gald.Player.Stats do
   import Destructure
   alias Gald.Status
   alias Gald.Status.List, as: StatusEffects
+  alias Gald.Status.Respawning
 
   @type life :: :alive | Gald.Death.t
   @type health :: non_neg_integer
@@ -155,7 +156,7 @@ defmodule Gald.Player.Stats do
     Agent.update(stats, &%Gald.Player.Stats{ &1 |
       life: %Gald.Death{},
       health: 0,
-      status_effects: StatusEffects.filter_category(&1.status_effects, :soulbound)
+      status_effects: &1.status_effects |> StatusEffects.filter_category(:soulbound) |> StatusEffects.put(%Respawning{})
     })
   end
 
@@ -164,9 +165,14 @@ defmodule Gald.Player.Stats do
   def respawn_tick(stats) do
     Agent.get_and_update(stats, &respawn_tick_impl/1)
   end
-  defp respawn_tick_impl(stats = %Gald.Player.Stats{life: life, max_health: max_health}) do
+  defp respawn_tick_impl(stats = d%Gald.Player.Stats{life, max_health, status_effects}) do
     {new_life, respawned} = Gald.RespawnTick.respawn_tick(life)
     health = if respawned do max_health else 0 end
-    {respawned, %{stats | life: new_life, health: health}}
+    status_effects = if respawned do
+      StatusEffects.delete(status_effects, Gald.Status.Respawning)
+    else
+      status_effects
+    end
+    {respawned, %{stats | life: new_life, health: health, status_effects: status_effects}}
   end
 end

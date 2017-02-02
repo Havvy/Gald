@@ -5,7 +5,6 @@ defmodule Gald.HasteTest do
   alias Gald.TestHelpers.EventQueue
   alias Gald.Race
   alias Gald.Display.Standard, as: StandardDisplay
-  alias Gald.Status.{Haste}
   alias Gald.Player.Stats, as: PlayerStats
 
   @p1 "Alice"
@@ -61,7 +60,7 @@ defmodule Gald.HasteTest do
           assert :ok = select_option(player_in, "Haste")
           assert {:stats, %PlayerStats{
               health: 10,
-              status_effects: [%Haste{}]
+              status_effects: ["Haste"]
           }} = next_event(player_out)
 
           assert {:screen, %StandardDisplay{

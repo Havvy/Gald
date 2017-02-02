@@ -6,7 +6,7 @@ defmodule Gald.Monsters do
   """
   
   use Supervisor
-  import ShortMaps
+  import Destructure
   alias Gald.Monster
 
   # Client
@@ -14,8 +14,8 @@ defmodule Gald.Monsters do
     Supervisor.start_link(__MODULE__, init_map, otp_opts)
   end
 
-  def start_monster(monsters, ~m{monster_module}a) do
-    Supervisor.start_child(monsters, [~m{monster_module}a])
+  def start_monster(monsters, d%{monster_module}) do
+    Supervisor.start_child(monsters, [d%{monster_module}])
   end
 
   # Server

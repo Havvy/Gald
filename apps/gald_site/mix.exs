@@ -11,7 +11,7 @@ defmodule GaldSite.Mixfile do
     compilers: [:phoenix] ++ Mix.compilers,
     build_embedded: Mix.env == :prod,
     start_permanent: Mix.env == :prod,
-    deps: deps
+    deps: deps()
   ]
 
   def application, do: [

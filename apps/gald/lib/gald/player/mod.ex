@@ -104,21 +104,36 @@ defmodule Gald.Player do
     GenServer.call(controller(player), :on_turn_start)
   end
 
+  def update_health(player, updater) when is_pid(player) do
+    GenServer.cast(controller(player), {:update_health, updater})
+  end
+
   @spec put_usable(Supervisor.supervisor, Gald.Usable.t) :: :ok
   def put_usable(player, usable) when is_pid(player) do
     GenServer.cast(controller(player), {:put_usable, usable})
   end
 
+  # TODO(Havvy): Return a ref with the usable for the spot the usable was at.
+  @spec borrow_usable(Supervisor.supervisor, String.t) :: {:ok, Usable.t} | {:error, :no_such_item}
+  def borrow_usable(player, usable_name) do
+    GenServer.call(controller(player), {:borrow_usable, usable_name})
+  end
+
+  @spec unborrow_usable(Supervisor.supervisor, Usable.use_result) :: :ok
+  def unborrow_usable(player, usable_result) do
+    GenServer.cast(controller(player), {:unborrow_usable, usable_result})
+  end
+
   # Server
   def init(d%{race, name}) do
-    base_args = d%{race, player: self}
+    base_args = d%{race, player: self()}
     controller_args = Map.put(base_args, :name, name)
     children = [
-      worker(Controller, [controller_args, [name: controller(self)]]),
-      worker(Input, [base_args, [name: input(self)]]),
-      worker(GenEvent, [[name: output(self)]]),
-      worker(Stats, [base_args, [name: stats(self)]]),
-      worker(Inventory, [base_args, [name: inventory(self)]])
+      worker(Controller, [controller_args, [name: controller(self())]]),
+      worker(Input, [base_args, [name: input(self())]]),
+      worker(GenEvent, [[name: output(self())]]),
+      worker(Stats, [base_args, [name: stats(self())]]),
+      worker(Inventory, [base_args, [name: inventory(self())]])
     ]
 
     supervise(children, [strategy: :one_for_all, max_restarts: 0])

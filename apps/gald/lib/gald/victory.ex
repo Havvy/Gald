@@ -7,7 +7,7 @@ defmodule Gald.Victory do
 
   use Gald.Race
   use GenServer
-  import ShortMaps
+  import Destructure
 
   # Server
   def start_link(init_arg, opts \\ []) do
@@ -23,11 +23,11 @@ defmodule Gald.Victory do
   end
 
   # Client
-  def init(~m{race end_space}a) do
-    {:ok, ~m{race end_space}a}
+  def init(d%{race, end_space}) do
+    {:ok, d%{race, end_space}}
   end
 
-  def handle_call(:check, _from, state = ~m{race end_space}a) do
+  def handle_call(:check, _from, state = d%{race, end_space}) do
     victory = player_spaces(race)
     |> Map.values()
     |> Enum.any?(&(&1 >= end_space))
@@ -40,7 +40,7 @@ defmodule Gald.Victory do
     {:reply, victory, state}
   end
 
-  def handle_call(:winners, _from, state = ~m{race end_space}a) do
+  def handle_call(:winners, _from, state = d%{race, end_space}) do
     reply = player_spaces(race)
     |> Enum.filter(fn ({_name, space}) -> space >= end_space end)
     |> Enum.map(fn ({name, _space}) -> name end)

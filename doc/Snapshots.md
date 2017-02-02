@@ -3,7 +3,7 @@ state of the game.
 
 Solution: Upon joining, the user is presented with a `Snapshot`.
 
-===
+## Snapshots
 
 This type represents a snapshot of a `GaldRace` from the perspective of a
 viewer who is not playing.
@@ -25,7 +25,7 @@ data of that state. In Elixir, this is represented as a tuple. In JSON, it is
 represented as `{status: "lobby" | "play" | "over", data: Object}`
 
 ```
-(This looks like a language; but no tool processes it)
+// Psuedorust
 
 import Screens::Screen
 type PlayerName: String;
@@ -40,9 +40,10 @@ enum Gald {
   Play(struct {
     config: GaldConfig;
     players: [PlayerName];
-    map: Map<PlayerName, Space>
-    turn: Optional<PlayerName>
-    screen: Optional<Screen>
+    map: Map<PlayerName, Space>;
+    turn: Optional<PlayerName>;
+    screen: Optional<Screen>;
+    status_effects: Map<PlayerName, 
   });
 
   Over(struct {

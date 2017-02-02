@@ -5,7 +5,7 @@ defmodule Gald.Screen.Combat.Battle do
   For now, it's a hard-coded encounter with a unicorn cat.
   """
   use Gald.Screen
-  import ShortMaps
+  import Destructure
   alias Gald.Battle.ActionResult
   alias Gald.Display.Battle, as: BattleDisplay
   alias Gald.Monster
@@ -13,18 +13,18 @@ defmodule Gald.Screen.Combat.Battle do
   alias Gald.Player
   alias Gald.Rng
 
-  def init(~m{race player player_name monster_module}a) do
+  def init(d%{race, player, player_name, monster_module}) do
     rng = rng(race)
     monster_module = Module.safe_concat(Gald.Monsters, monster_module)
-    {:ok, monster} = Monsters.start_monster(monsters(race), ~m{monster_module}a)
+    {:ok, monster} = Monsters.start_monster(monsters(race), d%{monster_module})
     monster_name = Monster.name(monster)
     previous_action_descriptions = []
-    ~m{monster monster_name player player_name rng previous_action_descriptions}a
+    d%{monster, monster_name, player, player_name, rng, previous_action_descriptions}
   end
 
-  def init(~m{race player player_name monster monster_name previous_action_descriptions}a) do
+  def init(d%{race, player, player_name, monster, monster_name, previous_action_descriptions}) do
     rng = rng(race)
-    ~m{player player_name monster monster_name rng previous_action_descriptions}a
+    d%{player, player_name, monster, monster_name, rng, previous_action_descriptions}
   end
 
   def get_display(state) do
@@ -35,7 +35,7 @@ defmodule Gald.Screen.Combat.Battle do
     }
   end
 
-  def handle_player_option("Attack", state = ~m{player monster rng player_name monster_name}a) do
+  def handle_player_option("Attack", state = d%{player, monster, rng, player_name, monster_name}) do
     {player_action_results, player_action_descriptions} = player_basic_attack(player, monster, rng, player_name)
     {monster_action_results, monster_action_descriptions} = monster_attack(monster, rng, monster_name, player_name)
 

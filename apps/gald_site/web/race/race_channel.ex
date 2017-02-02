@@ -1,7 +1,7 @@
 defmodule GaldSite.RaceChannel do
   use Phoenix.Channel
   require Logger
-  import ShortMaps
+  import Destructure
   alias GaldSite.RaceManager
   alias Gald.Player.Input, as: PlayerInput
 
@@ -25,13 +25,12 @@ defmodule GaldSite.RaceChannel do
     {:error, %{reason: "unknown-channel"}}
   end
 
-  @doctype """
-  One of "join", "start", or "option".
+  @typedoc """
+  Valid values are "join", "start", "option", and "usable".
   """
   @type in_type :: String.t
 
   @spec handle_in(in_type, Map.t, Phoenix.Socket.t) :: {:reply, Phoenix.Channel.reply, Phoenix.Socket.t}
-
   def handle_in("join", %{"name" => player_name}, socket) do
     if Regex.match?(~R/[^\p{L}0-9-]/, player_name) do
       {:reply, {:error, %{reason: "Invalid nickname. Only letters, numbers, and dashes are allowed."}}, socket}
@@ -40,7 +39,8 @@ defmodule GaldSite.RaceChannel do
       case Gald.Race.new_player(race, player_name) do
         {:ok, {input, output}} ->
           socket = Phoenix.Socket.assign(socket, :player_input, input)
-          GenEvent.add_handler(output, GaldSite.PlayerOutToSocketHandler, ~m{socket}a)
+          GenEvent.add_handler(output, GaldSite.PlayerOutToSocketHandler, d%{socket})
+          Logger.debug("Added player #{player_name} to a race.")
           {:reply, {:ok, %{name: player_name}}, socket}
         {:error, :duplicate_name} ->
           {:reply, {:error, %{reason: "Cannot join game with that name. Name is already taken."}}, socket}
@@ -58,14 +58,27 @@ defmodule GaldSite.RaceChannel do
     {:reply, {:ok, %{}}, socket}
   end
 
-  def handle_in("option", ~m{option}, socket) do
-    # race = get_race(socket)
+  def handle_in("option", %{"option" => option}, socket) do
+    Logger.debug("Socket got an option.")
     player_input = get_player_input(socket)
     PlayerInput.select_option(player_input, option)
     {:reply, {:ok, %{}}, socket}
   end
 
+  def handle_in("usable", %{"name" => usable}, socket) do
+    player_input = get_player_input(socket)
+    try do
+      PlayerInput.use_usable(player_input, usable)
+    catch
+      :exit, _ -> nil
+    end
+    {:reply, {:ok, %{}}, socket}
+  end
+
   def handle_in(message, payload, socket) do
+    Logger.warn("Got an unknown message (#{message}) from a socket.")
+    Logger.warn("With payload")
+    Logger.warn(inspect(payload))
     {:reply, {:error, %{reason: "Unknown message", message: message, payload: payload}}, socket}
   end
 

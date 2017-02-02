@@ -46,7 +46,7 @@ const LobbyScreen = function ({hasControlledPlayer, onRequestJoinGame, onRequest
 
 const StandardScreen = React.createClass({
   render () {
-    const {title, isCurrentTurn = false, onOption} = this.props;
+    const {title, isCurrentTurn = false} = this.props;
     let {options = [], body} = this.props;
 
     options = options.map((option) => {

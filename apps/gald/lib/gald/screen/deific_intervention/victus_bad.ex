@@ -4,19 +4,19 @@ defmodule Gald.Screen.DeificIntervention.VictusBad do
   """
 
   use Gald.Screen
-  import ShortMaps
+  import Destructure
   alias Gald.Player
   alias Gald.Player.Stats
 
-  def init(~m{player player_name}a) do
+  def init(d%{player, player_name}) do
     stats = Player.stats(player)
     Stats.update_health(stats, &Kernel.round(&1 / 2))
     Player.emit_stats(player)
 
-    ~m{player_name}a
+    d%{player_name}
   end
 
-  def get_display(~m{player_name}a) do
+  def get_display(d%{player_name}) do
     %StandardDisplay{
       title: "Deific Intervention!",
       body: "Victus curses. You feel drained of health.",

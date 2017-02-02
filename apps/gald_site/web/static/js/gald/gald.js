@@ -6,6 +6,7 @@ import update from "react-addons-update";
 // fields on it directly, but rather go through the other functions in this
 // module.
 export const create = function ({status, data}) {
+  console.log(data);
    return update(data, {
      lifecycleStatus: {$set: status}
    });
@@ -50,7 +51,7 @@ export const setPlayerStatusEffect = function (gald, playerName, statusEffect) {
     return gald;
   }
 
-  return update(gald, { status_effects: {[playerName]: {$push: statusEffect}} });
+  return update(gald, { status_effects: {[playerName]: {$push: [statusEffect]}} });
 }
 
 export const removePlayerStatusEffect = function (gald, playerName, statusEffect) {

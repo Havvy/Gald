@@ -18,3 +18,7 @@ The player rolls 2d8 instead of 2d6 for movement.
 ### Poison
 
 The player loses one health at the beginning of their turn.
+
+### Regen
+
+The player gains one health at the beginning of their turn.

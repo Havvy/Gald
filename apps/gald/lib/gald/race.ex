@@ -37,12 +37,12 @@ defmodule Gald.Race do
   # Server
   def init(config = %Config{}) do
     children = [
-      worker(GenEvent, [[name: out(self)]]),
-      worker(Gald.Controller, [self, config, [name: controller(self)]]),
-      worker(Gald.Players, [self, [name: players(self)]]),
-      worker(Gald.Rng, [%{module: config.rng, config: config.rng_config}, [name: rng(self)]]),
-      worker(Gald.Display, [%{race: self}, [name: display(self)]]),
-      worker(Gald.Monsters, [nil, [name: monsters(self)]]),
+      worker(GenEvent, [[name: out(self())]]),
+      worker(Gald.Controller, [self(), config, [name: controller(self())]]),
+      worker(Gald.Players, [self(), [name: players(self())]]),
+      worker(Gald.Rng, [%{module: config.rng, config: config.rng_config}, [name: rng(self())]]),
+      worker(Gald.Display, [%{race: self()}, [name: display(self())]]),
+      worker(Gald.Monsters, [nil, [name: monsters(self())]]),
       # Other children started dynamically.
     ]
 

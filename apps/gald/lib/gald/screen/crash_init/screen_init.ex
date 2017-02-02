@@ -10,7 +10,7 @@ defmodule Gald.Screen.CrashGame.ScreenInit do
   use Gald.Screen
 
   def init(_opts) do
-    Process.exit(self, :crash)
+    Process.exit(self(), :crash)
   end
 
   def get_display(_opts) do

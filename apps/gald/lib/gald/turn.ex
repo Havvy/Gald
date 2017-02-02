@@ -3,8 +3,9 @@ defmodule Gald.Turn do
   use Gald.Race
   import Destructure
   require Logger
-  alias Gald.Race
-  alias Gald.Phase
+  alias Gald.{Race, Phase}
+
+  @type player_option_result :: :ok | {:error, :not_your_turn}
 
   # Server
   def start_link(init_arg, opts \\ []) do
@@ -14,6 +15,7 @@ defmodule Gald.Turn do
   @doc """
   Handles a player selecting an option.
   """
+  @spec player_option(GenServer.server, Supervisor.supervisor, String.t) :: player_option_result
   def player_option(turn, player, option) do
     GenServer.call(turn, {:player_option, player, option})
   end
@@ -28,7 +30,7 @@ defmodule Gald.Turn do
     else
       dice_or_respawn(race, player_name)
     end
-    GenServer.cast(self, {:start_phase, starting_screen})
+    GenServer.cast(self(), {:start_phase, starting_screen})
     screen_ref = nil
     {:ok, d%{race, player_name, screen_ref, phase}}
   end
@@ -42,20 +44,20 @@ defmodule Gald.Turn do
 
   def handle_cast(:next_phase, state = %{phase: :begin_turn_effects, race: race, player_name: player_name}) do
     {screen, phase} = dice_or_respawn(race, player_name)
-    GenServer.cast(self, {:start_phase, screen})
+    GenServer.cast(self(), {:start_phase, screen})
     {:noreply, %{state | phase: phase}}
   end
   def handle_cast(:next_phase, state = %{phase: :dice, race: race, player_name: player_name}) do
     initial_event_screen = Gald.EventManager.next(event_manager(race), player_name)
-    GenServer.cast(self, {:start_phase, initial_event_screen})
+    GenServer.cast(self(), {:start_phase, initial_event_screen})
     {:noreply, %{state | phase: :event}}
   end
   def handle_cast(:next_phase, state = %{phase: :event}) do
-    GenServer.cast(self, :stop)
+    GenServer.cast(self(), :stop)
     {:noreply, state}
   end
   def handle_cast(:next_phase, state = %{phase: :respawn}) do
-    GenServer.cast(self, :stop)
+    GenServer.cast(self(), :stop)
     {:noreply, state}
   end
 
@@ -76,7 +78,7 @@ defmodule Gald.Turn do
   @doc false
   def handle_info({:DOWN, screen_ref, :process, _pid, _reason}, state = d%{race, screen_ref}) do
     Gald.Race.delete_phase(race)
-    GenServer.cast(self, :next_phase)
+    GenServer.cast(self(), :next_phase)
     {:noreply, %{state | screen_ref: nil}}
   end
 
