@@ -2,71 +2,50 @@ defmodule Gald.Screen.DiceMove do
   use Gald.Screen
   import Destructure
   require Logger
-  alias Gald.{Race, Map, Rng, Player, Status}
-  alias Player.Stats
-  alias Status.Haste
+  alias Gald.{Race, Map, Player, Dice}
+  alias Gald.Dice.Modifier, as: DiceModifier
 
   @moduledoc """
   The screen for requesting a player roll the dice for movement.
 
   This screen is seen at the beginning of a player's turn.
   """
+  @enforce_keys [:roll, :map, :rng, :player_name]
   defstruct [
-    roll: {:d, 2, 6},
-    player_name: "$player",
+    roll: nil,
+    player_name: nil,
     map: nil,
     rng: nil
   ]
 
   def init(d%{race, player, player_name}) do
-    has_haste = Stats.has_status_effect(Player.stats(player), Haste)
-    dice_size = if has_haste do 8 else 6 end
+    roll = DiceModifier.modify(Dice.new(2), Player.movement_modifier(player))
 
-    %Gald.Screen.DiceMove{
-      roll: {:d, 2, dice_size},
+    d%Gald.Screen.DiceMove{
+      roll, player_name,
       map: Race.map(race),
       rng: Race.rng(race),
       player_name: player_name
     }
   end
 
-  def handle_player_option(_option, state) do
-    %Gald.Screen.DiceMove{
-      map: map,
-      rng: rng,
-      player_name: player_name,
-      roll: roll
-    } = state
+  def handle_player_option(_option, d%Gald.Screen.DiceMove{roll, player_name, map, rng, player_name}) do
+    {movement, rolls} = Dice.roll(rng, roll)
 
-    roll_result = roll_dice(rng, roll)
-    total = sum_roll(roll_result)
-    {:d, _roll_count, roll_size} = roll
-
-    roll = {{:d, roll_size}, roll_result}
-    Map.move(map, {:player, player_name}, {:relative, total})
+    roll = {{:d, roll.size}, rolls}
+    Map.move(map, {:player, player_name}, {:relative, movement})
     player_space = Map.space_of(map, {:player, player_name})
 
-    {:next, DiceMoveResult, d%{player_space, roll}}
+    {:next, DiceMoveResult, d%{roll, player_space, relative: movement}}
   end
 
-  def get_display(%Gald.Screen.DiceMove{roll: {:d, dice_count, dice_size}, player_name: player_name}) do
+  def get_display(%Gald.Screen.DiceMove{roll: d(%Gald.Dice{count, size}), player_name: player_name}) do
     %StandardDisplay{
       title: "Roll Dice",
-      body: "It's #{player_name}'s turn. #{player_name} is rolling #{dice_count}d#{dice_size}",
+      body: "It's #{player_name}'s turn. #{player_name} is rolling #{count}d#{size}",
       pictures: [],
       options: ["Roll"]
     }
-  end
-
-  # TODO(Havvy): [DICE] Move to a dice module.
-  defp roll_dice(rng, {:d, dice_count, dice_size}) do
-    for _ <- 1..dice_count do
-      Rng.pos_integer(rng, dice_size)
-    end
-  end
-
-  defp sum_roll(roll) do
-    Enum.sum(roll)
   end
 end
 
@@ -97,14 +76,10 @@ defmodule Gald.Screen.DiceMoveResult do
     roll: {{:d, 6}, [1, 1]}
   ]
 
-  def init(d%{player_space, roll, player_name}) do
-    {_dice, relative} = roll
-    relative = Enum.sum(relative)
-
-    %Gald.Screen.DiceMoveResult{
-      player_name: player_name,
+  def init(d%{roll, relative, player_space, player_name}) do
+    d%Gald.Screen.DiceMoveResult{
+      roll, player_name,
       to: {relative, player_space},
-      roll: roll
     }
   end
 

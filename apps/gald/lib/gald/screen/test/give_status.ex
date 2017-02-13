@@ -8,7 +8,7 @@ defmodule Gald.Screen.Test.GiveStatus do
   import Destructure
   use Gald.Screen
   alias Gald.Player
-  alias Gald.Status.{Haste, Poison, Regen}
+  alias Gald.Status.{Haste, Lucky, Poison, Regen}
 
   def init(d%{player}) do
     d%{player}
@@ -18,7 +18,7 @@ defmodule Gald.Screen.Test.GiveStatus do
     %StandardDisplay{
       title: "Give Status",
       body: "Which status do you want to gain?",
-      options: ["Haste", "Poison", "Regen"]
+      options: ["Haste", "Lucky", "Poison", "Regen"]
     }
   end
 
@@ -32,6 +32,7 @@ defmodule Gald.Screen.Test.GiveStatus do
   defp status_from_name("Poison"), do: %Poison{}
   defp status_from_name("Regen"), do: %Regen{}
   defp status_from_name("Haste"), do: %Haste{}
+  defp status_from_name("Lucky"), do: %Lucky{}
 end
 
 defmodule Gald.Screen.Test.GiveStatusResult do

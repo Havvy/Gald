@@ -2,6 +2,7 @@ defmodule Gald.Rng do
   @moduledoc false
   
   use GenServer
+  import Destructure
 
   # Behaviour
   @callback init(any) :: any
@@ -17,9 +18,9 @@ defmodule Gald.Rng do
   end
 
   # Server
-  def init(%{module: module, config: config}) do
+  def init(d%{module, config}) do
     rng_state = apply(module, :init, [config])
-    {:ok, %{module: module, rng_state: rng_state}}
+    {:ok, d%{module, rng_state}}
   end
 
   def handle_call({:pos_integer, i}, _from, state) do

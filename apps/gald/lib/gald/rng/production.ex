@@ -1,5 +1,7 @@
 defmodule Gald.Rng.Production do
-  @moduledoc false
+  @moduledoc """
+  Production RNG. Uses :random seeded by randomness from :crypto.
+  """
   @behaviour Gald.Rng
   
   def init(_) do

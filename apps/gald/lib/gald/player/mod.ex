@@ -96,6 +96,10 @@ defmodule Gald.Player do
     GenServer.call(controller(Race.player(race, player_name)), {:has_status_effect_category, :start_turn})
   end
 
+  def movement_modifier(player) when is_pid(player) do
+    GenServer.call(controller(player), :movement_modifier)
+  end
+
   def name(player) when is_pid(player) do
     GenServer.call(controller(player), :name)
   end

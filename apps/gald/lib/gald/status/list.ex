@@ -1,5 +1,6 @@
 defmodule Gald.Status.List do
   alias Gald.Status
+  alias Gald.Dice.Modifier, as: DiceModifier
 
   @typep status :: Status.t
   @type t :: [status]
@@ -43,5 +44,12 @@ defmodule Gald.Status.List do
   @spec names(t) :: [String.t]
   def names(status_effects) do
     Enum.map(status_effects, &Status.name/1)
+  end
+
+  @spec movement_modifier(t) :: DiceModifier.t
+  def movement_modifier(status_effects) do
+    Enum.reduce(status_effects, %DiceModifier{}, fn (status, modifier) ->
+      DiceModifier.add(modifier, Status.movement_modifier(status))
+    end)
   end
 end

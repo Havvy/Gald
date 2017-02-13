@@ -175,4 +175,10 @@ defmodule Gald.Player.Stats do
     end
     {respawned, %{stats | life: new_life, health: health, status_effects: status_effects}}
   end
+
+  def movement_modifier(stats) do
+    Agent.get(stats, fn (d%Gald.Player.Stats{status_effects}) ->
+      StatusEffects.movement_modifier(status_effects)
+    end)
+  end
 end

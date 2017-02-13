@@ -23,6 +23,10 @@ defprotocol Gald.Status do
   @spec on_turn_start(Gald.Status.t, on_turn_start_args) :: on_turn_start_ret
   def on_turn_start(status, player)
 
+  @doc "Any movement modifications that the status does."
+  @spec movement_modifier(Gald.Status.t) :: Gald.Dice.Modifier.t
+  def movement_modifier(status)
+
   @spec is(t, atom) :: boolean
   Kernel.def is(%status_module{}, status_module), do: true
   Kernel.def is(_status, _status_module), do: false
@@ -41,11 +45,14 @@ defmodule Gald.Status.Mixin do
       def has_on_turn_start(_status), do: false
       def on_turn_start(_status, _player), do: %{}
 
+      def movement_modifier(_status), do: %Gald.Dice.Modifier{}
+
       defoverridable [
         name: 1,
         soulbound: 1,
         has_on_turn_start: 1,
-        on_turn_start: 2
+        on_turn_start: 2,
+        movement_modifier: 1
       ]
     end
   end

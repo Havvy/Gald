@@ -111,6 +111,10 @@ defmodule Gald.Player.Controller do
     {:reply, Player.Stats.has_status_effect_in_category(Player.stats(player), :on_turn_start), state}
   end
 
+  def handle_call(:movement_modifier, _from, state = d%{player}) do
+    {:reply, Player.Stats.movement_modifier(Player.stats(player)), state}
+  end
+
   def handle_call(:on_turn_start, _from, state = d%{player}) do
     stats = Player.stats(player)
 
