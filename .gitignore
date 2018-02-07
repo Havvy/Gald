@@ -4,5 +4,5 @@
 erl_crash.dump
 *.ez
 *.beam
+*.iml
 gald_umbrella.iml
-/apps/simple_supervisor/

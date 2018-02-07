@@ -30,8 +30,8 @@ defmodule Gald.Mixfile do
 
   defp deps, do: [
     {:destructure, "~> 0.2.2"},
-    {:dialyxir, "~> 0.4", only: [:dev], runtime: false},
-    {:ex_doc, "~> 0.14.5", only: :dev},
-    {:earmark, "~> 1.0.0", only: :dev}
+    {:dialyxir, "~> 0.5.1", only: [:dev], runtime: false},
+    {:ex_doc, "~> 0.18.2", only: :dev},
+    {:earmark, "~> 1.2.0", only: :dev}
   ]
 end

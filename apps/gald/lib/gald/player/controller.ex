@@ -9,7 +9,7 @@ defmodule Gald.Player.Controller do
   import Destructure
   require Logger
   alias Gald.{Race, Player}
-  alias Gald.Player.{Inventory, Stats}
+  alias Gald.Player.{Equipment, Inventory, Stats}
 
   @typep state :: %{
     required(:race) => Race.t,
@@ -54,8 +54,13 @@ defmodule Gald.Player.Controller do
     {:noreply, state}
   end
 
-  def handle_cast({:unborrow_usable, use_result}, state=d%{player}) do
-    Player.Inventory.unborrow_usable(Player.inventory(player), use_result)
+  def handle_cast({:unborrow_usable, use_result}, state = d%{player}) do
+    Inventory.unborrow_usable(Player.inventory(player), use_result)
+    {:noreply, state}
+  end
+
+  def handle_cast({:equip, equipable}, state = d%{player}) do
+    Equipment.equip(Player.equipment(player), equipable)
     {:noreply, state}
   end
 
@@ -108,11 +113,11 @@ defmodule Gald.Player.Controller do
   end
 
   def handle_call({:has_status_effect_category, :start_turn}, _from, state = d%{player}) do
-    {:reply, Player.Stats.has_status_effect_in_category(Player.stats(player), :on_turn_start), state}
+    {:reply, Stats.has_status_effect_in_category(Player.stats(player), :on_turn_start), state}
   end
 
   def handle_call(:movement_modifier, _from, state = d%{player}) do
-    {:reply, Player.Stats.movement_modifier(Player.stats(player)), state}
+    {:reply, Stats.movement_modifier(Player.stats(player)), state}
   end
 
   def handle_call(:on_turn_start, _from, state = d%{player}) do

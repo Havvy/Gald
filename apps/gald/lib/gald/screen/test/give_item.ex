@@ -8,7 +8,7 @@ defmodule Gald.Screen.Test.GiveItem do
   use Gald.Screen
   import Destructure
   alias Gald.{Player}
-  alias Gald.Usable.{RedPotion}
+  alias Gald.Usable.{ChainlinkArmor, RedPotion}
 
   def init(d%{player}), do: d%{player}
 
@@ -16,7 +16,7 @@ defmodule Gald.Screen.Test.GiveItem do
     %StandardDisplay{
       title: "Get Item",
       body: "What item do you want?",
-      options: ["Red Potion"]
+      options: ["Chainlink Armor", "Red Potion"]
     }
   end
 
@@ -29,6 +29,7 @@ defmodule Gald.Screen.Test.GiveItem do
 
   defp item_from_name(name) do
     case name do
+      "Chainlink Armor" -> %ChainlinkArmor{}
       "Red Potion" -> %RedPotion{}
     end
   end

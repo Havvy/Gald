@@ -35,9 +35,9 @@ Or when they are added, always able to be disabled.
 The Umbrella
 ============
 
-Gald is split into two main applications: Gald and GaldSite. The former is the
+Gald is split into two main applications: Gald and GaldWeb. The former is the
 core of the game while the latter is the website itself. Not having to worry
 about the website or JSON while working on the game makes it easier to work on.
 It also means that there could e.g. be GaldIrc or some other way of playing. Though
-there should also be GaldPool or something that holds GaldSite.RaceManager if that
+there should also be GaldPool or something that holds GaldWeb.RaceManager if that
 happens.
