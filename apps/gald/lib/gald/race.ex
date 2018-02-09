@@ -10,7 +10,7 @@ defmodule Gald.Race do
 
   @opaque t :: pid
 
-  use Supervisor
+  use Supervisor, restart: :temporary
   import Kernel, except: [round: 1]
   alias Gald.Config
 

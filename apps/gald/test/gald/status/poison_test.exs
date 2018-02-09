@@ -112,7 +112,7 @@ defmodule Gald.PoisonTest do
         assert {:death, @p1} = next_event(race_out)
         assert {:stats, %Gald.Player.Stats{
           life: %Gald.Death{},
-          status_effects: []
+          status_effects: ["Respawning"]
         }} = next_event(player_out)
         assert {:screen, %StandardDisplay{
           title: "Beginning of Turn Effects"

@@ -5,12 +5,11 @@ defmodule Gald.Rng.Production do
   @behaviour Gald.Rng
   
   def init(_) do
-    << a :: 32, b :: 32, c :: 32 >> = :crypto.rand_bytes(12)
-    :random.seed(a,b,c)
+    #:crypto.rand_seed()
     nil
   end
 
   def pos_integer(i, nil) do
-    {:reply, :random.uniform(i), nil}
+    {:reply, :rand.uniform(i), nil}
   end
 end

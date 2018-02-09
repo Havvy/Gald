@@ -317,7 +317,7 @@ defmodule Gald.PoisonRegenTest do
           assert {:stats, %PlayerStats{
               health: 0,
               life: %Gald.Death{},
-              status_effects: []
+              status_effects: ["Respawning"]
           }} = next_event(player_out)
           assert {:death, @p1} = next_event(race_out)
           assert {:screen, %StandardDisplay{

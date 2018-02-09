@@ -77,6 +77,7 @@ defmodule Gald.UnicatTest do
     # The player misses.
     # The unicat misses.
     assert {:stats, %Gald.Player.Stats{}} = next_event(player_out)
+    miss_message = "#{@p1} misses with a basic attack."
     assert {:screen, %BattleDisplay{
       player: %PlayerCard{
         name: @p1,
@@ -95,7 +96,7 @@ defmodule Gald.UnicatTest do
       },
 
       previous_action_descriptions: [
-        "#{@p1} misses with a basic attack.",
+        ^miss_message,
         "Unicorned Cat misses."
       ]
     }} = next_event(race_out)
