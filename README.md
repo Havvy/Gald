@@ -8,10 +8,7 @@ is already a bad idea. Projects on GitHub are not immediately free to use,
 they also need a permissive license which this project does not have. That said,
 feel free to look around and learn.
 
-Please don't send PRs right now. Everything is in flux and your PR is likely to fix
-something that is just a temporary hack anyways.
-
-"To hack and hack and hack, but to hack less as time goes on."
+This project has been abandoned.
 
 What is This?
 =============
